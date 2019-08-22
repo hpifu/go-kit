@@ -1,4 +1,4 @@
-package connpool
+package cpool
 
 import (
 	"fmt"
