@@ -1,6 +1,7 @@
 package cpool
 
 import (
+	"context"
 	"net"
 	"net/http"
 	"time"
@@ -27,7 +28,7 @@ func (rp *HttpPool) Get() *http.Client {
 	default:
 		return &http.Client{
 			Transport: &http.Transport{
-				Dial: func(netw, addr string) (net.Conn, error) {
+				DialContext: func(ctx context.Context, netw, addr string) (net.Conn, error) {
 					c, err := net.DialTimeout(netw, addr, rp.connTimeout)
 					if err != nil {
 						return nil, err
