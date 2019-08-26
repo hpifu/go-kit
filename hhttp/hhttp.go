@@ -3,6 +3,7 @@ package hhttp
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/hpifu/go-kit/cpool"
 	"io/ioutil"
 	"net/http"
@@ -59,7 +60,7 @@ func (h *HttpClient) Do(method string, uri string, req interface{}, res interfac
 	defer hres.Body.Close()
 
 	if err := json.Unmarshal(buf, res); err != nil {
-		return err
+		return fmt.Errorf("res: [%v], err: [%v]", string(buf), err)
 	}
 
 	h.pool.Put(client)
