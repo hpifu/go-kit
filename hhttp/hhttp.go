@@ -1,12 +1,14 @@
 package hhttp
 
 import (
-	"fmt"
+	"bytes"
+	"encoding/json"
 	"github.com/hpifu/go-kit/cpool"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -24,34 +26,41 @@ func (h *HttpClient) Do(method string, uri string, req interface{}, res interfac
 	client := h.pool.Get()
 
 	body := map[string]interface{}{}
+	param := &url.Values{}
 
-	val := reflect.ValueOf(req)
+	val := reflect.ValueOf(req).Elem()
 	for i := 0; i < val.Type().NumField(); i++ {
+		key := strings.Split(val.Type().Field(i).Tag.Get("json"), ",")[0]
 		switch val.Type().Field(i).Tag.Get("http") {
 		case "body":
-			body[val.Type().Field(i).Name] = "1"
+			body[key] = val.Field(i).String()
+		case "param":
+			param.Add(key, val.Field(i).String())
 		}
 	}
-	fmt.Println(body)
-	hreq, err := http.NewRequest(method, uri, nil)
+
+	buf, _ := json.Marshal(body)
+
+	hreq, err := http.NewRequest(method, uri, bytes.NewReader(buf))
 	if err != nil {
 		return err
 	}
 
-	q := &url.Values{}
-	q.Add("token", "123")
-	hreq.URL.RawQuery = q.Encode()
+	hreq.URL.RawQuery = param.Encode()
 
 	hres, err := client.Do(hreq)
 	if err != nil {
 		return err
 	}
-	buf, err := ioutil.ReadAll(hres.Body)
+	buf, err = ioutil.ReadAll(hres.Body)
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(buf))
 	defer hres.Body.Close()
+
+	if err := json.Unmarshal(buf, res); err != nil {
+		return err
+	}
 
 	h.pool.Put(client)
 
