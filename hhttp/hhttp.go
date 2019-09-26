@@ -5,16 +5,40 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hpifu/go-kit/cpool"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"reflect"
-	"strings"
 	"time"
 )
 
 type HttpClient struct {
 	pool *cpool.HttpPool
+}
+
+type HttpResult struct {
+	Res []byte
+	Err error
+}
+
+func (hr *HttpResult) String(res *string) error {
+	if hr.Err != nil {
+		return hr.Err
+	}
+	*res = string(hr.Res)
+
+	return nil
+}
+
+func (hr *HttpResult) Interface(res interface{}) error {
+	if hr.Err != nil {
+		return hr.Err
+	}
+	if err := json.Unmarshal(hr.Res, res); err != nil {
+		return fmt.Errorf("res: [%v], err: [%v]", string(hr.Res), err)
+	}
+
+	return nil
 }
 
 func NewHttpClient(maxConn int, connTimeout time.Duration, recvTimeout time.Duration) *HttpClient {
@@ -23,55 +47,54 @@ func NewHttpClient(maxConn int, connTimeout time.Duration, recvTimeout time.Dura
 	}
 }
 
-func (h *HttpClient) Do(method string, uri string, req interface{}, res interface{}) error {
+func (h *HttpClient) Do(method string, uri string, params map[string]string, req interface{}) *HttpResult {
 	client := h.pool.Get()
 
-	body := map[string]interface{}{}
-	param := &url.Values{}
-
-	val := reflect.ValueOf(req).Elem()
-	for i := 0; i < val.Type().NumField(); i++ {
-		key := strings.Split(val.Type().Field(i).Tag.Get("json"), ",")[0]
-		switch val.Type().Field(i).Tag.Get("http") {
-		case "body":
-			body[key] = val.Field(i).String()
-		case "param":
-			param.Add(key, val.Field(i).String())
+	var reader io.Reader
+	if req != nil {
+		buf, _ := json.Marshal(req)
+		reader = bytes.NewReader(buf)
+	}
+	hreq, err := http.NewRequest(method, uri, reader)
+	if err != nil {
+		return &HttpResult{
+			Err: err,
 		}
 	}
 
-	buf, _ := json.Marshal(body)
-
-	hreq, err := http.NewRequest(method, uri, bytes.NewReader(buf))
-	if err != nil {
-		return err
+	if params != nil {
+		param := &url.Values{}
+		for k, v := range params {
+			param.Add(k, v)
+		}
+		hreq.URL.RawQuery = param.Encode()
 	}
-
-	hreq.URL.RawQuery = param.Encode()
 
 	hres, err := client.Do(hreq)
 	if err != nil {
-		return err
+		return &HttpResult{
+			Err: err,
+		}
 	}
-	buf, err = ioutil.ReadAll(hres.Body)
+	buf, err := ioutil.ReadAll(hres.Body)
 	if err != nil {
-		return err
+		return &HttpResult{
+			Err: err,
+		}
 	}
 	defer hres.Body.Close()
 
-	if err := json.Unmarshal(buf, res); err != nil {
-		return fmt.Errorf("res: [%v], err: [%v]", string(buf), err)
-	}
-
 	h.pool.Put(client)
 
-	return nil
+	return &HttpResult{
+		Res: buf,
+	}
 }
 
-func (h *HttpClient) GET(uri string, req interface{}, res interface{}) error {
-	return h.Do("GET", uri, req, res)
+func (h *HttpClient) GET(uri string, params map[string]string, req interface{}) *HttpResult {
+	return h.Do("GET", uri, params, req)
 }
 
-func (h *HttpClient) POST(uri string, req interface{}, res interface{}) error {
-	return h.Do("POST", uri, req, res)
+func (h *HttpClient) POST(uri string, params map[string]string, req interface{}) *HttpResult {
+	return h.Do("POST", uri, params, req)
 }
