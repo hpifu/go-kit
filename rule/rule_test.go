@@ -1,9 +1,19 @@
 package rule
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
+
+func TestCheckV2(t *testing.T) {
+	Convey("test check", t, func() {
+		So(Check([][3]interface{}{
+			{"邮箱", "hatlonely@foxmail.com", []Rule{ValidEmail, AtMost(64), AtLeast(12)}},
+			{"电话", "12345674567", []Rule{ValidPhone}},
+		}), ShouldNotBeNil)
+	})
+}
 
 func TestValidEmail(t *testing.T) {
 	Convey("test email", t, func() {

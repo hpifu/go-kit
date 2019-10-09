@@ -18,11 +18,14 @@ func init() {
 
 type Rule func(interface{}) error
 
-func Check(vrules map[interface{}][]Rule) error {
-	for val, rules := range vrules {
+func Check(items [][3]interface{}) error {
+	for _, item := range items {
+		key := item[0].(string)
+		val := item[1]
+		rules := item[2].([]Rule)
 		for _, r := range rules {
 			if err := r(val); err != nil {
-				return fmt.Errorf("[%v] %v", val, err)
+				return fmt.Errorf("key: [%v], val: [%v], err: [%v]", key, val, err)
 			}
 		}
 	}
