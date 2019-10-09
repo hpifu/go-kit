@@ -33,10 +33,52 @@ func Check(items [][3]interface{}) error {
 	return nil
 }
 
-func In(sets map[interface{}]struct{}) Rule {
+func In(vals ...interface{}) Rule {
 	return func(v interface{}) error {
+		sets := map[interface{}]struct{}{}
+		for _, val := range vals {
+			sets[val] = struct{}{}
+		}
+
 		if _, ok := sets[v]; !ok {
-			return fmt.Errorf("%v 必须在 %v 中", v, sets)
+			return fmt.Errorf("%v 必须在 %v 中", v, vals)
+		}
+
+		return nil
+	}
+}
+
+func LessThan(num int) Rule {
+	return func(v interface{}) error {
+		if v.(int) >= num {
+			return fmt.Errorf("%v >= [%v]", v, num)
+		}
+		return nil
+	}
+}
+
+func LessEqual(num int) Rule {
+	return func(v interface{}) error {
+		if v.(int) > num {
+			return fmt.Errorf("%v > [%v]", v, num)
+		}
+		return nil
+	}
+}
+
+func GreaterThan(num int) Rule {
+	return func(v interface{}) error {
+		if v.(int) <= num {
+			return fmt.Errorf("%v <= [%v]", v, num)
+		}
+		return nil
+	}
+}
+
+func GreaterEqual(num int) Rule {
+	return func(v interface{}) error {
+		if v.(int) < num {
+			return fmt.Errorf("%v < [%v]", v, num)
 		}
 		return nil
 	}

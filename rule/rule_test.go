@@ -6,12 +6,36 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestCheckV2(t *testing.T) {
+func TestCheck(t *testing.T) {
 	Convey("test check", t, func() {
 		So(Check([][3]interface{}{
 			{"邮箱", "hatlonely@foxmail.com", []Rule{ValidEmail, AtMost(64), AtLeast(12)}},
 			{"电话", "12345674567", []Rule{ValidPhone}},
 		}), ShouldNotBeNil)
+	})
+}
+
+func TestIn(t *testing.T) {
+	Convey("test in", t, func() {
+		So(In(1, 2, 3)(1), ShouldBeNil)
+		So(In(1, 2, 3)(2), ShouldBeNil)
+		So(In(1, 2, 3)(4), ShouldNotBeNil)
+		So(In("dog", "cat", "pig")("apple"), ShouldNotBeNil)
+	})
+}
+
+func TestGreaterLess(t *testing.T) {
+	Convey("test greater less", t, func() {
+		So(LessThan(10)(9), ShouldBeNil)
+		So(GreaterThan(10)(11), ShouldBeNil)
+		So(GreaterEqual(10)(10), ShouldBeNil)
+		So(GreaterEqual(10)(11), ShouldBeNil)
+		So(LessEqual(10)(10), ShouldBeNil)
+		So(LessEqual(10)(9), ShouldBeNil)
+		So(LessThan(10)(10), ShouldNotBeNil)
+		So(LessThan(10)(11), ShouldNotBeNil)
+		So(GreaterThan(10)(10), ShouldNotBeNil)
+		So(GreaterThan(10)(9), ShouldNotBeNil)
 	})
 }
 
