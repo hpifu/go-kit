@@ -20,6 +20,10 @@ func NewGinHttpDecorator(info, warn, access *logrus.Logger) *GinHttpDecorator {
 	}
 }
 
+type FileRes struct {
+	Filename string
+}
+
 func (d *GinHttpDecorator) Decorate(inner func(*gin.Context) (interface{}, interface{}, int, error)) func(*gin.Context) {
 	return func(c *gin.Context) {
 		rid := c.DefaultQuery("rid", hrand.NewToken())
@@ -33,6 +37,8 @@ func (d *GinHttpDecorator) Decorate(inner func(*gin.Context) (interface{}, inter
 			switch res.(type) {
 			case string:
 				c.String(status, res.(string))
+			case *FileRes:
+				c.File(res.(*FileRes).Filename)
 			default:
 				c.JSON(status, res)
 			}
