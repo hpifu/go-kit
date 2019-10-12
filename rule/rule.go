@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-var EmailRegex *regexp.Regexp = regexp.MustCompile(`^1[345789][0-9]{9}$`)
-var PhoneRegex *regexp.Regexp = regexp.MustCompile(`^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$`)
+var EmailRegex *regexp.Regexp = regexp.MustCompile(`^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$`)
+var PhoneRegex *regexp.Regexp = regexp.MustCompile(`^1[345789][0-9]{9}$`)
 var CodeRegex *regexp.Regexp = regexp.MustCompile(`^[0-9]{6}$`)
 
 type Rule func(interface{}) error
