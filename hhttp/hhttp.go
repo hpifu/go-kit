@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/hpifu/go-kit/cpool"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/hpifu/go-kit/cpool"
 )
 
 type HttpClient struct {
@@ -17,8 +18,9 @@ type HttpClient struct {
 }
 
 type HttpResult struct {
-	Res []byte
-	Err error
+	Status int
+	Res    []byte
+	Err    error
 }
 
 func (hr *HttpResult) String(res *string) error {
@@ -87,7 +89,8 @@ func (h *HttpClient) Do(method string, uri string, params map[string]string, req
 	h.pool.Put(client)
 
 	return &HttpResult{
-		Res: buf,
+		Status: hres.StatusCode,
+		Res:    buf,
 	}
 }
 
