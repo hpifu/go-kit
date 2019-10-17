@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/hpifu/go-kit/cpool"
@@ -49,7 +50,7 @@ func NewHttpClient(maxConn int, connTimeout time.Duration, recvTimeout time.Dura
 	}
 }
 
-func (h *HttpClient) Do(method string, uri string, params map[string]string, req interface{}) *HttpResult {
+func (h *HttpClient) Do(method string, uri string, header map[string]string, params map[string]interface{}, req interface{}) *HttpResult {
 	client := h.pool.Get()
 
 	var reader io.Reader
@@ -64,12 +65,33 @@ func (h *HttpClient) Do(method string, uri string, params map[string]string, req
 		}
 	}
 
-	if params != nil {
-		param := &url.Values{}
-		for k, v := range params {
-			param.Add(k, v)
+	if header != nil {
+		for k, v := range header {
+			hreq.Header.Add(k, v)
 		}
-		hreq.URL.RawQuery = param.Encode()
+	}
+
+	if params != nil {
+		values := &url.Values{}
+		for k, v := range params {
+			switch v.(type) {
+			case string:
+				values.Add(k, v.(string))
+			case []string:
+				for _, i := range v.([]string) {
+					values.Add(k, i)
+				}
+			case int:
+				values.Add(k, strconv.Itoa(v.(int)))
+			case []int:
+				for _, i := range v.([]int) {
+					values.Add(k, strconv.Itoa(i))
+				}
+			default:
+				values.Add(k, fmt.Sprintf("%v", v))
+			}
+		}
+		hreq.URL.RawQuery = values.Encode()
 	}
 
 	hres, err := client.Do(hreq)
@@ -94,10 +116,10 @@ func (h *HttpClient) Do(method string, uri string, params map[string]string, req
 	}
 }
 
-func (h *HttpClient) GET(uri string, params map[string]string, req interface{}) *HttpResult {
-	return h.Do("GET", uri, params, req)
+func (h *HttpClient) GET(uri string, header map[string]string, params map[string]interface{}, req interface{}) *HttpResult {
+	return h.Do("GET", uri, header, params, req)
 }
 
-func (h *HttpClient) POST(uri string, params map[string]string, req interface{}) *HttpResult {
-	return h.Do("POST", uri, params, req)
+func (h *HttpClient) POST(uri string, header map[string]string, params map[string]interface{}, req interface{}) *HttpResult {
+	return h.Do("POST", uri, header, params, req)
 }
