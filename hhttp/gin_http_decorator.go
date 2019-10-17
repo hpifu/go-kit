@@ -24,10 +24,10 @@ type FileRes struct {
 	Filename string
 }
 
-func (d *GinHttpDecorator) Decorate(inner func(*gin.Context) (interface{}, interface{}, int, error)) func(*gin.Context) {
+func (d *GinHttpDecorator) Decorate(inner func(string, *gin.Context) (interface{}, interface{}, int, error)) func(*gin.Context) {
 	return func(c *gin.Context) {
 		rid := c.DefaultQuery("rid", hrand.NewToken())
-		req, res, status, err := inner(c)
+		req, res, status, err := inner(rid, c)
 		if err != nil {
 			c.String(status, err.Error())
 			d.WarnLog.WithField("@rid", rid).WithField("err", err).Warn()
