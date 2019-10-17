@@ -1,6 +1,8 @@
 package hhttp
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/hpifu/go-kit/hrand"
 	"github.com/sirupsen/logrus"
@@ -26,6 +28,7 @@ type FileRes struct {
 
 func (d *GinHttpDecorator) Decorate(inner func(string, *gin.Context) (interface{}, interface{}, int, error)) func(*gin.Context) {
 	return func(c *gin.Context) {
+		ts := time.Now()
 		rid := c.DefaultQuery("rid", hrand.NewToken())
 		req, res, status, err := inner(rid, c)
 		if err != nil {
@@ -58,6 +61,7 @@ func (d *GinHttpDecorator) Decorate(inner func(string, *gin.Context) (interface{
 			"rid":       rid,
 			"err":       errstr,
 			"status":    status,
+			"resTimeNs": time.Now().Sub(ts).Nanoseconds(),
 		}).Info()
 	}
 }
