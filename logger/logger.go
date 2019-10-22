@@ -133,3 +133,20 @@ func NewTextLoggerWithViper(v *viper.Viper) (*logrus.Logger, error) {
 func NewJsonLoggerWithViper(v *viper.Viper) (*logrus.Logger, error) {
 	return NewJsonLogger(v.GetString("filename"), v.GetDuration("maxAge"))
 }
+
+func NewLoggerGroupWithViper(v *viper.Viper) (*logrus.Logger, *logrus.Logger, *logrus.Logger, error) {
+	infoLog, err := NewTextLoggerWithViper(v.Sub("infoLog"))
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	warnLog, err := NewTextLoggerWithViper(v.Sub("warnLog"))
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	accessLog, err := NewJsonLoggerWithViper(v.Sub("accessLog"))
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	return infoLog, warnLog, accessLog, nil
+}
