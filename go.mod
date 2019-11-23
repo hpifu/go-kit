@@ -32,5 +32,6 @@ require (
 	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337
 	github.com/spf13/viper v1.4.0
 	github.com/tebeka/strftime v0.1.3 // indirect
+	github.com/yosuke-furukawa/json5 v0.1.1
 	google.golang.org/grpc v1.21.0
 )
