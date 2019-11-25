@@ -15,7 +15,7 @@ func TestArgumentParserParse(t *testing.T) {
 		So(flag.addFlag("key", "k", "help", "float", true, ""), ShouldBeNil)
 		So(flag.addFlag("all", "a", "help", "bool", true, ""), ShouldBeNil)
 		So(flag.addFlag("user", "u", "help", "bool", true, ""), ShouldBeNil)
-		So(flag.addFlag("password", "p", "help", "string", true, "654321"), ShouldBeNil)
+		So(flag.addFlag("password", "p", "help", "string", false, "654321"), ShouldBeNil)
 		So(flag.addPosFlag("pos1", "help", "string", ""), ShouldBeNil)
 		So(flag.addPosFlag("pos2", "help", "string", ""), ShouldBeNil)
 		err := flag.parse([]string{

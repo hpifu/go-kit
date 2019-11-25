@@ -168,7 +168,7 @@ func (f *FlagSet) Duration(name string, defaultValue time.Duration, help string)
 }
 
 func (f *FlagSet) parse(args []string) error {
-	var positionParam []string
+	var posFlagValues []string
 	//optionParam := map[string]string{}
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
@@ -181,7 +181,7 @@ func (f *FlagSet) parse(args []string) error {
 					return fmt.Errorf("unknow option [%v]", key)
 				} else {
 					if err := p.value.Set(val, p.typeStr); err != nil {
-						return fmt.Errorf("set value failed. key: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
 					}
 				}
 			} else { // --key1 val1
@@ -194,7 +194,7 @@ func (f *FlagSet) parse(args []string) error {
 					}
 					val := args[i+1]
 					if err := p.value.Set(val, p.typeStr); err != nil {
-						return fmt.Errorf("set value failed. key: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
 					}
 					i++
 				} else { // 参数为 bool 类型，如果后面的值为 true 或者 false 则设为后面值，否则设置为 true
@@ -204,7 +204,7 @@ func (f *FlagSet) parse(args []string) error {
 						i++
 					}
 					if err := p.value.Set(val, p.typeStr); err != nil {
-						return fmt.Errorf("set value failed. key: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
 					}
 				}
 			}
@@ -221,7 +221,7 @@ func (f *FlagSet) parse(args []string) error {
 					}
 					val := args[i+1]
 					if err := p.value.Set(val, p.typeStr); err != nil {
-						return fmt.Errorf("set value failed. key: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
 					}
 					i++
 				} else { // 参数为 bool 类型，如果后面的值为 true 或者 false 则设为后面值，否则设置为 true
@@ -231,7 +231,7 @@ func (f *FlagSet) parse(args []string) error {
 						i++
 					}
 					if err := p.value.Set(val, p.typeStr); err != nil {
-						return fmt.Errorf("set value failed. key: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
 					}
 				}
 			} else { // -kval
@@ -251,7 +251,7 @@ func (f *FlagSet) parse(args []string) error {
 						key := f.shorthandToName[arg[i:i+1]]
 						p := f.nameToFlag[key]
 						if err := p.value.Set("true", p.typeStr); err != nil {
-							return fmt.Errorf("set value failed. key: [%v], val: [%v], type: [%v]", key, "true", p.typeStr)
+							return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, "true", p.typeStr)
 						}
 					}
 				} else {
@@ -259,38 +259,38 @@ func (f *FlagSet) parse(args []string) error {
 					if !ok {
 						return fmt.Errorf("unknow shorthand option [%v]", arg[1:2])
 					}
-					//p := f.nameToFlag[key]
+					//flag := f.nameToFlag[name]
 					val := arg[2:]
 					p := f.nameToFlag[key]
 					if err := p.value.Set(val, p.typeStr); err != nil {
-						return fmt.Errorf("set value failed. key: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
 					}
 				}
 			}
 		} else {
-			positionParam = append(positionParam, arg)
+			posFlagValues = append(posFlagValues, arg)
 		}
 	}
 
-	for i, key := range f.posFlagNames {
-		if i >= len(positionParam) {
+	for i, name := range f.posFlagNames {
+		if i >= len(posFlagValues) {
 			break
 		}
-		val := positionParam[i]
-		p := f.nameToFlag[key]
+		val := posFlagValues[i]
+		p := f.nameToFlag[name]
 		if err := p.value.Set(val, p.typeStr); err != nil {
-			return fmt.Errorf("set value failed. key: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+			return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, p.typeStr)
 		}
 	}
 
-	for key, p := range f.nameToFlag {
-		if p.required && !p.value.assigned {
-			return fmt.Errorf("option [%v] is required, but not assigned", key)
+	for name, flag := range f.nameToFlag {
+		if flag.required && !flag.value.assigned {
+			return fmt.Errorf("option [%v] is required, but not assigned", name)
 		}
 	}
 
-	//for key, val := range f.nameToFlag {
-	//	fmt.Println(key, "=>", val.value)
+	//for name, val := range f.nameToFlag {
+	//	fmt.Println(name, "=>", val.value)
 	//}
 
 	return nil
