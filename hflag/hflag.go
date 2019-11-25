@@ -3,6 +3,7 @@ package hflag
 import (
 	"bytes"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -67,14 +68,15 @@ type Flag struct {
 }
 
 type FlagSet struct {
-	optionMap       map[string]*Flag
+	nameToFlag      map[string]*Flag
 	shorthandToName map[string]string
-	positionOption  []string
+	posFlagNames    []string
+	flagNames       []string
 }
 
 func NewFlagSet() *FlagSet {
 	return &FlagSet{
-		optionMap:       map[string]*Flag{},
+		nameToFlag:      map[string]*Flag{},
 		shorthandToName: map[string]string{},
 	}
 }
@@ -83,40 +85,49 @@ func (f *FlagSet) Usage() string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString("usage: ")
-	positionOptionSet := map[string]bool{}
-	for _, name := range f.positionOption {
-		positionOptionSet[name] = true
-		p := f.optionMap[name]
+	for _, name := range f.posFlagNames {
+		p := f.nameToFlag[name]
 		buffer.WriteString(fmt.Sprintf(" [%v]", p.name))
 	}
 
-	for k, p := range f.optionMap {
-		if positionOptionSet[k] {
-			continue
-		}
-		if p.required {
-			buffer.WriteString(fmt.Sprintf(" <--%v=%v>", p.name, p.typeStr))
+	sort.Strings(f.flagNames)
+	for _, name := range f.flagNames {
+		flag := f.nameToFlag[name]
+		if flag.required {
+			buffer.WriteString(fmt.Sprintf(" <--%v=%v>", flag.name, flag.typeStr))
 		} else {
-			buffer.WriteString(fmt.Sprintf(" [--%v=%v]", p.name, p.typeStr))
+			buffer.WriteString(fmt.Sprintf(" [--%v=%v]", flag.name, flag.typeStr))
 		}
 	}
-	buffer.WriteString("\n\n")
+	buffer.WriteString("\n")
 
-	for _, v := range f.optionMap {
-		//if positionOptionSet[k] {
-		//	continue
-		//}
+	buffer.WriteString("\npositional options:\n")
+	for _, name := range f.posFlagNames {
+		flag := f.nameToFlag[name]
 		shorthand := ""
-		if v.shorthand != "" {
-			shorthand = "-" + v.shorthand
-		}
-		name := "--" + v.name
-		defaultValue := v.typeStr
-		if v.defaultValue != "" {
-			defaultValue = v.typeStr + "=" + v.defaultValue
+		name := flag.name
+		defaultValue := flag.typeStr
+		if flag.defaultValue != "" {
+			defaultValue = flag.typeStr + "=" + flag.defaultValue
 		}
 		defaultValue = "[" + defaultValue + "]"
-		buffer.WriteString(fmt.Sprintf("%11v, %-15v %-15v %v\n", shorthand, name, defaultValue, v.help))
+		buffer.WriteString(fmt.Sprintf("%4v  %-15v %-15v %v\n", shorthand, name, defaultValue, flag.help))
+	}
+
+	buffer.WriteString("\noptions:\n")
+	for _, name := range f.flagNames {
+		flag := f.nameToFlag[name]
+		shorthand := ""
+		if flag.shorthand != "" {
+			shorthand = "-" + flag.shorthand
+		}
+		name := "--" + flag.name
+		defaultValue := flag.typeStr
+		if flag.defaultValue != "" {
+			defaultValue = flag.typeStr + "=" + flag.defaultValue
+		}
+		defaultValue = "[" + defaultValue + "]"
+		buffer.WriteString(fmt.Sprintf("%4v, %-15v %-15v %v\n", shorthand, name, defaultValue, flag.help))
 	}
 	fmt.Println(buffer.String())
 
@@ -129,7 +140,7 @@ func (f *FlagSet) Bool(name string, defaultValue bool, help string) *bool {
 		panic(err)
 	}
 
-	return &f.optionMap[name].value.b
+	return &f.nameToFlag[name].value.b
 }
 
 func (f *FlagSet) Int(name string, defaultValue int, help string) *int {
@@ -137,7 +148,7 @@ func (f *FlagSet) Int(name string, defaultValue int, help string) *int {
 		panic(err)
 	}
 
-	return &f.optionMap[name].value.i
+	return &f.nameToFlag[name].value.i
 }
 
 func (f *FlagSet) String(name string, defaultValue string, help string) *string {
@@ -145,7 +156,7 @@ func (f *FlagSet) String(name string, defaultValue string, help string) *string 
 		panic(err)
 	}
 
-	return &f.optionMap[name].value.s
+	return &f.nameToFlag[name].value.s
 }
 
 func (f *FlagSet) Duration(name string, defaultValue time.Duration, help string) *time.Duration {
@@ -153,7 +164,7 @@ func (f *FlagSet) Duration(name string, defaultValue time.Duration, help string)
 		panic(err)
 	}
 
-	return &f.optionMap[name].value.d
+	return &f.nameToFlag[name].value.d
 }
 
 func (f *FlagSet) parse(args []string) error {
@@ -166,7 +177,7 @@ func (f *FlagSet) parse(args []string) error {
 				idx := strings.Index(arg, "=")
 				key := arg[2:idx]
 				val := arg[idx+1:]
-				if p, ok := f.optionMap[key]; !ok {
+				if p, ok := f.nameToFlag[key]; !ok {
 					return fmt.Errorf("unknow option [%v]", key)
 				} else {
 					if err := p.value.Set(val, p.typeStr); err != nil {
@@ -175,7 +186,7 @@ func (f *FlagSet) parse(args []string) error {
 				}
 			} else { // --key1 val1
 				key := arg[2:]
-				if p, ok := f.optionMap[key]; !ok {
+				if p, ok := f.nameToFlag[key]; !ok {
 					return fmt.Errorf("unknow option [%v]", key)
 				} else if p.typeStr != "bool" { // 参数不是 bool，后面必有一个值
 					if i+1 >= len(args) {
@@ -203,7 +214,7 @@ func (f *FlagSet) parse(args []string) error {
 				if !ok {
 					return fmt.Errorf("unknow shorthand option [%v]", arg[1:])
 				}
-				p := f.optionMap[key]
+				p := f.nameToFlag[key]
 				if p.typeStr != "bool" { // 参数不是 bool 类型，后面必有一个值
 					if i+1 >= len(args) {
 						return fmt.Errorf("miss value for nonboolean option [%v]", key)
@@ -231,14 +242,14 @@ func (f *FlagSet) parse(args []string) error {
 						allBool = false
 						break
 					}
-					if f.optionMap[key].typeStr != "bool" {
+					if f.nameToFlag[key].typeStr != "bool" {
 						allBool = false
 					}
 				}
 				if allBool { // 全是 bool 选项，-kval 和 -k -v -f -l 等效
 					for i := 1; i < len(arg); i++ {
 						key := f.shorthandToName[arg[i:i+1]]
-						p := f.optionMap[key]
+						p := f.nameToFlag[key]
 						if err := p.value.Set("true", p.typeStr); err != nil {
 							return fmt.Errorf("set value failed. key: [%v], val: [%v], type: [%v]", key, "true", p.typeStr)
 						}
@@ -248,9 +259,9 @@ func (f *FlagSet) parse(args []string) error {
 					if !ok {
 						return fmt.Errorf("unknow shorthand option [%v]", arg[1:2])
 					}
-					//p := f.optionMap[key]
+					//p := f.nameToFlag[key]
 					val := arg[2:]
-					p := f.optionMap[key]
+					p := f.nameToFlag[key]
 					if err := p.value.Set(val, p.typeStr); err != nil {
 						return fmt.Errorf("set value failed. key: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
 					}
@@ -261,24 +272,24 @@ func (f *FlagSet) parse(args []string) error {
 		}
 	}
 
-	for i, key := range f.positionOption {
+	for i, key := range f.posFlagNames {
 		if i >= len(positionParam) {
 			break
 		}
 		val := positionParam[i]
-		p := f.optionMap[key]
+		p := f.nameToFlag[key]
 		if err := p.value.Set(val, p.typeStr); err != nil {
 			return fmt.Errorf("set value failed. key: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
 		}
 	}
 
-	for key, p := range f.optionMap {
+	for key, p := range f.nameToFlag {
 		if p.required && !p.value.assigned {
 			return fmt.Errorf("option [%v] is required, but not assigned", key)
 		}
 	}
 
-	//for key, val := range f.optionMap {
+	//for key, val := range f.nameToFlag {
 	//	fmt.Println(key, "=>", val.value)
 	//}
 
@@ -286,7 +297,7 @@ func (f *FlagSet) parse(args []string) error {
 }
 
 func (f *FlagSet) addFlag(name string, shorthand string, help string, typeStr string, required bool, defaultValue string) error {
-	if _, ok := f.optionMap[name]; ok {
+	if _, ok := f.nameToFlag[name]; ok {
 		return fmt.Errorf("conflict option [%v]", name)
 	}
 
@@ -312,14 +323,15 @@ func (f *FlagSet) addFlag(name string, shorthand string, help string, typeStr st
 		}
 	}
 
-	f.optionMap[name] = option
+	f.nameToFlag[name] = option
 	f.shorthandToName[shorthand] = name
+	f.flagNames = append(f.flagNames, name)
 
 	return nil
 }
 
 func (f *FlagSet) addPosFlag(name string, help string, typeStr string, defaultValue string) error {
-	if _, ok := f.optionMap[name]; ok {
+	if _, ok := f.nameToFlag[name]; ok {
 		return fmt.Errorf("conflict option [%v]", name)
 	}
 
@@ -337,8 +349,8 @@ func (f *FlagSet) addPosFlag(name string, help string, typeStr string, defaultVa
 		}
 	}
 
-	f.optionMap[name] = option
-	f.positionOption = append(f.positionOption, name)
+	f.nameToFlag[name] = option
+	f.posFlagNames = append(f.posFlagNames, name)
 
 	return nil
 }

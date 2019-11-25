@@ -28,6 +28,7 @@ func TestArgumentParserParse(t *testing.T) {
 			"pos2",
 		})
 		So(err, ShouldBeNil)
+		flag.Usage()
 	})
 
 	Convey("test case2", t, func() {
@@ -37,6 +38,5 @@ func TestArgumentParserParse(t *testing.T) {
 		So(flag.parse(strings.Split("--v", " ")), ShouldBeNil)
 		So(*version, ShouldBeTrue)
 		So(*configfile, ShouldEqual, "configs/monitor.json")
-		flag.Usage()
 	})
 }
