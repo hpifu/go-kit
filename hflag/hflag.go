@@ -169,32 +169,31 @@ func (f *FlagSet) Duration(name string, defaultValue time.Duration, help string)
 
 func (f *FlagSet) parse(args []string) error {
 	var posFlagValues []string
-	//optionParam := map[string]string{}
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
 		if strings.HasPrefix(arg, "--") {
 			if strings.Contains(arg, "=") { // --key1=val1
 				idx := strings.Index(arg, "=")
-				key := arg[2:idx]
+				name := arg[2:idx]
 				val := arg[idx+1:]
-				if p, ok := f.nameToFlag[key]; !ok {
-					return fmt.Errorf("unknow option [%v]", key)
+				if flag, ok := f.nameToFlag[name]; !ok {
+					return fmt.Errorf("unknow option [%v]", name)
 				} else {
-					if err := p.value.Set(val, p.typeStr); err != nil {
-						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+					if err := flag.value.Set(val, flag.typeStr); err != nil {
+						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 					}
 				}
 			} else { // --key1 val1
-				key := arg[2:]
-				if p, ok := f.nameToFlag[key]; !ok {
-					return fmt.Errorf("unknow option [%v]", key)
-				} else if p.typeStr != "bool" { // 参数不是 bool，后面必有一个值
+				name := arg[2:]
+				if flag, ok := f.nameToFlag[name]; !ok {
+					return fmt.Errorf("unknow option [%v]", name)
+				} else if flag.typeStr != "bool" { // 参数不是 bool，后面必有一个值
 					if i+1 >= len(args) {
-						return fmt.Errorf("miss value for nonboolean option [%v]", key)
+						return fmt.Errorf("miss value for nonboolean option [%v]", name)
 					}
 					val := args[i+1]
-					if err := p.value.Set(val, p.typeStr); err != nil {
-						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+					if err := flag.value.Set(val, flag.typeStr); err != nil {
+						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 					}
 					i++
 				} else { // 参数为 bool 类型，如果后面的值为 true 或者 false 则设为后面值，否则设置为 true
@@ -203,25 +202,25 @@ func (f *FlagSet) parse(args []string) error {
 						val = args[i+1]
 						i++
 					}
-					if err := p.value.Set(val, p.typeStr); err != nil {
-						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+					if err := flag.value.Set(val, flag.typeStr); err != nil {
+						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 					}
 				}
 			}
 		} else if strings.HasPrefix(arg, "-") {
 			if len(arg) == 2 { // -k val
-				key, ok := f.shorthandToName[arg[1:]]
+				name, ok := f.shorthandToName[arg[1:]]
 				if !ok {
 					return fmt.Errorf("unknow shorthand option [%v]", arg[1:])
 				}
-				p := f.nameToFlag[key]
-				if p.typeStr != "bool" { // 参数不是 bool 类型，后面必有一个值
+				flag := f.nameToFlag[name]
+				if flag.typeStr != "bool" { // 参数不是 bool 类型，后面必有一个值
 					if i+1 >= len(args) {
-						return fmt.Errorf("miss value for nonboolean option [%v]", key)
+						return fmt.Errorf("miss value for nonboolean option [%v]", name)
 					}
 					val := args[i+1]
-					if err := p.value.Set(val, p.typeStr); err != nil {
-						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+					if err := flag.value.Set(val, flag.typeStr); err != nil {
+						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 					}
 					i++
 				} else { // 参数为 bool 类型，如果后面的值为 true 或者 false 则设为后面值，否则设置为 true
@@ -230,40 +229,39 @@ func (f *FlagSet) parse(args []string) error {
 						val = args[i+1]
 						i++
 					}
-					if err := p.value.Set(val, p.typeStr); err != nil {
-						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+					if err := flag.value.Set(val, flag.typeStr); err != nil {
+						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 					}
 				}
 			} else { // -kval
 				allBool := true
 				for i := 1; i < len(arg); i++ {
-					key, ok := f.shorthandToName[arg[i:i+1]]
+					name, ok := f.shorthandToName[arg[i:i+1]]
 					if !ok {
 						allBool = false
 						break
 					}
-					if f.nameToFlag[key].typeStr != "bool" {
+					if f.nameToFlag[name].typeStr != "bool" {
 						allBool = false
 					}
 				}
 				if allBool { // 全是 bool 选项，-kval 和 -k -v -f -l 等效
 					for i := 1; i < len(arg); i++ {
-						key := f.shorthandToName[arg[i:i+1]]
-						p := f.nameToFlag[key]
-						if err := p.value.Set("true", p.typeStr); err != nil {
-							return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, "true", p.typeStr)
+						name := f.shorthandToName[arg[i:i+1]]
+						flag := f.nameToFlag[name]
+						if err := flag.value.Set("true", flag.typeStr); err != nil {
+							return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, "true", flag.typeStr)
 						}
 					}
 				} else {
-					key, ok := f.shorthandToName[arg[1:2]]
+					name, ok := f.shorthandToName[arg[1:2]]
 					if !ok {
 						return fmt.Errorf("unknow shorthand option [%v]", arg[1:2])
 					}
-					//flag := f.nameToFlag[name]
 					val := arg[2:]
-					p := f.nameToFlag[key]
-					if err := p.value.Set(val, p.typeStr); err != nil {
-						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", key, val, p.typeStr)
+					flag := f.nameToFlag[name]
+					if err := flag.value.Set(val, flag.typeStr); err != nil {
+						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 					}
 				}
 			}
