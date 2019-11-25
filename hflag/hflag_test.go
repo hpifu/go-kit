@@ -10,14 +10,14 @@ import (
 func TestArgumentParserParse(t *testing.T) {
 	Convey("test case1", t, func() {
 		flag := NewFlagSet()
-		So(flag.addOption("int-option", "i", "help", "int", true, "0"), ShouldBeNil)
-		So(flag.addOption("str-option", "s", "help", "string", true, ""), ShouldBeNil)
-		So(flag.addOption("key", "k", "help", "float", true, ""), ShouldBeNil)
-		So(flag.addOption("all", "a", "help", "bool", true, ""), ShouldBeNil)
-		So(flag.addOption("user", "u", "help", "bool", true, ""), ShouldBeNil)
-		So(flag.addOption("password", "p", "help", "string", true, "654321"), ShouldBeNil)
-		So(flag.addPositionOption("pos1", "help", "string", ""), ShouldBeNil)
-		So(flag.addPositionOption("pos2", "help", "string", ""), ShouldBeNil)
+		So(flag.addFlag("int-option", "i", "help", "int", true, "0"), ShouldBeNil)
+		So(flag.addFlag("str-option", "s", "help", "string", true, ""), ShouldBeNil)
+		So(flag.addFlag("key", "k", "help", "float", true, ""), ShouldBeNil)
+		So(flag.addFlag("all", "a", "help", "bool", true, ""), ShouldBeNil)
+		So(flag.addFlag("user", "u", "help", "bool", true, ""), ShouldBeNil)
+		So(flag.addFlag("password", "p", "help", "string", true, "654321"), ShouldBeNil)
+		So(flag.addPosFlag("pos1", "help", "string", ""), ShouldBeNil)
+		So(flag.addPosFlag("pos2", "help", "string", ""), ShouldBeNil)
 		err := flag.parse([]string{
 			"pos1",
 			"--int-option=123",

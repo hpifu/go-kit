@@ -124,7 +124,7 @@ func (f *FlagSet) Usage() string {
 }
 
 func (f *FlagSet) Bool(name string, defaultValue bool, help string) *bool {
-	err := f.addOption(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
+	err := f.addFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
 	if err != nil {
 		panic(err)
 	}
@@ -133,7 +133,7 @@ func (f *FlagSet) Bool(name string, defaultValue bool, help string) *bool {
 }
 
 func (f *FlagSet) Int(name string, defaultValue int, help string) *int {
-	if err := f.addOption(name, "", help, "int", false, strconv.Itoa(defaultValue)); err != nil {
+	if err := f.addFlag(name, "", help, "int", false, strconv.Itoa(defaultValue)); err != nil {
 		panic(err)
 	}
 
@@ -141,7 +141,7 @@ func (f *FlagSet) Int(name string, defaultValue int, help string) *int {
 }
 
 func (f *FlagSet) String(name string, defaultValue string, help string) *string {
-	if err := f.addOption(name, "", help, "string", false, defaultValue); err != nil {
+	if err := f.addFlag(name, "", help, "string", false, defaultValue); err != nil {
 		panic(err)
 	}
 
@@ -149,7 +149,7 @@ func (f *FlagSet) String(name string, defaultValue string, help string) *string 
 }
 
 func (f *FlagSet) Duration(name string, defaultValue time.Duration, help string) *time.Duration {
-	if err := f.addOption(name, "", help, "duration", false, defaultValue.String()); err != nil {
+	if err := f.addFlag(name, "", help, "duration", false, defaultValue.String()); err != nil {
 		panic(err)
 	}
 
@@ -285,7 +285,7 @@ func (f *FlagSet) parse(args []string) error {
 	return nil
 }
 
-func (f *FlagSet) addOption(name string, shorthand string, help string, typeStr string, required bool, defaultValue string) error {
+func (f *FlagSet) addFlag(name string, shorthand string, help string, typeStr string, required bool, defaultValue string) error {
 	if _, ok := f.optionMap[name]; ok {
 		return fmt.Errorf("conflict option [%v]", name)
 	}
@@ -318,7 +318,7 @@ func (f *FlagSet) addOption(name string, shorthand string, help string, typeStr 
 	return nil
 }
 
-func (f *FlagSet) addPositionOption(name string, help string, typeStr string, defaultValue string) error {
+func (f *FlagSet) addPosFlag(name string, help string, typeStr string, defaultValue string) error {
 	if _, ok := f.optionMap[name]; ok {
 		return fmt.Errorf("conflict option [%v]", name)
 	}
