@@ -218,4 +218,5 @@ type Value interface {
 
 ## 链接
 
-- 测试代码: <>
+- package flag: <https://golang.google.cn/pkg/flag/>
+- 测试代码: <https://github.com/hpifu/go-kit/blob/master/hflag/golang-flag%E5%BA%93%E8%AF%A6%E8%A7%A3.md>
