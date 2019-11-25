@@ -57,11 +57,6 @@ func TestFlagParse(t *testing.T) {
 			})
 		})
 
-		Convey("parse error", func() {
-			err := flagSet.Parse(strings.Split("-xx abc", " "))
-			So(err, ShouldBeNil)
-		})
-
 		Convey("set case", func() {
 			err := flagSet.Set("i", "120")
 			So(err, ShouldBeNil)
@@ -85,6 +80,7 @@ func TestFlagParse(t *testing.T) {
 			So(f.Name, ShouldEqual, "i")
 			So(f.DefValue, ShouldEqual, "10")
 			So(f.Usage, ShouldEqual, "int flag")
+			So(f.Value.String(), ShouldEqual, "10")
 		})
 
 		Convey("print defaults", func() {
