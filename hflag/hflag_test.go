@@ -10,7 +10,7 @@ import (
 
 func TestHFlag(t *testing.T) {
 	Convey("test flag", t, func() {
-		flagSet := NewFlagSet()
+		flagSet := NewFlagSet("test flag")
 		i := flagSet.Int("i", 10, "int flag")
 		//i := new(int)
 		//flagSet.IntVar(i, "i", 10, "int flag")
@@ -76,7 +76,7 @@ func TestHFlag(t *testing.T) {
 			So(f.Name, ShouldEqual, "i")
 			So(f.DefValue, ShouldEqual, "10")
 			So(f.Usage, ShouldEqual, "int flag")
-			//So(f.Value.String(), ShouldEqual, "10")
+			So(f.Value.String(), ShouldEqual, "10")
 		})
 
 		Convey("print defaults", func() {
@@ -87,7 +87,7 @@ func TestHFlag(t *testing.T) {
 
 func TestHFlagParse(t *testing.T) {
 	Convey("test case1", t, func() {
-		flagSet := NewFlagSet()
+		flagSet := NewFlagSet("test flag")
 		So(flagSet.AddFlag("int-option", "i", "usage", "int", true, "0"), ShouldBeNil)
 		So(flagSet.AddFlag("str-option", "s", "usage", "string", true, ""), ShouldBeNil)
 		So(flagSet.AddFlag("key", "k", "usage", "float", true, ""), ShouldBeNil)
@@ -110,7 +110,7 @@ func TestHFlagParse(t *testing.T) {
 	})
 
 	Convey("test case2", t, func() {
-		flagSet := NewFlagSet()
+		flagSet := NewFlagSet("test flag")
 		version := flagSet.Bool("v", false, "print current version")
 		configfile := flagSet.String("c", "configs/monitor.json", "config file path")
 		So(flagSet.Parse(strings.Split("--v", " ")), ShouldBeNil)

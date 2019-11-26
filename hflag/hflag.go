@@ -29,6 +29,7 @@ func (f *Flag) Set(val string) error {
 }
 
 type FlagSet struct {
+	name            string
 	nameToFlag      map[string]*Flag
 	shorthandToName map[string]string
 	posFlagNames    []string
@@ -37,8 +38,9 @@ type FlagSet struct {
 	parsed          bool
 }
 
-func NewFlagSet() *FlagSet {
+func NewFlagSet(name string) *FlagSet {
 	return &FlagSet{
+		name:            name,
 		nameToFlag:      map[string]*Flag{},
 		shorthandToName: map[string]string{},
 		parsed:          false,
@@ -112,7 +114,7 @@ func (f *FlagSet) Parse(args []string) error {
 				}
 			}
 		} else if f.allBoolFlag(option) { // -kval 全是 bool 选项，-kval 和 -k -v -f -l 等效
-			for i := 0; i < len(arg); i++ {
+			for i := 0; i < len(option); i++ {
 				name := option[i : i+1]
 				flag := f.Lookup(name)
 				if err := flag.Set("true"); err != nil {

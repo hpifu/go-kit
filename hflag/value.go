@@ -1,13 +1,14 @@
 package hflag
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 )
 
 type Value interface {
 	Set(string) error
-	//String()
+	String() string
 }
 
 type intValue int
@@ -139,4 +140,24 @@ func (v *boolValue) Set(str string) error {
 
 	*v = boolValue(b)
 	return nil
+}
+
+func (v intValue) String() string {
+	return strconv.Itoa(int(v))
+}
+
+func (v floatValue) String() string {
+	return fmt.Sprintf("%f", float64(v))
+}
+
+func (v stringValue) String() string {
+	return string(v)
+}
+
+func (v durationValue) String() string {
+	return time.Duration(v).String()
+}
+
+func (v boolValue) String() string {
+	return fmt.Sprintf("%v", bool(v))
 }
