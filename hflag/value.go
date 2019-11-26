@@ -1,8 +1,10 @@
 package hflag
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -12,10 +14,15 @@ type Value interface {
 }
 
 type intValue int
+type uintValue uint
+type int64Value int64
+type uint64Value uint64
 type floatValue float64
 type durationValue time.Duration
 type stringValue string
 type boolValue bool
+type intSliceValue []int
+type stringSliceValue []string
 
 func NewValueType(typeStr string) Value {
 	switch typeStr {
@@ -23,12 +30,22 @@ func NewValueType(typeStr string) Value {
 		return new(boolValue)
 	case "int":
 		return new(intValue)
-	case "float":
+	case "float", "float64":
 		return new(floatValue)
 	case "string":
 		return new(stringValue)
 	case "duration":
 		return new(durationValue)
+	case "uint":
+		return new(uintValue)
+	case "int64":
+		return new(int64Value)
+	case "uint64":
+		return new(uint64Value)
+	case "[]int":
+		return new(intSliceValue)
+	case "[]string":
+		return new(stringSliceValue)
 	}
 
 	return nil
@@ -40,6 +57,33 @@ func (v *intValue) Set(str string) error {
 		return err
 	}
 	*v = intValue(i)
+	return nil
+}
+
+func (v *uintValue) Set(str string) error {
+	i, err := strconv.ParseUint(str, 10, 64)
+	if err != nil {
+		return err
+	}
+	*v = uintValue(i)
+	return nil
+}
+
+func (v *uint64Value) Set(str string) error {
+	i, err := strconv.ParseUint(str, 10, 64)
+	if err != nil {
+		return err
+	}
+	*v = uint64Value(i)
+	return nil
+}
+
+func (v *int64Value) Set(str string) error {
+	i, err := strconv.ParseInt(str, 10, 64)
+	if err != nil {
+		return err
+	}
+	*v = int64Value(i)
 	return nil
 }
 
@@ -78,8 +122,38 @@ func (v *boolValue) Set(str string) error {
 	return nil
 }
 
+func (v *intSliceValue) Set(strs string) error {
+	var ia []int
+	for _, str := range strings.Split(strs, ",") {
+		i, err := strconv.Atoi(str)
+		if err != nil {
+			return err
+		}
+		ia = append(ia, i)
+	}
+	*v = intSliceValue(ia)
+	return nil
+}
+
+func (v *stringSliceValue) Set(strs string) error {
+	*v = stringSliceValue(strings.Split(strs, ","))
+	return nil
+}
+
 func (v intValue) String() string {
 	return strconv.Itoa(int(v))
+}
+
+func (v int64Value) String() string {
+	return strconv.FormatInt(int64(v), 10)
+}
+
+func (v uintValue) String() string {
+	return strconv.FormatUint(uint64(uint(v)), 10)
+}
+
+func (v uint64Value) String() string {
+	return strconv.FormatUint(uint64(v), 10)
 }
 
 func (v floatValue) String() string {
@@ -96,4 +170,21 @@ func (v durationValue) String() string {
 
 func (v boolValue) String() string {
 	return fmt.Sprintf("%v", bool(v))
+}
+
+func (v intSliceValue) String() string {
+	var buffer bytes.Buffer
+
+	vi := []int(v)
+	for idx, i := range vi {
+		buffer.WriteString(strconv.Itoa(i))
+		if idx != len(vi)-1 {
+			buffer.WriteString(",")
+		}
+	}
+	return buffer.String()
+}
+
+func (v stringSliceValue) String() string {
+	return strings.Join([]string(v), ",")
 }

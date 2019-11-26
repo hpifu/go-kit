@@ -89,6 +89,27 @@ func (f *FlagSet) Int(name string, defaultValue int, usage string) *int {
 	return (*int)(f.nameToFlag[name].Value.(*intValue))
 }
 
+func (f *FlagSet) Int64(name string, defaultValue int64, usage string) *int64 {
+	if err := f.addFlagAutoShorthand(name, usage, "int64", strconv.FormatInt(defaultValue, 10)); err != nil {
+		panic(err)
+	}
+	return (*int64)(f.nameToFlag[name].Value.(*int64Value))
+}
+
+func (f *FlagSet) Uint(name string, defaultValue uint, usage string) *uint {
+	if err := f.addFlagAutoShorthand(name, usage, "uint", strconv.FormatUint(uint64(defaultValue), 10)); err != nil {
+		panic(err)
+	}
+	return (*uint)(f.nameToFlag[name].Value.(*uintValue))
+}
+
+func (f *FlagSet) Uint64(name string, defaultValue uint64, usage string) *uint64 {
+	if err := f.addFlagAutoShorthand(name, usage, "uint64", strconv.FormatUint(defaultValue, 10)); err != nil {
+		panic(err)
+	}
+	return (*uint64)(f.nameToFlag[name].Value.(*uint64Value))
+}
+
 func (f *FlagSet) String(name string, defaultValue string, usage string) *string {
 	if err := f.addFlagAutoShorthand(name, usage, "string", defaultValue); err != nil {
 		panic(err)
@@ -124,6 +145,30 @@ func (f *FlagSet) IntVar(v *int, name string, defaultValue int, usage string) {
 		panic(err)
 	}
 	f.nameToFlag[name].Value = (*intValue)(v)
+}
+
+func (f *FlagSet) Int64Var(v *int64, name string, defaultValue int64, usage string) {
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "int64", strconv.FormatInt(defaultValue, 10)); err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*int64Value)(v)
+}
+
+func (f *FlagSet) UintVar(v *uint, name string, defaultValue uint, usage string) {
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "uint", strconv.FormatUint(uint64(defaultValue), 10)); err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*uintValue)(v)
+}
+
+func (f *FlagSet) Uint64Var(v *uint64, name string, defaultValue uint64, usage string) {
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "uint64", strconv.FormatUint(defaultValue, 10)); err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*uint64Value)(v)
 }
 
 func (f *FlagSet) StringVar(v *string, name string, defaultValue string, usage string) {

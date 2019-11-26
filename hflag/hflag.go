@@ -178,6 +178,10 @@ func (f *FlagSet) AddFlag(name string, shorthand string, usage string, typeStr s
 		Value:     NewValueType(typeStr),
 	}
 
+	if flag.Value == nil {
+		return fmt.Errorf("type [%v] not support", typeStr)
+	}
+
 	if len(defaultValue) != 0 {
 		if err := flag.Set(defaultValue); err != nil {
 			return fmt.Errorf("set default failed. err: [%v]", err)
@@ -202,6 +206,10 @@ func (f *FlagSet) AddPosFlag(name string, usage string, typeStr string, defaultV
 		Type:     typeStr,
 		DefValue: defaultValue,
 		Value:    NewValueType(typeStr),
+	}
+
+	if flag.Value == nil {
+		return fmt.Errorf("type [%v] not support", typeStr)
 	}
 
 	if len(defaultValue) != 0 {
