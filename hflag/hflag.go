@@ -9,62 +9,15 @@ import (
 	"time"
 )
 
-type Any struct {
-	typeStr  string
-	assigned bool
-	i        int
-	s        string
-	f        float64
-	d        time.Duration
-	b        bool
-}
-
-func (a *Any) Set(val string, typeStr string) error {
-	switch typeStr {
-	case "int":
-		i, err := strconv.Atoi(val)
-		if err != nil {
-			return err
-		}
-		a.i = i
-	case "string":
-		a.s = val
-	case "float":
-		f, err := strconv.ParseFloat(val, 64)
-		if err != nil {
-			return err
-		}
-		a.f = f
-	case "duration":
-		d, err := time.ParseDuration(val)
-		if err != nil {
-			return err
-		}
-		a.d = d
-	case "bool":
-		if val == "false" {
-			a.b = false
-		} else {
-			a.b = true
-		}
-	default:
-		return fmt.Errorf("unsupport type [%v]", typeStr)
-	}
-
-	a.typeStr = typeStr
-	a.assigned = true
-
-	return nil
-}
-
 type Flag struct {
 	name         string
 	shorthand    string
 	help         string
-	required     bool
 	typeStr      string
 	defaultValue string
-	value        *Any
+	required     bool
+	assigned     bool
+	value        Value
 }
 
 type FlagSet struct {
@@ -134,40 +87,52 @@ func (f *FlagSet) Usage() string {
 	return buffer.String()
 }
 
+func (f *FlagSet) BoolVar(b *bool, name string, defaultValue bool, help string) {
+	*b = defaultValue
+	err := f.addFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
+	if err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].value = (*boolValue)(b)
+}
+
 func (f *FlagSet) Bool(name string, defaultValue bool, help string) *bool {
 	err := f.addFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
 	if err != nil {
 		panic(err)
 	}
-
-	return &f.nameToFlag[name].value.b
+	return (*bool)(f.nameToFlag[name].value.(*boolValue))
 }
 
 func (f *FlagSet) Int(name string, defaultValue int, help string) *int {
 	if err := f.addFlag(name, "", help, "int", false, strconv.Itoa(defaultValue)); err != nil {
 		panic(err)
 	}
-
-	return &f.nameToFlag[name].value.i
+	return (*int)(f.nameToFlag[name].value.(*intValue))
 }
 
 func (f *FlagSet) String(name string, defaultValue string, help string) *string {
 	if err := f.addFlag(name, "", help, "string", false, defaultValue); err != nil {
 		panic(err)
 	}
-
-	return &f.nameToFlag[name].value.s
+	return (*string)(f.nameToFlag[name].value.(*stringValue))
 }
 
 func (f *FlagSet) Duration(name string, defaultValue time.Duration, help string) *time.Duration {
 	if err := f.addFlag(name, "", help, "duration", false, defaultValue.String()); err != nil {
 		panic(err)
 	}
-
-	return &f.nameToFlag[name].value.d
+	return (*time.Duration)(f.nameToFlag[name].value.(*durationValue))
 }
 
-func (f *FlagSet) parse(args []string) error {
+func (f *FlagSet) Float(name string, defaultValue float64, help string) *float64 {
+	if err := f.addFlag(name, "", help, "float", false, fmt.Sprintf("%f", defaultValue)); err != nil {
+		panic(err)
+	}
+	return (*float64)(f.nameToFlag[name].value.(*floatValue))
+}
+
+func (f *FlagSet) Parse(args []string) error {
 	var posFlagValues []string
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
@@ -179,8 +144,8 @@ func (f *FlagSet) parse(args []string) error {
 				if flag, ok := f.nameToFlag[name]; !ok {
 					return fmt.Errorf("unknow option [%v]", name)
 				} else {
-					if err := flag.value.Set(val, flag.typeStr); err != nil {
-						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+					if err := flag.value.Set(val); err != nil {
+						return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 					}
 				}
 			} else { // --key1 val1
@@ -189,11 +154,11 @@ func (f *FlagSet) parse(args []string) error {
 					return fmt.Errorf("unknow option [%v]", name)
 				} else if flag.typeStr != "bool" { // 参数不是 bool，后面必有一个值
 					if i+1 >= len(args) {
-						return fmt.Errorf("miss value for nonboolean option [%v]", name)
+						return fmt.Errorf("miss any for nonboolean option [%v]", name)
 					}
 					val := args[i+1]
-					if err := flag.value.Set(val, flag.typeStr); err != nil {
-						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+					if err := flag.value.Set(val); err != nil {
+						return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 					}
 					i++
 				} else { // 参数为 bool 类型，如果后面的值为 true 或者 false 则设为后面值，否则设置为 true
@@ -202,8 +167,8 @@ func (f *FlagSet) parse(args []string) error {
 						val = args[i+1]
 						i++
 					}
-					if err := flag.value.Set(val, flag.typeStr); err != nil {
-						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+					if err := flag.value.Set(val); err != nil {
+						return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 					}
 				}
 			}
@@ -216,11 +181,11 @@ func (f *FlagSet) parse(args []string) error {
 				flag := f.nameToFlag[name]
 				if flag.typeStr != "bool" { // 参数不是 bool 类型，后面必有一个值
 					if i+1 >= len(args) {
-						return fmt.Errorf("miss value for nonboolean option [%v]", name)
+						return fmt.Errorf("miss any for nonboolean option [%v]", name)
 					}
 					val := args[i+1]
-					if err := flag.value.Set(val, flag.typeStr); err != nil {
-						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+					if err := flag.value.Set(val); err != nil {
+						return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 					}
 					i++
 				} else { // 参数为 bool 类型，如果后面的值为 true 或者 false 则设为后面值，否则设置为 true
@@ -229,8 +194,8 @@ func (f *FlagSet) parse(args []string) error {
 						val = args[i+1]
 						i++
 					}
-					if err := flag.value.Set(val, flag.typeStr); err != nil {
-						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+					if err := flag.value.Set(val); err != nil {
+						return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 					}
 				}
 			} else { // -kval
@@ -249,8 +214,8 @@ func (f *FlagSet) parse(args []string) error {
 					for i := 1; i < len(arg); i++ {
 						name := f.shorthandToName[arg[i:i+1]]
 						flag := f.nameToFlag[name]
-						if err := flag.value.Set("true", flag.typeStr); err != nil {
-							return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, "true", flag.typeStr)
+						if err := flag.value.Set("true"); err != nil {
+							return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, "true", flag.typeStr)
 						}
 					}
 				} else {
@@ -260,8 +225,8 @@ func (f *FlagSet) parse(args []string) error {
 					}
 					val := arg[2:]
 					flag := f.nameToFlag[name]
-					if err := flag.value.Set(val, flag.typeStr); err != nil {
-						return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+					if err := flag.value.Set(val); err != nil {
+						return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 					}
 				}
 			}
@@ -276,19 +241,20 @@ func (f *FlagSet) parse(args []string) error {
 		}
 		val := posFlagValues[i]
 		p := f.nameToFlag[name]
-		if err := p.value.Set(val, p.typeStr); err != nil {
-			return fmt.Errorf("set value failed. name: [%v], val: [%v], type: [%v]", name, val, p.typeStr)
+		if err := p.value.Set(val); err != nil {
+			return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, p.typeStr)
 		}
 	}
 
-	for name, flag := range f.nameToFlag {
-		if flag.required && !flag.value.assigned {
-			return fmt.Errorf("option [%v] is required, but not assigned", name)
-		}
-	}
+	// required check
+	//for name, flag := range f.nameToFlag {
+	//	if flag.required {
+	//		return fmt.Errorf("option [%v] is required, but not assigned", name)
+	//	}
+	//}
 
 	//for name, val := range f.nameToFlag {
-	//	fmt.Println(name, "=>", val.value)
+	//	fmt.Println(name, "=>", val.any)
 	//}
 
 	return nil
@@ -296,7 +262,7 @@ func (f *FlagSet) parse(args []string) error {
 
 func (f *FlagSet) addFlag(name string, shorthand string, help string, typeStr string, required bool, defaultValue string) error {
 	if _, ok := f.nameToFlag[name]; ok {
-		return fmt.Errorf("conflict option [%v]", name)
+		return fmt.Errorf("conflict flag [%v]", name)
 	}
 
 	if shorthand != "" {
@@ -305,23 +271,23 @@ func (f *FlagSet) addFlag(name string, shorthand string, help string, typeStr st
 		}
 	}
 
-	option := &Flag{
+	flag := &Flag{
 		name:         name,
 		shorthand:    shorthand,
 		help:         help,
 		typeStr:      typeStr,
 		required:     required,
 		defaultValue: defaultValue,
-		value:        &Any{},
+		value:        NewValueType(typeStr),
 	}
 
 	if len(defaultValue) != 0 {
-		if err := option.value.Set(defaultValue, typeStr); err != nil {
-			return fmt.Errorf("set default value failed. err: [%v]", err)
+		if err := flag.value.Set(defaultValue); err != nil {
+			return fmt.Errorf("set default any failed. err: [%v]", err)
 		}
 	}
 
-	f.nameToFlag[name] = option
+	f.nameToFlag[name] = flag
 	f.shorthandToName[shorthand] = name
 	f.flagNames = append(f.flagNames, name)
 
@@ -330,24 +296,24 @@ func (f *FlagSet) addFlag(name string, shorthand string, help string, typeStr st
 
 func (f *FlagSet) addPosFlag(name string, help string, typeStr string, defaultValue string) error {
 	if _, ok := f.nameToFlag[name]; ok {
-		return fmt.Errorf("conflict option [%v]", name)
+		return fmt.Errorf("conflict flag [%v]", name)
 	}
 
-	option := &Flag{
+	flag := &Flag{
 		name:         name,
 		help:         help,
 		typeStr:      typeStr,
 		defaultValue: defaultValue,
-		value:        &Any{},
+		value:        NewValueType(typeStr),
 	}
 
 	if len(defaultValue) != 0 {
-		if err := option.value.Set(defaultValue, typeStr); err != nil {
-			return fmt.Errorf("set default value failed. err: [%v]", err)
+		if err := flag.value.Set(defaultValue); err != nil {
+			return fmt.Errorf("set default any failed. err: [%v]", err)
 		}
 	}
 
-	f.nameToFlag[name] = option
+	f.nameToFlag[name] = flag
 	f.posFlagNames = append(f.posFlagNames, name)
 
 	return nil
