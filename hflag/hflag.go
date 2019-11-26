@@ -258,7 +258,6 @@ func (f *FlagSet) Usage() string {
 		defaultValue = "[" + defaultValue + "]"
 		buffer.WriteString(fmt.Sprintf("%4v, %-15v %-15v %v\n", shorthand, name, defaultValue, flag.Usage))
 	}
-	fmt.Println(buffer.String())
 
 	return buffer.String()
 }

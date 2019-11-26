@@ -76,10 +76,10 @@ func TestHFlag(t *testing.T) {
 			So(f.Usage, ShouldEqual, "int flag")
 			//So(f.Value.String(), ShouldEqual, "10")
 		})
-		//
-		//Convey("print defaults", func() {
-		//	flagSet.PrintDefaults()
-		//})
+
+		Convey("print defaults", func() {
+			flagSet.PrintDefaults()
+		})
 	})
 }
 

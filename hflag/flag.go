@@ -67,6 +67,10 @@ func (f *FlagSet) NFlag() int {
 	return n
 }
 
+func (f *FlagSet) PrintDefaults() {
+	fmt.Println(f.Usage())
+}
+
 func (f *FlagSet) BoolVar(b *bool, name string, defaultValue bool, help string) {
 	*b = defaultValue
 	err := f.AddFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
