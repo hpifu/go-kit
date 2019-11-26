@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Flag struct {
@@ -45,6 +46,83 @@ func NewFlagSet(name string) *FlagSet {
 		shorthandToName: map[string]string{},
 		parsed:          false,
 	}
+}
+
+func (f *FlagSet) GetInt(name string) int {
+	flag := f.Lookup(name)
+	if flag == nil {
+		return 0
+	}
+	if flag.Type != "int" {
+		return 0
+	}
+	return int(*flag.Value.(*intValue))
+}
+
+func (f *FlagSet) GetFloat(name string) float64 {
+	flag := f.Lookup(name)
+	if flag == nil {
+		return 0.0
+	}
+	if flag.Type != "float" && flag.Type != "float64" {
+		return 0.0
+	}
+	return float64(*flag.Value.(*floatValue))
+}
+
+func (f *FlagSet) GetString(name string) string {
+	flag := f.Lookup(name)
+	if flag == nil {
+		return ""
+	}
+	if flag.Type != "string" {
+		return ""
+	}
+	return string(*flag.Value.(*stringValue))
+}
+
+func (f *FlagSet) GetDuration(name string) time.Duration {
+	flag := f.Lookup(name)
+	if flag == nil {
+		return time.Duration(0)
+	}
+	if flag.Type != "duration" {
+		return time.Duration(0)
+	}
+	return time.Duration(*flag.Value.(*durationValue))
+}
+
+func (f *FlagSet) GetBool(name string) bool {
+	flag := f.Lookup(name)
+	if flag == nil {
+		return false
+	}
+	if flag.Type != "bool" {
+		return false
+	}
+	return bool(*flag.Value.(*boolValue))
+}
+
+func (f *FlagSet) GetIntSlice(name string) []int {
+	flag := f.Lookup(name)
+	if flag == nil {
+		return nil
+	}
+	if flag.Type != "[]int" {
+		return nil
+	}
+	return []int(*flag.Value.(*intSliceValue))
+}
+
+func (f *FlagSet) GetStringSlice(name string) []string {
+	flag := f.Lookup(name)
+	if flag == nil {
+		return nil
+	}
+	if flag.Type != "[]string" {
+		return nil
+	}
+	return []string(*flag.Value.(*stringSliceValue))
 }
 
 func (f *FlagSet) Parse(args []string) error {
@@ -104,7 +182,7 @@ func (f *FlagSet) Parse(args []string) error {
 			}
 		} else {
 			name := option[0:1]
-			val := arg[1:]
+			val := option[1:]
 			flag := f.Lookup(name)
 			if flag == nil {
 				return fmt.Errorf("unknow option [%v]", name)

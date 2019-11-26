@@ -92,24 +92,57 @@ func TestHFlag(t *testing.T) {
 func TestHFlagParse(t *testing.T) {
 	Convey("test case1", t, func() {
 		flagSet := NewFlagSet("test flag")
-		So(flagSet.AddFlag("int-option", "i", "usage", "int", true, "0"), ShouldBeNil)
+		So(flagSet.AddFlag("int-option", "i", "usage", "int", true, "10"), ShouldBeNil)
 		So(flagSet.AddFlag("str-option", "s", "usage", "string", true, ""), ShouldBeNil)
 		So(flagSet.AddFlag("key", "k", "usage", "float", true, ""), ShouldBeNil)
 		So(flagSet.AddFlag("all", "a", "usage", "bool", true, ""), ShouldBeNil)
 		So(flagSet.AddFlag("user", "u", "usage", "bool", true, ""), ShouldBeNil)
 		So(flagSet.AddFlag("password", "p", "usage", "string", false, "654321"), ShouldBeNil)
+		So(flagSet.AddFlag("vs", "v", "usage", "[]string", false, "dog,cat"), ShouldBeNil)
 		So(flagSet.AddPosFlag("pos1", "usage", "string", ""), ShouldBeNil)
 		So(flagSet.AddPosFlag("pos2", "usage", "string", ""), ShouldBeNil)
-		err := flagSet.Parse([]string{
-			"pos1",
-			"--int-option=123",
-			"--str-option", "hello world",
-			"-k", "3.14",
-			"-au",
-			"-p123456",
-			"pos2",
+
+		Convey("check default value", func() {
+			So(flagSet.GetInt("int-option"), ShouldEqual, 10)
+			So(flagSet.GetString("str-option"), ShouldEqual, "")
+			So(flagSet.GetFloat("key"), ShouldEqual, 0.0)
+			So(flagSet.GetBool("all"), ShouldBeFalse)
+			So(flagSet.GetBool("user"), ShouldBeFalse)
+			So(flagSet.GetString("password"), ShouldEqual, "654321")
+			So(flagSet.GetStringSlice("vs"), ShouldResemble, []string{"dog", "cat"})
+			So(flagSet.GetString("pos1"), ShouldEqual, "")
+			So(flagSet.GetString("pos2"), ShouldEqual, "")
 		})
-		So(err, ShouldBeNil)
+
+		Convey("parse", func() {
+			err := flagSet.Parse([]string{
+				"val1",
+				"--int-option=123",
+				"--str-option", "hello world",
+				"-k", "3.14",
+				"-au",
+				"-p123456",
+				"val2",
+				"-vs", "one,two,three",
+			})
+			So(err, ShouldBeNil)
+
+			So(flagSet.GetInt("int-option"), ShouldEqual, 123)
+			So(flagSet.GetString("str-option"), ShouldEqual, "hello world")
+			So(flagSet.GetFloat("key"), ShouldAlmostEqual, 3.14)
+			So(flagSet.GetBool("all"), ShouldBeTrue)
+			So(flagSet.GetBool("user"), ShouldBeTrue)
+			So(flagSet.GetString("password"), ShouldEqual, "123456")
+			So(flagSet.GetStringSlice("vs"), ShouldResemble, []string{"one", "two", "three"})
+			So(flagSet.GetString("pos1"), ShouldEqual, "val1")
+			So(flagSet.GetString("pos2"), ShouldEqual, "val2")
+
+			So(flagSet.Args(), ShouldResemble, []string{
+				"val1", "val2",
+			})
+			So(flagSet.Arg(0), ShouldEqual, "val1")
+			So(flagSet.Arg(1), ShouldEqual, "val2")
+		})
 		flagSet.Usage()
 	})
 
