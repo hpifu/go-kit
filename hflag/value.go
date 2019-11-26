@@ -3,6 +3,7 @@ package hflag
 import (
 	"bytes"
 	"fmt"
+	"net"
 	"strconv"
 	"strings"
 	"time"
@@ -23,6 +24,8 @@ type stringValue string
 type boolValue bool
 type intSliceValue []int
 type stringSliceValue []string
+type timeValue time.Time
+type ipValue net.IP
 
 func NewValueType(typeStr string) Value {
 	switch typeStr {
@@ -46,6 +49,10 @@ func NewValueType(typeStr string) Value {
 		return new(intSliceValue)
 	case "[]string":
 		return new(stringSliceValue)
+	case "time":
+		return new(timeValue)
+	case "ip":
+		return new(ipValue)
 	}
 
 	return nil
@@ -140,6 +147,34 @@ func (v *stringSliceValue) Set(strs string) error {
 	return nil
 }
 
+func (v *timeValue) Set(str string) error {
+	var t time.Time
+	var err error
+	if str == "now" {
+		t = time.Now()
+	} else if len(str) == 10 {
+		t, err = time.Parse("2006-01-02", str)
+	} else if len(str) == 19 {
+		t, err = time.Parse("2006-01-02T15:04:05", str)
+	} else {
+		t, err = time.Parse(time.RFC3339, str)
+	}
+	if err != nil {
+		return err
+	}
+	*v = timeValue(t)
+	return nil
+}
+
+func (v *ipValue) Set(str string) error {
+	i := net.ParseIP(str)
+	if i == nil {
+		return fmt.Errorf("parse [%v] to ip failed", str)
+	}
+	*v = ipValue(i)
+	return nil
+}
+
 func (v intValue) String() string {
 	return strconv.Itoa(int(v))
 }
@@ -187,4 +222,12 @@ func (v intSliceValue) String() string {
 
 func (v stringSliceValue) String() string {
 	return strings.Join([]string(v), ",")
+}
+
+func (v timeValue) String() string {
+	return time.Time(v).Format(time.RFC3339)
+}
+
+func (v ipValue) String() string {
+	return net.IP(v).String()
 }

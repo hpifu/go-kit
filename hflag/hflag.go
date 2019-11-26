@@ -184,7 +184,7 @@ func (f *FlagSet) Parse(args []string) error {
 				return fmt.Errorf("unknow option [%v]", name)
 			}
 			if err := flag.Set(val); err != nil {
-				return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
+				return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v], err: [%v]", name, val, flag.Type, err)
 			}
 		} else if f.Lookup(option) != nil {
 			name := option
@@ -198,7 +198,7 @@ func (f *FlagSet) Parse(args []string) error {
 				}
 				val := args[i+1]
 				if err := flag.Set(val); err != nil {
-					return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
+					return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v], err: [%v]", name, val, flag.Type, err)
 				}
 				i++
 			} else { // 选项为 bool 类型，如果后面的值为合法的 bool 值，否则设置为 true
@@ -208,7 +208,7 @@ func (f *FlagSet) Parse(args []string) error {
 					i++
 				}
 				if err := flag.Set(val); err != nil {
-					return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
+					return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v], err: [%v]", name, val, flag.Type, err)
 				}
 			}
 		} else if f.allBoolFlag(option) { // -aux 全是 bool 选项，-aux 和 -a -u -x 等效
@@ -216,7 +216,7 @@ func (f *FlagSet) Parse(args []string) error {
 				name := option[i : i+1]
 				flag := f.Lookup(name)
 				if err := flag.Set("true"); err != nil {
-					return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v]", name, "true", flag.Type)
+					return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v], err: [%v]", name, "true", flag.Type, err)
 				}
 			}
 		} else { // -p123456 和 -p 123456 等效
@@ -227,7 +227,7 @@ func (f *FlagSet) Parse(args []string) error {
 				return fmt.Errorf("unknow option [%v]", name)
 			}
 			if err := flag.Set(val); err != nil {
-				return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
+				return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v], err: [%v]", name, val, flag.Type, err)
 			}
 		}
 	}

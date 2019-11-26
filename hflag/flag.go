@@ -2,6 +2,7 @@ package hflag
 
 import (
 	"fmt"
+	"net"
 	"strconv"
 	"time"
 )
@@ -145,6 +146,24 @@ func (f *FlagSet) StringSlice(name string, defaultValue []string, usage string) 
 	return (*[]string)(f.nameToFlag[name].Value.(*stringSliceValue))
 }
 
+func (f *FlagSet) Time(name string, defaultValue time.Time, usage string) *time.Time {
+	if err := f.addFlagAutoShorthand(name, usage, "time", timeValue(defaultValue).String()); err != nil {
+		panic(err)
+	}
+	return (*time.Time)(f.nameToFlag[name].Value.(*timeValue))
+}
+
+func (f *FlagSet) IP(name string, defaultValue net.IP, usage string) *net.IP {
+	ipstr := ""
+	if defaultValue != nil {
+		ipstr = ipValue(defaultValue).String()
+	}
+	if err := f.addFlagAutoShorthand(name, usage, "ip", ipstr); err != nil {
+		panic(err)
+	}
+	return (*net.IP)(f.nameToFlag[name].Value.(*ipValue))
+}
+
 func (f *FlagSet) BoolVar(v *bool, name string, defaultValue bool, usage string) {
 	*v = defaultValue
 	if err := f.addFlagAutoShorthand(name, usage, "bool", fmt.Sprintf("%v", defaultValue)); err != nil {
@@ -225,10 +244,25 @@ func (f *FlagSet) StringSliceVar(v *[]string, name string, defaultValue []string
 	f.nameToFlag[name].Value = (*stringSliceValue)(v)
 }
 
+func (f *FlagSet) TimeVar(v *time.Time, name string, defaultValue time.Time, usage string) {
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "time", timeValue(defaultValue).String()); err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*timeValue)(v)
+}
+
+func (f FlagSet) IPVar(v *net.IP, name string, defaultValue net.IP, usage string) {
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "ip", ipValue(defaultValue).String()); err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*ipValue)(v)
+}
+
 func (f *FlagSet) addFlagAutoShorthand(name string, usage string, typeStr string, defaultValue string) error {
 	if len(name) == 1 {
 		return f.AddFlag(name, usage, Type(typeStr), DefaultValue(defaultValue), Shorthand(name))
 	}
-
 	return f.AddFlag(name, usage, Type(typeStr), DefaultValue(defaultValue))
 }

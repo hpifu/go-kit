@@ -9,7 +9,7 @@ hflag 是被设计用来替代标准的 flag 库，提供更强大更灵活的�
 - 支持位置参数
 - 支持 bool 参数简写 (`-aux` 和 `-a -u -x` 等效)
 - 支持值参数缩写 (`-p123456` 和 `-p 123456` 等效)
-- 支持 `[]int`, `[]string` 的解析
+- 支持 `net.IP`，`time.Time`，`time.Duration`，`[]int`, `[]string` 的解析
 - 提供一套更简洁的 api
 - 完全兼容 flag 接口
 
