@@ -29,7 +29,7 @@ func TestHFlag(t *testing.T) {
 			//  -flag		(只支持 bool)
 			// 	-flag value	(不支持 bool)
 			//	-flag=value
-			err := flagSet.Parse(strings.Split("--b --i 100 --f=12.12 --s golang --d=20s", " "))
+			err := flagSet.Parse(strings.Split("-b -i 100 -f=12.12 --s golang --d=20s", " "))
 			So(err, ShouldBeNil)
 			So(*i, ShouldEqual, 100)
 			So(*f, ShouldAlmostEqual, 12.12)

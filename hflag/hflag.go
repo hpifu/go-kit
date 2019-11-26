@@ -132,106 +132,95 @@ func (f *FlagSet) Float(name string, defaultValue float64, help string) *float64
 	return (*float64)(f.nameToFlag[name].value.(*floatValue))
 }
 
+func (f *FlagSet) LookUp(name string) *Flag {
+	flag, ok := f.nameToFlag[name]
+	if ok {
+		return flag
+	}
+	k, ok := f.shorthandToName[name]
+	if ok {
+		return f.nameToFlag[k]
+	}
+	return nil
+}
+
+func (f *FlagSet) allBoolFlag(name string) bool {
+	for i := 0; i < len(name); i++ {
+		flag := f.LookUp(name[i : i+1])
+		if flag == nil || flag.typeStr != "bool" {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (f *FlagSet) Parse(args []string) error {
 	var posFlagValues []string
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
+		if !strings.HasPrefix(arg, "-") {
+			posFlagValues = append(posFlagValues, arg)
+			continue
+		}
+		option := arg[1:]
 		if strings.HasPrefix(arg, "--") {
-			if strings.Contains(arg, "=") { // --key1=val1
-				idx := strings.Index(arg, "=")
-				name := arg[2:idx]
-				val := arg[idx+1:]
-				if flag, ok := f.nameToFlag[name]; !ok {
-					return fmt.Errorf("unknow option [%v]", name)
-				} else {
-					if err := flag.value.Set(val); err != nil {
-						return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
-					}
+			option = arg[2:]
+		}
+		if strings.Contains(option, "=") {
+			idx := strings.Index(option, "=")
+			name := option[0:idx]
+			val := option[idx+1:]
+			flag := f.LookUp(name)
+			if flag == nil {
+				return fmt.Errorf("unknow option [%v]", name)
+			}
+			if err := flag.value.Set(val); err != nil {
+				return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+			}
+		} else if f.LookUp(option) != nil {
+			name := option
+			flag := f.LookUp(name)
+			if flag == nil {
+				return fmt.Errorf("unknow option [%v]", name)
+			}
+			if flag.typeStr != "bool" { // 参数不是 bool，后面必有一个值
+				if i+1 >= len(args) {
+					return fmt.Errorf("miss any for nonboolean option [%v]", name)
 				}
-			} else { // --key1 val1
-				name := arg[2:]
-				if flag, ok := f.nameToFlag[name]; !ok {
-					return fmt.Errorf("unknow option [%v]", name)
-				} else if flag.typeStr != "bool" { // 参数不是 bool，后面必有一个值
-					if i+1 >= len(args) {
-						return fmt.Errorf("miss any for nonboolean option [%v]", name)
-					}
-					val := args[i+1]
-					if err := flag.value.Set(val); err != nil {
-						return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
-					}
+				val := args[i+1]
+				if err := flag.value.Set(val); err != nil {
+					return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+				}
+				i++
+			} else { // 参数为 bool 类型，如果后面的值为 true 或者 false 则设为后面值，否则设置为 true
+				val := "true"
+				if i+1 < len(args) && (args[i+1] == "true" || args[i+1] == "false") {
+					val = args[i+1]
 					i++
-				} else { // 参数为 bool 类型，如果后面的值为 true 或者 false 则设为后面值，否则设置为 true
-					val := "true"
-					if i+1 < len(args) && (args[i+1] == "true" || args[i+1] == "false") {
-						val = args[i+1]
-						i++
-					}
-					if err := flag.value.Set(val); err != nil {
-						return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
-					}
+				}
+				if err := flag.value.Set(val); err != nil {
+					return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 				}
 			}
-		} else if strings.HasPrefix(arg, "-") {
-			if len(arg) == 2 { // -k val
-				name, ok := f.shorthandToName[arg[1:]]
-				if !ok {
-					return fmt.Errorf("unknow shorthand option [%v]", arg[1:])
-				}
-				flag := f.nameToFlag[name]
-				if flag.typeStr != "bool" { // 参数不是 bool 类型，后面必有一个值
-					if i+1 >= len(args) {
-						return fmt.Errorf("miss any for nonboolean option [%v]", name)
-					}
-					val := args[i+1]
-					if err := flag.value.Set(val); err != nil {
-						return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
-					}
-					i++
-				} else { // 参数为 bool 类型，如果后面的值为 true 或者 false 则设为后面值，否则设置为 true
-					val := "true"
-					if i+1 < len(args) && (args[i+1] == "true" || args[i+1] == "false") {
-						val = args[i+1]
-						i++
-					}
-					if err := flag.value.Set(val); err != nil {
-						return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
-					}
-				}
-			} else { // -kval
-				allBool := true
-				for i := 1; i < len(arg); i++ {
-					name, ok := f.shorthandToName[arg[i:i+1]]
-					if !ok {
-						allBool = false
-						break
-					}
-					if f.nameToFlag[name].typeStr != "bool" {
-						allBool = false
-					}
-				}
-				if allBool { // 全是 bool 选项，-kval 和 -k -v -f -l 等效
-					for i := 1; i < len(arg); i++ {
-						name := f.shorthandToName[arg[i:i+1]]
-						flag := f.nameToFlag[name]
-						if err := flag.value.Set("true"); err != nil {
-							return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, "true", flag.typeStr)
-						}
-					}
-				} else {
-					name, ok := f.shorthandToName[arg[1:2]]
-					if !ok {
-						return fmt.Errorf("unknow shorthand option [%v]", arg[1:2])
-					}
-					val := arg[2:]
-					flag := f.nameToFlag[name]
-					if err := flag.value.Set(val); err != nil {
-						return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
-					}
+		} else if f.allBoolFlag(option) { // -kval 全是 bool 选项，-kval 和 -k -v -f -l 等效
+			for i := 0; i < len(arg); i++ {
+				name := option[i : i+1]
+				flag := f.LookUp(name)
+				if err := flag.value.Set("true"); err != nil {
+					return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, "true", flag.typeStr)
 				}
 			}
 		} else {
-			posFlagValues = append(posFlagValues, arg)
+			name := option[0:1]
+			val := arg[1:]
+			flag := f.LookUp(name)
+			if flag == nil {
+				return fmt.Errorf("unknow option [%v]", name)
+			}
+			if err := flag.value.Set(val); err != nil {
+				return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+			}
 		}
 	}
 
@@ -240,9 +229,9 @@ func (f *FlagSet) Parse(args []string) error {
 			break
 		}
 		val := posFlagValues[i]
-		p := f.nameToFlag[name]
-		if err := p.value.Set(val); err != nil {
-			return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, p.typeStr)
+		flag := f.nameToFlag[name]
+		if err := flag.value.Set(val); err != nil {
+			return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
 		}
 	}
 
