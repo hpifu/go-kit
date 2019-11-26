@@ -107,7 +107,7 @@ func (f *FlagSet) NFlag() int {
 
 func (f *FlagSet) BoolVar(b *bool, name string, defaultValue bool, help string) {
 	*b = defaultValue
-	err := f.addFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
+	err := f.AddFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
 	if err != nil {
 		panic(err)
 	}
@@ -115,7 +115,7 @@ func (f *FlagSet) BoolVar(b *bool, name string, defaultValue bool, help string) 
 }
 
 func (f *FlagSet) Bool(name string, defaultValue bool, help string) *bool {
-	err := f.addFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
+	err := f.AddFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
 	if err != nil {
 		panic(err)
 	}
@@ -123,28 +123,28 @@ func (f *FlagSet) Bool(name string, defaultValue bool, help string) *bool {
 }
 
 func (f *FlagSet) Int(name string, defaultValue int, help string) *int {
-	if err := f.addFlag(name, "", help, "int", false, strconv.Itoa(defaultValue)); err != nil {
+	if err := f.AddFlag(name, "", help, "int", false, strconv.Itoa(defaultValue)); err != nil {
 		panic(err)
 	}
 	return (*int)(f.nameToFlag[name].Value.(*intValue))
 }
 
 func (f *FlagSet) String(name string, defaultValue string, help string) *string {
-	if err := f.addFlag(name, "", help, "string", false, defaultValue); err != nil {
+	if err := f.AddFlag(name, "", help, "string", false, defaultValue); err != nil {
 		panic(err)
 	}
 	return (*string)(f.nameToFlag[name].Value.(*stringValue))
 }
 
 func (f *FlagSet) Duration(name string, defaultValue time.Duration, help string) *time.Duration {
-	if err := f.addFlag(name, "", help, "duration", false, defaultValue.String()); err != nil {
+	if err := f.AddFlag(name, "", help, "duration", false, defaultValue.String()); err != nil {
 		panic(err)
 	}
 	return (*time.Duration)(f.nameToFlag[name].Value.(*durationValue))
 }
 
 func (f *FlagSet) Float(name string, defaultValue float64, help string) *float64 {
-	if err := f.addFlag(name, "", help, "float", false, fmt.Sprintf("%f", defaultValue)); err != nil {
+	if err := f.AddFlag(name, "", help, "float", false, fmt.Sprintf("%f", defaultValue)); err != nil {
 		panic(err)
 	}
 	return (*float64)(f.nameToFlag[name].Value.(*floatValue))
@@ -258,7 +258,7 @@ func (f *FlagSet) Parse(args []string) error {
 	return nil
 }
 
-func (f *FlagSet) addFlag(name string, shorthand string, help string, typeStr string, required bool, defaultValue string) error {
+func (f *FlagSet) AddFlag(name string, shorthand string, help string, typeStr string, required bool, defaultValue string) error {
 	if _, ok := f.nameToFlag[name]; ok {
 		return fmt.Errorf("conflict flag [%v]", name)
 	}
@@ -292,7 +292,7 @@ func (f *FlagSet) addFlag(name string, shorthand string, help string, typeStr st
 	return nil
 }
 
-func (f *FlagSet) addPosFlag(name string, help string, typeStr string, defaultValue string) error {
+func (f *FlagSet) AddPosFlag(name string, help string, typeStr string, defaultValue string) error {
 	if _, ok := f.nameToFlag[name]; ok {
 		return fmt.Errorf("conflict flag [%v]", name)
 	}
