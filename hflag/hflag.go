@@ -47,25 +47,6 @@ func NewFlagSet(name string) *FlagSet {
 	}
 }
 
-func (f *FlagSet) allBoolFlag(name string) bool {
-	for i := 0; i < len(name); i++ {
-		flag := f.Lookup(name[i : i+1])
-		if flag == nil || flag.Type != "bool" {
-			return false
-		}
-	}
-
-	return true
-}
-
-func isBoolValue(val string) bool {
-	_, err := strconv.ParseBool(val)
-	if err != nil {
-		return false
-	}
-	return true
-}
-
 func (f *FlagSet) Parse(args []string) error {
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
@@ -274,4 +255,23 @@ func (f *FlagSet) Usage() string {
 	}
 
 	return buffer.String()
+}
+
+func (f *FlagSet) allBoolFlag(name string) bool {
+	for i := 0; i < len(name); i++ {
+		flag := f.Lookup(name[i : i+1])
+		if flag == nil || flag.Type != "bool" {
+			return false
+		}
+	}
+
+	return true
+}
+
+func isBoolValue(val string) bool {
+	_, err := strconv.ParseBool(val)
+	if err != nil {
+		return false
+	}
+	return true
 }
