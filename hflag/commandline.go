@@ -1,6 +1,7 @@
 package hflag
 
 import (
+	"net"
 	"os"
 	"time"
 )
@@ -87,6 +88,14 @@ func StringSlice(name string, defaultValue []string, usage string) *[]string {
 	return CommandLine.StringSlice(name, defaultValue, usage)
 }
 
+func Time(name string, defaultValue time.Time, usage string) *time.Time {
+	return CommandLine.Time(name, defaultValue, usage)
+}
+
+func IP(name string, defaultValue net.IP, usage string) *net.IP {
+	return CommandLine.IP(name, defaultValue, usage)
+}
+
 func BoolVar(v *bool, name string, defaultValue bool, usage string) {
 	CommandLine.BoolVar(v, name, defaultValue, usage)
 }
@@ -125,6 +134,14 @@ func IntSliceVar(v *[]int, name string, defaultValue []int, usage string) {
 
 func StringSliceVar(v *[]string, name string, defaultValue []string, usage string) {
 	CommandLine.StringSliceVar(v, name, defaultValue, usage)
+}
+
+func TimeVar(v *time.Time, name string, defaultValue time.Time, usage string) {
+	CommandLine.TimeVar(v, name, defaultValue, usage)
+}
+
+func IPVar(v *net.IP, name string, defaultValue net.IP, usage string) {
+	CommandLine.IPVar(v, name, defaultValue, usage)
 }
 
 func GetInt(name string) int {
