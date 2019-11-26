@@ -53,6 +53,13 @@ func (f *FlagSet) GetInt(name string) int {
 	if flag == nil {
 		return 0
 	}
+	if flag.Type == "string" {
+		i, err := strconv.Atoi(flag.Value.String())
+		if err != nil {
+			return 0
+		}
+		return i
+	}
 	if flag.Type != "int" {
 		return 0
 	}
@@ -63,6 +70,13 @@ func (f *FlagSet) GetFloat(name string) float64 {
 	flag := f.Lookup(name)
 	if flag == nil {
 		return 0.0
+	}
+	if flag.Type == "string" {
+		f, err := strconv.ParseFloat(flag.Value.String(), 64)
+		if err != nil {
+			return 0.0
+		}
+		return f
 	}
 	if flag.Type != "float" && flag.Type != "float64" {
 		return 0.0
@@ -75,16 +89,20 @@ func (f *FlagSet) GetString(name string) string {
 	if flag == nil {
 		return ""
 	}
-	if flag.Type != "string" {
-		return ""
-	}
-	return string(*flag.Value.(*stringValue))
+	return flag.Value.String()
 }
 
 func (f *FlagSet) GetDuration(name string) time.Duration {
 	flag := f.Lookup(name)
 	if flag == nil {
 		return time.Duration(0)
+	}
+	if flag.Type == "string" {
+		d, err := time.ParseDuration(flag.Value.String())
+		if err != nil {
+			return time.Duration(0)
+		}
+		return d
 	}
 	if flag.Type != "duration" {
 		return time.Duration(0)
