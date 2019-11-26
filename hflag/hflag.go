@@ -10,14 +10,23 @@ import (
 )
 
 type Flag struct {
-	name         string
-	shorthand    string
-	help         string
-	typeStr      string
-	defaultValue string
-	required     bool
-	assigned     bool
-	value        Value
+	Name      string
+	Shorthand string
+	Usage     string
+	Type      string
+	DefValue  string
+	Required  bool
+	Assigned  bool
+	Value     Value
+}
+
+func (f *Flag) Set(val string) error {
+	if err := f.Value.Set(val); err != nil {
+		return err
+	}
+
+	f.Assigned = true
+	return nil
 }
 
 type FlagSet struct {
@@ -25,6 +34,7 @@ type FlagSet struct {
 	shorthandToName map[string]string
 	posFlagNames    []string
 	flagNames       []string
+	args            []string
 }
 
 func NewFlagSet() *FlagSet {
@@ -34,105 +44,7 @@ func NewFlagSet() *FlagSet {
 	}
 }
 
-func (f *FlagSet) Usage() string {
-	var buffer bytes.Buffer
-
-	buffer.WriteString("usage: ")
-	for _, name := range f.posFlagNames {
-		p := f.nameToFlag[name]
-		buffer.WriteString(fmt.Sprintf(" [%v]", p.name))
-	}
-
-	sort.Strings(f.flagNames)
-	for _, name := range f.flagNames {
-		flag := f.nameToFlag[name]
-		if flag.required {
-			buffer.WriteString(fmt.Sprintf(" <--%v=%v>", flag.name, flag.typeStr))
-		} else {
-			buffer.WriteString(fmt.Sprintf(" [--%v=%v]", flag.name, flag.typeStr))
-		}
-	}
-	buffer.WriteString("\n")
-
-	buffer.WriteString("\npositional options:\n")
-	for _, name := range f.posFlagNames {
-		flag := f.nameToFlag[name]
-		shorthand := ""
-		name := flag.name
-		defaultValue := flag.typeStr
-		if flag.defaultValue != "" {
-			defaultValue = flag.typeStr + "=" + flag.defaultValue
-		}
-		defaultValue = "[" + defaultValue + "]"
-		buffer.WriteString(fmt.Sprintf("%4v  %-15v %-15v %v\n", shorthand, name, defaultValue, flag.help))
-	}
-
-	buffer.WriteString("\noptions:\n")
-	for _, name := range f.flagNames {
-		flag := f.nameToFlag[name]
-		shorthand := ""
-		if flag.shorthand != "" {
-			shorthand = "-" + flag.shorthand
-		}
-		name := "--" + flag.name
-		defaultValue := flag.typeStr
-		if flag.defaultValue != "" {
-			defaultValue = flag.typeStr + "=" + flag.defaultValue
-		}
-		defaultValue = "[" + defaultValue + "]"
-		buffer.WriteString(fmt.Sprintf("%4v, %-15v %-15v %v\n", shorthand, name, defaultValue, flag.help))
-	}
-	fmt.Println(buffer.String())
-
-	return buffer.String()
-}
-
-func (f *FlagSet) BoolVar(b *bool, name string, defaultValue bool, help string) {
-	*b = defaultValue
-	err := f.addFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
-	if err != nil {
-		panic(err)
-	}
-	f.nameToFlag[name].value = (*boolValue)(b)
-}
-
-func (f *FlagSet) Bool(name string, defaultValue bool, help string) *bool {
-	err := f.addFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
-	if err != nil {
-		panic(err)
-	}
-	return (*bool)(f.nameToFlag[name].value.(*boolValue))
-}
-
-func (f *FlagSet) Int(name string, defaultValue int, help string) *int {
-	if err := f.addFlag(name, "", help, "int", false, strconv.Itoa(defaultValue)); err != nil {
-		panic(err)
-	}
-	return (*int)(f.nameToFlag[name].value.(*intValue))
-}
-
-func (f *FlagSet) String(name string, defaultValue string, help string) *string {
-	if err := f.addFlag(name, "", help, "string", false, defaultValue); err != nil {
-		panic(err)
-	}
-	return (*string)(f.nameToFlag[name].value.(*stringValue))
-}
-
-func (f *FlagSet) Duration(name string, defaultValue time.Duration, help string) *time.Duration {
-	if err := f.addFlag(name, "", help, "duration", false, defaultValue.String()); err != nil {
-		panic(err)
-	}
-	return (*time.Duration)(f.nameToFlag[name].value.(*durationValue))
-}
-
-func (f *FlagSet) Float(name string, defaultValue float64, help string) *float64 {
-	if err := f.addFlag(name, "", help, "float", false, fmt.Sprintf("%f", defaultValue)); err != nil {
-		panic(err)
-	}
-	return (*float64)(f.nameToFlag[name].value.(*floatValue))
-}
-
-func (f *FlagSet) LookUp(name string) *Flag {
+func (f *FlagSet) Lookup(name string) *Flag {
 	flag, ok := f.nameToFlag[name]
 	if ok {
 		return flag
@@ -144,10 +56,104 @@ func (f *FlagSet) LookUp(name string) *Flag {
 	return nil
 }
 
+func (f *FlagSet) Set(name string, val string) error {
+	flag := f.Lookup(name)
+	if flag == nil {
+		return fmt.Errorf("no such flag, Name [%v]", name)
+	}
+
+	return flag.Set(val)
+}
+
+func (f *FlagSet) Visit(callback func(f *Flag)) {
+	for _, flag := range f.nameToFlag {
+		if flag.Assigned {
+			callback(flag)
+		}
+	}
+}
+
+func (f *FlagSet) VisitAll(callback func(f *Flag)) {
+	for _, flag := range f.nameToFlag {
+		callback(flag)
+	}
+}
+
+func (f *FlagSet) NArg() int {
+	return len(f.args)
+}
+
+func (f *FlagSet) Args() []string {
+	return f.args
+}
+
+func (f *FlagSet) Arg(i int) string {
+	if i >= len(f.args) {
+		return ""
+	}
+
+	return f.args[i]
+}
+
+func (f *FlagSet) NFlag() int {
+	n := 0
+	for _, flag := range f.nameToFlag {
+		if flag.Assigned {
+			n++
+		}
+	}
+	return n
+}
+
+func (f *FlagSet) BoolVar(b *bool, name string, defaultValue bool, help string) {
+	*b = defaultValue
+	err := f.addFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
+	if err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*boolValue)(b)
+}
+
+func (f *FlagSet) Bool(name string, defaultValue bool, help string) *bool {
+	err := f.addFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
+	if err != nil {
+		panic(err)
+	}
+	return (*bool)(f.nameToFlag[name].Value.(*boolValue))
+}
+
+func (f *FlagSet) Int(name string, defaultValue int, help string) *int {
+	if err := f.addFlag(name, "", help, "int", false, strconv.Itoa(defaultValue)); err != nil {
+		panic(err)
+	}
+	return (*int)(f.nameToFlag[name].Value.(*intValue))
+}
+
+func (f *FlagSet) String(name string, defaultValue string, help string) *string {
+	if err := f.addFlag(name, "", help, "string", false, defaultValue); err != nil {
+		panic(err)
+	}
+	return (*string)(f.nameToFlag[name].Value.(*stringValue))
+}
+
+func (f *FlagSet) Duration(name string, defaultValue time.Duration, help string) *time.Duration {
+	if err := f.addFlag(name, "", help, "duration", false, defaultValue.String()); err != nil {
+		panic(err)
+	}
+	return (*time.Duration)(f.nameToFlag[name].Value.(*durationValue))
+}
+
+func (f *FlagSet) Float(name string, defaultValue float64, help string) *float64 {
+	if err := f.addFlag(name, "", help, "float", false, fmt.Sprintf("%f", defaultValue)); err != nil {
+		panic(err)
+	}
+	return (*float64)(f.nameToFlag[name].Value.(*floatValue))
+}
+
 func (f *FlagSet) allBoolFlag(name string) bool {
 	for i := 0; i < len(name); i++ {
-		flag := f.LookUp(name[i : i+1])
-		if flag == nil || flag.typeStr != "bool" {
+		flag := f.Lookup(name[i : i+1])
+		if flag == nil || flag.Type != "bool" {
 			return false
 		}
 	}
@@ -155,12 +161,19 @@ func (f *FlagSet) allBoolFlag(name string) bool {
 	return true
 }
 
+func isBoolValue(val string) bool {
+	_, err := strconv.ParseBool(val)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func (f *FlagSet) Parse(args []string) error {
-	var posFlagValues []string
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
 		if !strings.HasPrefix(arg, "-") {
-			posFlagValues = append(posFlagValues, arg)
+			f.args = append(f.args, arg)
 			continue
 		}
 		option := arg[1:]
@@ -171,79 +184,79 @@ func (f *FlagSet) Parse(args []string) error {
 			idx := strings.Index(option, "=")
 			name := option[0:idx]
 			val := option[idx+1:]
-			flag := f.LookUp(name)
+			flag := f.Lookup(name)
 			if flag == nil {
 				return fmt.Errorf("unknow option [%v]", name)
 			}
-			if err := flag.value.Set(val); err != nil {
-				return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+			if err := flag.Set(val); err != nil {
+				return fmt.Errorf("set failed. Name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
 			}
-		} else if f.LookUp(option) != nil {
+		} else if f.Lookup(option) != nil {
 			name := option
-			flag := f.LookUp(name)
+			flag := f.Lookup(name)
 			if flag == nil {
 				return fmt.Errorf("unknow option [%v]", name)
 			}
-			if flag.typeStr != "bool" { // 参数不是 bool，后面必有一个值
+			if flag.Type != "bool" { // 参数不是 bool，后面必有一个值
 				if i+1 >= len(args) {
 					return fmt.Errorf("miss any for nonboolean option [%v]", name)
 				}
 				val := args[i+1]
-				if err := flag.value.Set(val); err != nil {
-					return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+				if err := flag.Set(val); err != nil {
+					return fmt.Errorf("set any failed. Name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
 				}
 				i++
 			} else { // 参数为 bool 类型，如果后面的值为 true 或者 false 则设为后面值，否则设置为 true
 				val := "true"
-				if i+1 < len(args) && (args[i+1] == "true" || args[i+1] == "false") {
+				if i+1 < len(args) && isBoolValue(args[i+1]) {
 					val = args[i+1]
 					i++
 				}
-				if err := flag.value.Set(val); err != nil {
-					return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+				if err := flag.Set(val); err != nil {
+					return fmt.Errorf("set any failed. Name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
 				}
 			}
 		} else if f.allBoolFlag(option) { // -kval 全是 bool 选项，-kval 和 -k -v -f -l 等效
 			for i := 0; i < len(arg); i++ {
 				name := option[i : i+1]
-				flag := f.LookUp(name)
-				if err := flag.value.Set("true"); err != nil {
-					return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, "true", flag.typeStr)
+				flag := f.Lookup(name)
+				if err := flag.Set("true"); err != nil {
+					return fmt.Errorf("set any failed. Name: [%v], val: [%v], type: [%v]", name, "true", flag.Type)
 				}
 			}
 		} else {
 			name := option[0:1]
 			val := arg[1:]
-			flag := f.LookUp(name)
+			flag := f.Lookup(name)
 			if flag == nil {
 				return fmt.Errorf("unknow option [%v]", name)
 			}
-			if err := flag.value.Set(val); err != nil {
-				return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+			if err := flag.Set(val); err != nil {
+				return fmt.Errorf("set any failed. Name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
 			}
 		}
 	}
 
 	for i, name := range f.posFlagNames {
-		if i >= len(posFlagValues) {
+		if i >= len(f.args) {
 			break
 		}
-		val := posFlagValues[i]
+		val := f.args[i]
 		flag := f.nameToFlag[name]
-		if err := flag.value.Set(val); err != nil {
-			return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.typeStr)
+		if err := flag.Set(val); err != nil {
+			return fmt.Errorf("set any failed. Name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
 		}
 	}
 
-	// required check
-	//for name, flag := range f.nameToFlag {
-	//	if flag.required {
-	//		return fmt.Errorf("option [%v] is required, but not assigned", name)
-	//	}
-	//}
+	// Required check
+	for name, flag := range f.nameToFlag {
+		if flag.Required && !flag.Assigned {
+			return fmt.Errorf("option [%v] is Required, but not Assigned", name)
+		}
+	}
 
-	//for name, val := range f.nameToFlag {
-	//	fmt.Println(name, "=>", val.any)
+	//for Name, val := range f.nameToFlag {
+	//	fmt.Println(Name, "=>", val.any)
 	//}
 
 	return nil
@@ -256,23 +269,23 @@ func (f *FlagSet) addFlag(name string, shorthand string, help string, typeStr st
 
 	if shorthand != "" {
 		if _, ok := f.shorthandToName[shorthand]; ok {
-			return fmt.Errorf("conflict shorthand [%v]", shorthand)
+			return fmt.Errorf("conflict Shorthand [%v]", shorthand)
 		}
 	}
 
 	flag := &Flag{
-		name:         name,
-		shorthand:    shorthand,
-		help:         help,
-		typeStr:      typeStr,
-		required:     required,
-		defaultValue: defaultValue,
-		value:        NewValueType(typeStr),
+		Name:      name,
+		Shorthand: shorthand,
+		Usage:     help,
+		Type:      typeStr,
+		Required:  required,
+		DefValue:  defaultValue,
+		Value:     NewValueType(typeStr),
 	}
 
 	if len(defaultValue) != 0 {
-		if err := flag.value.Set(defaultValue); err != nil {
-			return fmt.Errorf("set default any failed. err: [%v]", err)
+		if err := flag.Set(defaultValue); err != nil {
+			return fmt.Errorf("set default failed. err: [%v]", err)
 		}
 	}
 
@@ -289,16 +302,16 @@ func (f *FlagSet) addPosFlag(name string, help string, typeStr string, defaultVa
 	}
 
 	flag := &Flag{
-		name:         name,
-		help:         help,
-		typeStr:      typeStr,
-		defaultValue: defaultValue,
-		value:        NewValueType(typeStr),
+		Name:     name,
+		Usage:    help,
+		Type:     typeStr,
+		DefValue: defaultValue,
+		Value:    NewValueType(typeStr),
 	}
 
 	if len(defaultValue) != 0 {
-		if err := flag.value.Set(defaultValue); err != nil {
-			return fmt.Errorf("set default any failed. err: [%v]", err)
+		if err := flag.Set(defaultValue); err != nil {
+			return fmt.Errorf("set default failed. err: [%v]", err)
 		}
 	}
 
@@ -306,4 +319,57 @@ func (f *FlagSet) addPosFlag(name string, help string, typeStr string, defaultVa
 	f.posFlagNames = append(f.posFlagNames, name)
 
 	return nil
+}
+
+func (f *FlagSet) Usage() string {
+	var buffer bytes.Buffer
+
+	buffer.WriteString("usage: ")
+	for _, name := range f.posFlagNames {
+		p := f.nameToFlag[name]
+		buffer.WriteString(fmt.Sprintf(" [%v]", p.Name))
+	}
+
+	sort.Strings(f.flagNames)
+	for _, name := range f.flagNames {
+		flag := f.nameToFlag[name]
+		if flag.Required {
+			buffer.WriteString(fmt.Sprintf(" <--%v=%v>", flag.Name, flag.Type))
+		} else {
+			buffer.WriteString(fmt.Sprintf(" [--%v=%v]", flag.Name, flag.Type))
+		}
+	}
+	buffer.WriteString("\n")
+
+	buffer.WriteString("\npositional options:\n")
+	for _, name := range f.posFlagNames {
+		flag := f.nameToFlag[name]
+		shorthand := ""
+		name := flag.Name
+		defaultValue := flag.Type
+		if flag.DefValue != "" {
+			defaultValue = flag.Type + "=" + flag.DefValue
+		}
+		defaultValue = "[" + defaultValue + "]"
+		buffer.WriteString(fmt.Sprintf("%4v  %-15v %-15v %v\n", shorthand, name, defaultValue, flag.Usage))
+	}
+
+	buffer.WriteString("\noptions:\n")
+	for _, name := range f.flagNames {
+		flag := f.nameToFlag[name]
+		shorthand := ""
+		if flag.Shorthand != "" {
+			shorthand = "-" + flag.Shorthand
+		}
+		name := "--" + flag.Name
+		defaultValue := flag.Type
+		if flag.DefValue != "" {
+			defaultValue = flag.Type + "=" + flag.DefValue
+		}
+		defaultValue = "[" + defaultValue + "]"
+		buffer.WriteString(fmt.Sprintf("%4v, %-15v %-15v %v\n", shorthand, name, defaultValue, flag.Usage))
+	}
+	fmt.Println(buffer.String())
+
+	return buffer.String()
 }

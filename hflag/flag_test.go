@@ -19,7 +19,7 @@ func TestFlag(t *testing.T) {
 		d := flagSet.Duration("d", time.Duration(30)*time.Second, "string flag")
 		b := flagSet.Bool("b", false, "bool flag")
 
-		Convey("check default value", func() {
+		Convey("check default Value", func() {
 			So(*i, ShouldEqual, 10)
 			So(*f, ShouldAlmostEqual, 11.11)
 			So(*s, ShouldEqual, "hello world")
@@ -30,8 +30,8 @@ func TestFlag(t *testing.T) {
 		Convey("parse case success", func() {
 			// 支持三种格式，'-' 和 '--' 是等效的
 			//  -flag		(只支持 bool)
-			// 	-flag value	(不支持 bool)
-			//	-flag=value
+			// 	-flag Value	(不支持 bool)
+			//	-flag=Value
 			err := flagSet.Parse(strings.Split("-b -i 100 -f=12.12 --s golang --d=20s", " "))
 			So(err, ShouldBeNil)
 			So(*i, ShouldEqual, 100)
@@ -41,7 +41,7 @@ func TestFlag(t *testing.T) {
 			So(*b, ShouldBeTrue)
 		})
 
-		Convey("parse case unexpected value", func() {
+		Convey("parse case unexpected Value", func() {
 			// -i 后面期望之后一个参数，但是提供了两个，解析会立即停止，剩下的参数会写入到 args 中
 			err := flagSet.Parse(strings.Split("-b -i 100 101 -f 12.12 -s golang -d 20s", " "))
 			So(err, ShouldBeNil)
