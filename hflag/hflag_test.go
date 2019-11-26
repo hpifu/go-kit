@@ -38,14 +38,14 @@ func TestHFlag(t *testing.T) {
 		})
 
 		Convey("parse case unexpected Value", func() {
-			// -i 后面期望之后一个参数，但是提供了两个，解析会立即停止，剩下的参数会写入到 args 中
+			// -i 后面期望之后一个参数，100 会被当做 -i 的参数，101 会被当成位置参数，继续解析
 			err := flagSet.Parse(strings.Split("-b -i 100 101 -f 12.12 -s golang -d 20s", " "))
 			So(err, ShouldBeNil)
 			So(*b, ShouldBeTrue)
 			So(*i, ShouldEqual, 100)
-			So(*f, ShouldEqual, 12.12)          // not override
-			So(*s, ShouldEqual, "golang")       // not override
-			So(*d, ShouldEqual, 20*time.Second) // not override
+			So(*f, ShouldEqual, 12.12)
+			So(*s, ShouldEqual, "golang")
+			So(*d, ShouldEqual, 20*time.Second)
 			So(flagSet.NFlag(), ShouldEqual, 5)
 			So(flagSet.NArg(), ShouldEqual, 1)
 			So(flagSet.Args(), ShouldResemble, []string{

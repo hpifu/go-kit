@@ -20,82 +20,18 @@ type boolValue bool
 func NewValueType(typeStr string) Value {
 	switch typeStr {
 	case "bool":
-		return NewValue(false)
+		return new(boolValue)
 	case "int":
-		return NewValue(0)
+		return new(intValue)
 	case "float":
-		return NewValue(0.0)
+		return new(floatValue)
 	case "string":
-		return NewValue("")
+		return new(stringValue)
 	case "duration":
-		return NewValue(time.Duration(0))
+		return new(durationValue)
 	}
 
 	return nil
-}
-
-func NewValue(defaultValue interface{}) Value {
-	switch defaultValue.(type) {
-	case int:
-		v := intValue(defaultValue.(int))
-		return &v
-	case float64:
-		v := floatValue(defaultValue.(float64))
-		return &v
-	case bool:
-		v := boolValue(defaultValue.(bool))
-		return &v
-	case string:
-		v := stringValue(defaultValue.(string))
-		return &v
-	case time.Duration:
-		v := durationValue(defaultValue.(time.Duration))
-		return &v
-	}
-
-	return nil
-}
-
-func NewValueVar(p interface{}) Value {
-	switch p.(type) {
-	case *int:
-		return (*intValue)(p.(*int))
-	case *bool:
-		return (*boolValue)(p.(*bool))
-	case *float64:
-		return (*floatValue)(p.(*float64))
-	case *string:
-		return (*stringValue)(p.(*string))
-	case *time.Duration:
-		return (*durationValue)(p.(*time.Duration))
-	}
-
-	return nil
-}
-
-func NewIntValue(defaultValue int, v *int) *intValue {
-	*v = defaultValue
-	return (*intValue)(v)
-}
-
-func NewFloatValue(defaultValue float64, v *float64) *floatValue {
-	*v = defaultValue
-	return (*floatValue)(v)
-}
-
-func NewDurationValue(defaultValue time.Duration, v *time.Duration) *durationValue {
-	*v = defaultValue
-	return (*durationValue)(v)
-}
-
-func NewStringValue(defaultValue string, v *string) *stringValue {
-	*v = defaultValue
-	return (*stringValue)(v)
-}
-
-func NewBoolValue(defaultValue bool, v *bool) *boolValue {
-	*v = defaultValue
-	return (*boolValue)(v)
 }
 
 func (v *intValue) Set(str string) error {
