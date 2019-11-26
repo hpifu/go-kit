@@ -131,6 +131,20 @@ func (f *FlagSet) Float64(name string, defaultValue float64, usage string) *floa
 	return (*float64)(f.nameToFlag[name].Value.(*floatValue))
 }
 
+func (f *FlagSet) IntSlice(name string, defaultValue []int, usage string) *[]int {
+	if err := f.addFlagAutoShorthand(name, usage, "[]int", intSliceValue(defaultValue).String()); err != nil {
+		panic(err)
+	}
+	return (*[]int)(f.nameToFlag[name].Value.(*intSliceValue))
+}
+
+func (f *FlagSet) StringSlice(name string, defaultValue []string, usage string) *[]string {
+	if err := f.addFlagAutoShorthand(name, usage, "[]string", stringSliceValue(defaultValue).String()); err != nil {
+		panic(err)
+	}
+	return (*[]string)(f.nameToFlag[name].Value.(*stringSliceValue))
+}
+
 func (f *FlagSet) BoolVar(v *bool, name string, defaultValue bool, usage string) {
 	*v = defaultValue
 	if err := f.addFlagAutoShorthand(name, usage, "bool", fmt.Sprintf("%v", defaultValue)); err != nil {
@@ -193,6 +207,22 @@ func (f *FlagSet) Float64Var(v *float64, name string, defaultValue float64, usag
 		panic(err)
 	}
 	f.nameToFlag[name].Value = (*floatValue)(v)
+}
+
+func (f *FlagSet) IntSliceVar(v *[]int, name string, defaultValue []int, usage string) {
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "[]int", intSliceValue(defaultValue).String()); err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*intSliceValue)(v)
+}
+
+func (f *FlagSet) StringSliceVar(v *[]string, name string, defaultValue []string, usage string) {
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "[]string", stringSliceValue(defaultValue).String()); err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*stringSliceValue)(v)
 }
 
 func (f *FlagSet) addFlagAutoShorthand(name string, usage string, typeStr string, defaultValue string) error {

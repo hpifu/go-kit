@@ -2,10 +2,11 @@ package hflag
 
 import (
 	"fmt"
-	. "github.com/smartystreets/goconvey/convey"
 	"strings"
 	"testing"
 	"time"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestHFlag(t *testing.T) {
@@ -18,6 +19,7 @@ func TestHFlag(t *testing.T) {
 		s := flagSet.String("s", "hello world", "string flag")
 		d := flagSet.Duration("d", time.Duration(30)*time.Second, "string flag")
 		b := flagSet.Bool("b", false, "bool flag")
+		vi := flagSet.IntSlice("vi", []int{1, 2, 3, 4, 5}, "int slice flag")
 
 		Convey("check default Value", func() {
 			So(*i, ShouldEqual, 10)
@@ -25,16 +27,18 @@ func TestHFlag(t *testing.T) {
 			So(*s, ShouldEqual, "hello world")
 			So(*d, ShouldEqual, time.Duration(30)*time.Second)
 			So(*b, ShouldBeFalse)
+			So(*vi, ShouldResemble, []int{1, 2, 3, 4, 5})
 		})
 
 		Convey("parse case success", func() {
-			err := flagSet.Parse(strings.Split("-b -i 100 -f=12.12 --s golang --d=20s", " "))
+			err := flagSet.Parse(strings.Split("-b -i 100 -f=12.12 --s golang --d=20s -vi 6,7,8,9", " "))
 			So(err, ShouldBeNil)
 			So(*i, ShouldEqual, 100)
 			So(*f, ShouldAlmostEqual, 12.12)
 			So(*s, ShouldEqual, "golang")
 			So(*d, ShouldEqual, time.Duration(20)*time.Second)
 			So(*b, ShouldBeTrue)
+			So(*vi, ShouldResemble, []int{6, 7, 8, 9})
 		})
 
 		Convey("parse case unexpected Value", func() {
@@ -46,7 +50,7 @@ func TestHFlag(t *testing.T) {
 			So(*f, ShouldEqual, 12.12)
 			So(*s, ShouldEqual, "golang")
 			So(*d, ShouldEqual, 20*time.Second)
-			So(flagSet.NFlag(), ShouldEqual, 5)
+			So(flagSet.NFlag(), ShouldEqual, 6)
 			So(flagSet.NArg(), ShouldEqual, 1)
 			So(flagSet.Args(), ShouldResemble, []string{
 				"101",
