@@ -227,8 +227,8 @@ func (f *FlagSet) StringSliceVar(v *[]string, name string, defaultValue []string
 
 func (f *FlagSet) addFlagAutoShorthand(name string, usage string, typeStr string, defaultValue string) error {
 	if len(name) == 1 {
-		return f.AddFlag(name, name, usage, typeStr, false, defaultValue)
+		return f.AddFlag(name, usage, Type(typeStr), DefaultValue(defaultValue), Shorthand(name))
 	}
 
-	return f.AddFlag(name, "", usage, typeStr, false, defaultValue)
+	return f.AddFlag(name, usage, Type(typeStr), DefaultValue(defaultValue))
 }

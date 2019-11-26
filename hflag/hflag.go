@@ -255,7 +255,67 @@ func (f *FlagSet) Parse(args []string) error {
 	return nil
 }
 
-func (f *FlagSet) AddFlag(name string, shorthand string, usage string, typeStr string, required bool, defaultValue string) error {
+type FlagOptions struct {
+	shorthand    string
+	typeStr      string
+	required     bool
+	defaultValue string
+}
+
+type FlagOption func(*FlagOptions)
+
+func NewFlagOptions() *FlagOptions {
+	return &FlagOptions{
+		shorthand:    "",
+		typeStr:      "string",
+		required:     false,
+		defaultValue: "",
+	}
+}
+
+func Required() FlagOption {
+	return func(o *FlagOptions) {
+		o.required = true
+	}
+}
+
+func DefaultValue(val string) FlagOption {
+	return func(o *FlagOptions) {
+		o.defaultValue = val
+	}
+}
+
+func Shorthand(shorthand string) FlagOption {
+	return func(o *FlagOptions) {
+		o.shorthand = shorthand
+	}
+}
+
+func Type(typeStr string) FlagOption {
+	return func(o *FlagOptions) {
+		o.typeStr = typeStr
+	}
+}
+
+func (f *FlagSet) AddFlag(name string, usage string, opts ...FlagOption) error {
+	o := NewFlagOptions()
+	for _, opt := range opts {
+		opt(o)
+	}
+
+	return f.addFlag(name, usage, o.shorthand, o.typeStr, o.required, o.defaultValue)
+}
+
+func (f *FlagSet) AddPosFlag(name string, usage string, opts ...FlagOption) error {
+	o := NewFlagOptions()
+	for _, opt := range opts {
+		opt(o)
+	}
+
+	return f.addPosFlag(name, usage, o.typeStr, o.required, o.defaultValue)
+}
+
+func (f *FlagSet) addFlag(name string, usage string, shorthand string, typeStr string, required bool, defaultValue string) error {
 	if _, ok := f.nameToFlag[name]; ok {
 		return fmt.Errorf("conflict flag [%v]", name)
 	}
@@ -293,7 +353,7 @@ func (f *FlagSet) AddFlag(name string, shorthand string, usage string, typeStr s
 	return nil
 }
 
-func (f *FlagSet) AddPosFlag(name string, usage string, typeStr string, defaultValue string) error {
+func (f *FlagSet) addPosFlag(name string, usage string, typeStr string, required bool, defaultValue string) error {
 	if _, ok := f.nameToFlag[name]; ok {
 		return fmt.Errorf("conflict flag [%v]", name)
 	}
@@ -302,6 +362,7 @@ func (f *FlagSet) AddPosFlag(name string, usage string, typeStr string, defaultV
 		Name:     name,
 		Usage:    usage,
 		Type:     typeStr,
+		Required: required,
 		DefValue: defaultValue,
 		Value:    NewValueType(typeStr),
 	}

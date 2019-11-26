@@ -159,12 +159,12 @@ func Parse(args []string) error {
 	return CommandLine.Parse(args)
 }
 
-func AddFlag(name string, shorthand string, usage string, typeStr string, required bool, defaultValue string) error {
-	return CommandLine.AddFlag(name, shorthand, usage, typeStr, required, defaultValue)
+func AddFlag(name string, usage string, opts ...FlagOption) error {
+	return CommandLine.AddFlag(name, usage, opts...)
 }
 
-func AddPosFlag(name string, usage string, typeStr string, defaultValue string) error {
-	return CommandLine.AddPosFlag(name, usage, typeStr, defaultValue)
+func AddPosFlag(name string, usage string, opts ...FlagOption) error {
+	return CommandLine.AddPosFlag(name, usage, opts...)
 }
 
 func Usage() string {

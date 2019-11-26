@@ -92,15 +92,15 @@ func TestHFlag(t *testing.T) {
 func TestHFlagParse(t *testing.T) {
 	Convey("test case1", t, func() {
 		flagSet := NewFlagSet("test flag")
-		So(flagSet.AddFlag("int-option", "i", "usage", "int", true, "10"), ShouldBeNil)
-		So(flagSet.AddFlag("str-option", "s", "usage", "string", true, ""), ShouldBeNil)
-		So(flagSet.AddFlag("key", "k", "usage", "float", true, ""), ShouldBeNil)
-		So(flagSet.AddFlag("all", "a", "usage", "bool", true, ""), ShouldBeNil)
-		So(flagSet.AddFlag("user", "u", "usage", "bool", true, ""), ShouldBeNil)
-		So(flagSet.AddFlag("password", "p", "usage", "string", false, "654321"), ShouldBeNil)
-		So(flagSet.AddFlag("vs", "v", "usage", "[]string", false, "dog,cat"), ShouldBeNil)
-		So(flagSet.AddPosFlag("pos1", "usage", "string", ""), ShouldBeNil)
-		So(flagSet.AddPosFlag("pos2", "usage", "string", ""), ShouldBeNil)
+		So(flagSet.AddFlag("int-option", "usage", Shorthand("i"), Type("int"), Required(), DefaultValue("10")), ShouldBeNil)
+		So(flagSet.AddFlag("str-option", "usage", Shorthand("s"), Required()), ShouldBeNil)
+		So(flagSet.AddFlag("key", "usage", Shorthand("k"), Type("float"), Required()), ShouldBeNil)
+		So(flagSet.AddFlag("all", "usage", Shorthand("a"), Type("bool"), Required()), ShouldBeNil)
+		So(flagSet.AddFlag("user", "usage", Shorthand("u"), Type("bool"), Required()), ShouldBeNil)
+		So(flagSet.AddFlag("password", "usage", Shorthand("p"), Type("string"), DefaultValue("654321")), ShouldBeNil)
+		So(flagSet.AddFlag("vs", "usage", Shorthand("v"), Type("[]string"), DefaultValue("dog,cat")), ShouldBeNil)
+		So(flagSet.AddPosFlag("pos1", "usage", Type("string")), ShouldBeNil)
+		So(flagSet.AddPosFlag("pos2", "usage", Type("string")), ShouldBeNil)
 
 		Convey("check default value", func() {
 			So(flagSet.GetInt("int-option"), ShouldEqual, 10)
