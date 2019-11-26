@@ -34,12 +34,14 @@ type FlagSet struct {
 	posFlagNames    []string
 	flagNames       []string
 	args            []string
+	parsed          bool
 }
 
 func NewFlagSet() *FlagSet {
 	return &FlagSet{
 		nameToFlag:      map[string]*Flag{},
 		shorthandToName: map[string]string{},
+		parsed:          false,
 	}
 }
 
@@ -148,10 +150,12 @@ func (f *FlagSet) Parse(args []string) error {
 		}
 	}
 
+	f.parsed = true
+
 	return nil
 }
 
-func (f *FlagSet) AddFlag(name string, shorthand string, help string, typeStr string, required bool, defaultValue string) error {
+func (f *FlagSet) AddFlag(name string, shorthand string, usage string, typeStr string, required bool, defaultValue string) error {
 	if _, ok := f.nameToFlag[name]; ok {
 		return fmt.Errorf("conflict flag [%v]", name)
 	}
@@ -165,7 +169,7 @@ func (f *FlagSet) AddFlag(name string, shorthand string, help string, typeStr st
 	flag := &Flag{
 		Name:      name,
 		Shorthand: shorthand,
-		Usage:     help,
+		Usage:     usage,
 		Type:      typeStr,
 		Required:  required,
 		DefValue:  defaultValue,
@@ -185,14 +189,14 @@ func (f *FlagSet) AddFlag(name string, shorthand string, help string, typeStr st
 	return nil
 }
 
-func (f *FlagSet) AddPosFlag(name string, help string, typeStr string, defaultValue string) error {
+func (f *FlagSet) AddPosFlag(name string, usage string, typeStr string, defaultValue string) error {
 	if _, ok := f.nameToFlag[name]; ok {
 		return fmt.Errorf("conflict flag [%v]", name)
 	}
 
 	flag := &Flag{
 		Name:     name,
-		Usage:    help,
+		Usage:    usage,
 		Type:     typeStr,
 		DefValue: defaultValue,
 		Value:    NewValueType(typeStr),

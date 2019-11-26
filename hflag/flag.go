@@ -41,6 +41,10 @@ func (f *FlagSet) VisitAll(callback func(f *Flag)) {
 	}
 }
 
+func (f *FlagSet) Parsed() bool {
+	return f.parsed
+}
+
 func (f *FlagSet) NArg() int {
 	return len(f.args)
 }
