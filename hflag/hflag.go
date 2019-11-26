@@ -115,6 +115,13 @@ func (f *FlagSet) GetBool(name string) bool {
 	if flag == nil {
 		return false
 	}
+	if flag.Type == "string" {
+		b, err := strconv.ParseBool(flag.Value.String())
+		if err != nil {
+			return false
+		}
+		return b
+	}
 	if flag.Type != "bool" {
 		return false
 	}
@@ -126,6 +133,13 @@ func (f *FlagSet) GetIntSlice(name string) []int {
 	if flag == nil {
 		return nil
 	}
+	if flag.Type == "string" {
+		v := intSliceValue{}
+		if err := v.Set(flag.Value.String()); err != nil {
+			return nil
+		}
+		return []int(v)
+	}
 	if flag.Type != "[]int" {
 		return nil
 	}
@@ -136,6 +150,13 @@ func (f *FlagSet) GetStringSlice(name string) []string {
 	flag := f.Lookup(name)
 	if flag == nil {
 		return nil
+	}
+	if flag.Type == "string" {
+		v := stringSliceValue{}
+		if err := v.Set(flag.Value.String()); err != nil {
+			return nil
+		}
+		return []string(v)
 	}
 	if flag.Type != "[]string" {
 		return nil

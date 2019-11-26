@@ -114,11 +114,11 @@ func TestHFlagParse(t *testing.T) {
 			So(flagSet.GetString("pos2"), ShouldEqual, "")
 		})
 
-		Convey("parse", func() {
+		Convey("parse case 1", func() {
 			err := flagSet.Parse([]string{
 				"val1",
 				"--int-option=123",
-				"--str-option", "hello world",
+				"--str-option", "apple,banana,orange",
 				"-k", "3.14",
 				"-au",
 				"-p123456",
@@ -128,7 +128,10 @@ func TestHFlagParse(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			So(flagSet.GetInt("int-option"), ShouldEqual, 123)
-			So(flagSet.GetString("str-option"), ShouldEqual, "hello world")
+			So(flagSet.GetString("str-option"), ShouldEqual, "apple,banana,orange")
+			So(flagSet.GetStringSlice("str-option"), ShouldResemble, []string{
+				"apple", "banana", "orange",
+			})
 			So(flagSet.GetFloat("key"), ShouldAlmostEqual, 3.14)
 			So(flagSet.GetBool("all"), ShouldBeTrue)
 			So(flagSet.GetBool("user"), ShouldBeTrue)
@@ -143,7 +146,14 @@ func TestHFlagParse(t *testing.T) {
 			So(flagSet.Arg(0), ShouldEqual, "val1")
 			So(flagSet.Arg(1), ShouldEqual, "val2")
 		})
-		flagSet.Usage()
+
+		Convey("parse case 2", func() {
+			err := flagSet.Parse(strings.Split("--str-option=1,2,3,4 -key=3 -au", " "))
+			So(err, ShouldBeNil)
+			So(flagSet.GetIntSlice("str-option"), ShouldResemble, []int{1, 2, 3, 4})
+			So(flagSet.GetString("a"), ShouldEqual, "true")
+			So(flagSet.GetString("u"), ShouldEqual, "true")
+		})
 	})
 
 	Convey("test case2", t, func() {

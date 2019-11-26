@@ -54,7 +54,7 @@ func (f *FlagSet) Args() []string {
 }
 
 func (f *FlagSet) Arg(i int) string {
-	if i >= len(f.args) {
+	if i >= len(f.args) || i < 0 {
 		return ""
 	}
 
