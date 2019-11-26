@@ -26,10 +26,6 @@ func TestHFlag(t *testing.T) {
 		})
 
 		Convey("parse case success", func() {
-			// 支持三种格式，'-' 和 '--' 是等效的
-			//  -flag		(只支持 bool)
-			// 	-flag Value	(不支持 bool)
-			//	-flag=Value
 			err := flagSet.Parse(strings.Split("-b -i 100 -f=12.12 --s golang --d=20s", " "))
 			So(err, ShouldBeNil)
 			So(*i, ShouldEqual, 100)

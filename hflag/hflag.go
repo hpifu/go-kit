@@ -189,21 +189,21 @@ func (f *FlagSet) Parse(args []string) error {
 				return fmt.Errorf("unknow option [%v]", name)
 			}
 			if err := flag.Set(val); err != nil {
-				return fmt.Errorf("set failed. Name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
+				return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
 			}
 		} else if f.Lookup(option) != nil {
 			name := option
 			flag := f.Lookup(name)
 			if flag == nil {
-				return fmt.Errorf("unknow option [%v]", name)
+				return fmt.Errorf("unknow flag [%v]", name)
 			}
 			if flag.Type != "bool" { // 参数不是 bool，后面必有一个值
 				if i+1 >= len(args) {
-					return fmt.Errorf("miss any for nonboolean option [%v]", name)
+					return fmt.Errorf("miss argument for nonboolean option [%v]", name)
 				}
 				val := args[i+1]
 				if err := flag.Set(val); err != nil {
-					return fmt.Errorf("set any failed. Name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
+					return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
 				}
 				i++
 			} else { // 参数为 bool 类型，如果后面的值为 true 或者 false 则设为后面值，否则设置为 true
@@ -213,7 +213,7 @@ func (f *FlagSet) Parse(args []string) error {
 					i++
 				}
 				if err := flag.Set(val); err != nil {
-					return fmt.Errorf("set any failed. Name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
+					return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
 				}
 			}
 		} else if f.allBoolFlag(option) { // -kval 全是 bool 选项，-kval 和 -k -v -f -l 等效
@@ -221,7 +221,7 @@ func (f *FlagSet) Parse(args []string) error {
 				name := option[i : i+1]
 				flag := f.Lookup(name)
 				if err := flag.Set("true"); err != nil {
-					return fmt.Errorf("set any failed. Name: [%v], val: [%v], type: [%v]", name, "true", flag.Type)
+					return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v]", name, "true", flag.Type)
 				}
 			}
 		} else {
@@ -232,7 +232,7 @@ func (f *FlagSet) Parse(args []string) error {
 				return fmt.Errorf("unknow option [%v]", name)
 			}
 			if err := flag.Set(val); err != nil {
-				return fmt.Errorf("set any failed. Name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
+				return fmt.Errorf("set failed. name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
 			}
 		}
 	}
@@ -244,20 +244,16 @@ func (f *FlagSet) Parse(args []string) error {
 		val := f.args[i]
 		flag := f.nameToFlag[name]
 		if err := flag.Set(val); err != nil {
-			return fmt.Errorf("set any failed. Name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
+			return fmt.Errorf("set any failed. name: [%v], val: [%v], type: [%v]", name, val, flag.Type)
 		}
 	}
 
 	// Required check
 	for name, flag := range f.nameToFlag {
 		if flag.Required && !flag.Assigned {
-			return fmt.Errorf("option [%v] is Required, but not Assigned", name)
+			return fmt.Errorf("option [%v] is required, but not assigned", name)
 		}
 	}
-
-	//for Name, val := range f.nameToFlag {
-	//	fmt.Println(Name, "=>", val.any)
-	//}
 
 	return nil
 }
@@ -269,7 +265,7 @@ func (f *FlagSet) addFlag(name string, shorthand string, help string, typeStr st
 
 	if shorthand != "" {
 		if _, ok := f.shorthandToName[shorthand]; ok {
-			return fmt.Errorf("conflict Shorthand [%v]", shorthand)
+			return fmt.Errorf("conflict shorthand [%v]", shorthand)
 		}
 	}
 
