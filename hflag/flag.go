@@ -75,47 +75,85 @@ func (f *FlagSet) PrintDefaults() {
 	fmt.Println(f.Usage())
 }
 
-func (f *FlagSet) BoolVar(b *bool, name string, defaultValue bool, help string) {
-	*b = defaultValue
-	err := f.AddFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
-	if err != nil {
-		panic(err)
-	}
-	f.nameToFlag[name].Value = (*boolValue)(b)
-}
-
-func (f *FlagSet) Bool(name string, defaultValue bool, help string) *bool {
-	err := f.AddFlag(name, "", help, "bool", false, fmt.Sprintf("%v", defaultValue))
-	if err != nil {
+func (f *FlagSet) Bool(name string, defaultValue bool, usage string) *bool {
+	if err := f.addFlagAutoShorthand(name, usage, "bool", fmt.Sprintf("%v", defaultValue)); err != nil {
 		panic(err)
 	}
 	return (*bool)(f.nameToFlag[name].Value.(*boolValue))
 }
 
-func (f *FlagSet) Int(name string, defaultValue int, help string) *int {
-	if err := f.AddFlag(name, "", help, "int", false, strconv.Itoa(defaultValue)); err != nil {
+func (f *FlagSet) Int(name string, defaultValue int, usage string) *int {
+	if err := f.addFlagAutoShorthand(name, usage, "int", strconv.Itoa(defaultValue)); err != nil {
 		panic(err)
 	}
 	return (*int)(f.nameToFlag[name].Value.(*intValue))
 }
 
-func (f *FlagSet) String(name string, defaultValue string, help string) *string {
-	if err := f.AddFlag(name, "", help, "string", false, defaultValue); err != nil {
+func (f *FlagSet) String(name string, defaultValue string, usage string) *string {
+	if err := f.addFlagAutoShorthand(name, usage, "string", defaultValue); err != nil {
 		panic(err)
 	}
 	return (*string)(f.nameToFlag[name].Value.(*stringValue))
 }
 
-func (f *FlagSet) Duration(name string, defaultValue time.Duration, help string) *time.Duration {
-	if err := f.AddFlag(name, "", help, "duration", false, defaultValue.String()); err != nil {
+func (f *FlagSet) Duration(name string, defaultValue time.Duration, usage string) *time.Duration {
+	if err := f.addFlagAutoShorthand(name, usage, "duration", defaultValue.String()); err != nil {
 		panic(err)
 	}
 	return (*time.Duration)(f.nameToFlag[name].Value.(*durationValue))
 }
 
-func (f *FlagSet) Float(name string, defaultValue float64, help string) *float64 {
-	if err := f.AddFlag(name, "", help, "float", false, fmt.Sprintf("%f", defaultValue)); err != nil {
+func (f *FlagSet) Float64(name string, defaultValue float64, usage string) *float64 {
+	if err := f.addFlagAutoShorthand(name, usage, "float", fmt.Sprintf("%f", defaultValue)); err != nil {
 		panic(err)
 	}
 	return (*float64)(f.nameToFlag[name].Value.(*floatValue))
+}
+
+func (f *FlagSet) BoolVar(v *bool, name string, defaultValue bool, usage string) {
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "bool", fmt.Sprintf("%v", defaultValue)); err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*boolValue)(v)
+}
+
+func (f *FlagSet) IntVar(v *int, name string, defaultValue int, usage string) {
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "int", strconv.Itoa(defaultValue)); err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*intValue)(v)
+}
+
+func (f *FlagSet) StringVar(v *string, name string, defaultValue string, usage string) {
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "string", defaultValue); err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*stringValue)(v)
+}
+
+func (f *FlagSet) DurationVar(v *time.Duration, name string, defaultValue time.Duration, usage string) {
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "duration", defaultValue.String()); err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*durationValue)(v)
+}
+
+func (f *FlagSet) Float64Var(v *float64, name string, defaultValue float64, usage string) {
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "float", fmt.Sprintf("%f", defaultValue)); err != nil {
+		panic(err)
+	}
+	f.nameToFlag[name].Value = (*floatValue)(v)
+}
+
+func (f *FlagSet) addFlagAutoShorthand(name string, usage string, typeStr string, defaultValue string) error {
+	if len(name) == 1 {
+		return f.AddFlag(name, name, usage, typeStr, false, defaultValue)
+	}
+
+	return f.AddFlag(name, "", usage, typeStr, false, defaultValue)
 }
