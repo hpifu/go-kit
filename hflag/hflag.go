@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net"
+	"path"
 	"sort"
 	"strconv"
 	"strings"
@@ -425,52 +426,98 @@ func (f *FlagSet) addPosFlag(name string, usage string, typeStr string, required
 }
 
 func (f *FlagSet) Usage() string {
-	var buffer bytes.Buffer
+	type info struct {
+		shorthand   string
+		name        string
+		typeDefault string
+		usage       string
+	}
 
-	buffer.WriteString("usage: ")
+	var posFlagInfos []*info
+	var flagInfos []*info
+
 	for _, name := range f.posFlagNames {
-		p := f.nameToFlag[name]
-		buffer.WriteString(fmt.Sprintf(" [%v]", p.Name))
+		flag := f.nameToFlag[name]
+		defaultValue := flag.Type
+		if flag.DefValue != "" {
+			defaultValue = flag.Type + "=" + flag.DefValue
+		}
+		posFlagInfos = append(posFlagInfos, &info{
+			shorthand:   "",
+			name:        flag.Name,
+			typeDefault: "[" + defaultValue + "]",
+			usage:       flag.Usage,
+		})
 	}
 
 	sort.Strings(f.flagNames)
 	for _, name := range f.flagNames {
 		flag := f.nameToFlag[name]
-		if flag.Required {
-			buffer.WriteString(fmt.Sprintf(" <--%v=%v>", flag.Name, flag.Type))
-		} else {
-			buffer.WriteString(fmt.Sprintf(" [--%v=%v]", flag.Name, flag.Type))
-		}
-	}
-	buffer.WriteString("\n")
-
-	buffer.WriteString("\npositional options:\n")
-	for _, name := range f.posFlagNames {
-		flag := f.nameToFlag[name]
-		shorthand := ""
-		name := flag.Name
 		defaultValue := flag.Type
 		if flag.DefValue != "" {
 			defaultValue = flag.Type + "=" + flag.DefValue
 		}
-		defaultValue = "[" + defaultValue + "]"
-		buffer.WriteString(fmt.Sprintf("%4v  %-15v %-15v %v\n", shorthand, name, defaultValue, flag.Usage))
-	}
-
-	buffer.WriteString("\noptions:\n")
-	for _, name := range f.flagNames {
-		flag := f.nameToFlag[name]
 		shorthand := ""
 		if flag.Shorthand != "" {
 			shorthand = "-" + flag.Shorthand
 		}
-		name := "--" + flag.Name
-		defaultValue := flag.Type
-		if flag.DefValue != "" {
-			defaultValue = flag.Type + "=" + flag.DefValue
+		flagInfos = append(flagInfos, &info{
+			shorthand:   shorthand,
+			name:        "--" + flag.Name,
+			typeDefault: "[" + defaultValue + "]",
+			usage:       flag.Usage,
+		})
+	}
+
+	max := func(a, b int) int {
+		if a > b {
+			return a
 		}
-		defaultValue = "[" + defaultValue + "]"
-		buffer.WriteString(fmt.Sprintf("%4v, %-15v %-15v %v\n", shorthand, name, defaultValue, flag.Usage))
+		return b
+	}
+	var shorthandWidth, nameWidth, typeDefaultWidth int
+	for _, i := range append(posFlagInfos, flagInfos...) {
+		shorthandWidth = max(len(i.shorthand), shorthandWidth)
+		nameWidth = max(len(i.name), nameWidth)
+		typeDefaultWidth = max(len(i.typeDefault), typeDefaultWidth)
+	}
+
+	var buffer bytes.Buffer
+
+	buffer.WriteString("usage: ")
+	buffer.WriteString(path.Base(f.name))
+	for _, name := range f.posFlagNames {
+		p := f.nameToFlag[name]
+		buffer.WriteString(fmt.Sprintf(" [%v]", p.Name))
+	}
+
+	for _, name := range f.flagNames {
+		flag := f.nameToFlag[name]
+		nameShorthand := flag.Name
+		if flag.Shorthand != "" {
+			nameShorthand = flag.Shorthand + "," + flag.Name
+		}
+		if flag.DefValue != "" {
+			buffer.WriteString(fmt.Sprintf(" [-%v %v=%v]", nameShorthand, flag.Type, flag.DefValue))
+		} else if flag.Required {
+			buffer.WriteString(fmt.Sprintf(" <-%v %v>", nameShorthand, flag.Type))
+		} else {
+			buffer.WriteString(fmt.Sprintf(" [-%v %v]", nameShorthand, flag.Type))
+		}
+	}
+	buffer.WriteString("\n")
+
+	if len(posFlagInfos) != 0 {
+		buffer.WriteString("\npositional options:\n")
+		posFormat := fmt.Sprintf("  %%%dv  %%-%dv  %%-%dv  %%v\n", shorthandWidth, nameWidth, typeDefaultWidth)
+		for _, i := range posFlagInfos {
+			buffer.WriteString(fmt.Sprintf(posFormat, i.shorthand, i.name, i.typeDefault, i.usage))
+		}
+	}
+	buffer.WriteString("\noptions:\n")
+	format := fmt.Sprintf("  %%%dv, %%-%dv  %%-%dv  %%v\n", shorthandWidth, nameWidth, typeDefaultWidth)
+	for _, i := range flagInfos {
+		buffer.WriteString(fmt.Sprintf(format, i.shorthand, i.name, i.typeDefault, i.usage))
 	}
 
 	return buffer.String()

@@ -1,6 +1,7 @@
 package hflag
 
 import (
+	"fmt"
 	"net"
 	"os"
 	"time"
@@ -181,7 +182,18 @@ func GetTime(name string) time.Time {
 }
 
 func Parse() error {
-	return CommandLine.Parse(os.Args[1:])
+	if CommandLine.Lookup("help") == nil && CommandLine.Lookup("h") == nil {
+		CommandLine.AddFlag("help", "show usage", Shorthand("h"), Type("bool"))
+	}
+	if err := CommandLine.Parse(os.Args[1:]); err != nil {
+		return err
+	}
+	if CommandLine.GetBool("help") {
+		fmt.Println(CommandLine.Usage())
+		os.Exit(0)
+	}
+
+	return nil
 }
 
 func AddFlag(name string, usage string, opts ...FlagOption) {
