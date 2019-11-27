@@ -186,6 +186,10 @@ func Parse() error {
 		CommandLine.AddFlag("help", "show usage", Shorthand("h"), Type("bool"))
 	}
 	if err := CommandLine.Parse(os.Args[1:]); err != nil {
+		if CommandLine.GetBool("help") {
+			fmt.Println(CommandLine.Usage())
+			os.Exit(0)
+		}
 		return err
 	}
 	if CommandLine.GetBool("help") {

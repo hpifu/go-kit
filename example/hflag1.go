@@ -13,6 +13,7 @@ func main() {
 	hflag.AddFlag("time", "time flag", hflag.Type("time"), hflag.DefaultValue("2019-11-27"))
 	hflag.AddPosFlag("pos", "pos flag")
 	if err := hflag.Parse(); err != nil {
+		fmt.Println(hflag.Usage())
 		panic(err)
 	}
 
