@@ -21,4 +21,5 @@ func main() {
 	fmt.Println("int-slice =>", hflag.GetIntSlice("int-slice"))
 	fmt.Println("ip =>", hflag.GetIP("ip"))
 	fmt.Println("time =>", hflag.GetTime("time"))
+	fmt.Println("pos =>", hflag.GetString("pos"))
 }
