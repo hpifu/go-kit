@@ -146,3 +146,7 @@ options:
 - 合法的 time 值: `2019-11-27`, `2019-11-27T00:00:00`, `2019-11-27T00:00:00Z8:00`, `now`
 - []int 值: `1,2,3,4`
 - []string: `apple,banana`
+
+## 链接
+
+- 例子: <https://github.com/hpifu/go-kit/tree/master/example>
