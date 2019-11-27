@@ -262,7 +262,7 @@ func (f FlagSet) IPVar(v *net.IP, name string, defaultValue net.IP, usage string
 
 func (f *FlagSet) addFlagAutoShorthand(name string, usage string, typeStr string, defaultValue string) error {
 	if len(name) == 1 {
-		return f.AddFlag(name, usage, Type(typeStr), DefaultValue(defaultValue), Shorthand(name))
+		return f.addFlag(name, usage, name, typeStr, false, defaultValue)
 	}
-	return f.AddFlag(name, usage, Type(typeStr), DefaultValue(defaultValue))
+	return f.addFlag(name, usage, "", typeStr, false, defaultValue)
 }

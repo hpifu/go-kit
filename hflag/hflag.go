@@ -3,6 +3,7 @@ package hflag
 import (
 	"bytes"
 	"fmt"
+	"net"
 	"sort"
 	"strconv"
 	"strings"
@@ -164,6 +165,42 @@ func (f *FlagSet) GetStringSlice(name string) []string {
 	return []string(*flag.Value.(*stringSliceValue))
 }
 
+func (f *FlagSet) GetIP(name string) net.IP {
+	flag := f.Lookup(name)
+	if flag == nil {
+		return nil
+	}
+	if flag.Type == "string" {
+		v := ipValue{}
+		if err := v.Set(flag.Value.String()); err != nil {
+			return nil
+		}
+		return net.IP(v)
+	}
+	if flag.Type != "ip" {
+		return nil
+	}
+	return net.IP(*flag.Value.(*ipValue))
+}
+
+func (f *FlagSet) GetTime(name string) time.Time {
+	flag := f.Lookup(name)
+	if flag == nil {
+		return time.Unix(0, 0)
+	}
+	if flag.Type == "string" {
+		v := timeValue{}
+		if err := v.Set(flag.Value.String()); err != nil {
+			return time.Unix(0, 0)
+		}
+		return time.Time(v)
+	}
+	if flag.Type != "time" {
+		return time.Unix(0, 0)
+	}
+	return time.Time(*flag.Value.(*timeValue))
+}
+
 func (f *FlagSet) Parse(args []string) error {
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
@@ -297,22 +334,26 @@ func Type(typeStr string) FlagOption {
 	}
 }
 
-func (f *FlagSet) AddFlag(name string, usage string, opts ...FlagOption) error {
+func (f *FlagSet) AddFlag(name string, usage string, opts ...FlagOption) {
 	o := NewFlagOptions()
 	for _, opt := range opts {
 		opt(o)
 	}
 
-	return f.addFlag(name, usage, o.shorthand, o.typeStr, o.required, o.defaultValue)
+	if err := f.addFlag(name, usage, o.shorthand, o.typeStr, o.required, o.defaultValue); err != nil {
+		panic(err)
+	}
 }
 
-func (f *FlagSet) AddPosFlag(name string, usage string, opts ...FlagOption) error {
+func (f *FlagSet) AddPosFlag(name string, usage string, opts ...FlagOption) {
 	o := NewFlagOptions()
 	for _, opt := range opts {
 		opt(o)
 	}
 
-	return f.addPosFlag(name, usage, o.typeStr, o.required, o.defaultValue)
+	if err := f.addPosFlag(name, usage, o.typeStr, o.required, o.defaultValue); err != nil {
+		panic(err)
+	}
 }
 
 func (f *FlagSet) addFlag(name string, usage string, shorthand string, typeStr string, required bool, defaultValue string) error {

@@ -172,16 +172,24 @@ func GetStringSlice(name string) []string {
 	return CommandLine.GetStringSlice(name)
 }
 
-func Parse(args []string) error {
-	return CommandLine.Parse(args)
+func GetIP(name string) net.IP {
+	return CommandLine.GetIP(name)
 }
 
-func AddFlag(name string, usage string, opts ...FlagOption) error {
-	return CommandLine.AddFlag(name, usage, opts...)
+func GetTime(name string) time.Time {
+	return CommandLine.GetTime(name)
 }
 
-func AddPosFlag(name string, usage string, opts ...FlagOption) error {
-	return CommandLine.AddPosFlag(name, usage, opts...)
+func Parse() error {
+	return CommandLine.Parse(os.Args[1:])
+}
+
+func AddFlag(name string, usage string, opts ...FlagOption) {
+	CommandLine.AddFlag(name, usage, opts...)
+}
+
+func AddPosFlag(name string, usage string, opts ...FlagOption) {
+	CommandLine.AddPosFlag(name, usage, opts...)
 }
 
 func Usage() string {
