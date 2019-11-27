@@ -149,4 +149,5 @@ options:
 
 ## 链接
 
+- 项目地址: <https://github.com/hpifu/go-kit/tree/master/hflag>
 - 例子: <https://github.com/hpifu/go-kit/tree/master/example>
