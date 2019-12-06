@@ -115,25 +115,25 @@ func TestHConfBindEnv(t *testing.T) {
 
 func TestHConfUnMarshal(t *testing.T) {
 	type cinfo struct {
-		Class    string `json:"class"`
-		Table    string `json:"table"`
-		Interval string `json:"interval"`
+		Class    string `hconf:"class"`
+		Table    string `hconf:"table"`
+		Interval string `hconf:"interval"`
 	}
 
 	type rinfo struct {
-		Address  string `json:"address"`
-		Database string `json:"database"`
-		Retry    int    `json:"retry"`
+		Address  string `hconf:"address"`
+		Database string `hconf:"database"`
+		Retry    int    `hconf:"retry"`
 	}
 
 	type linfo struct {
-		Filename string        `json:"filename"`
-		MaxAge   time.Duration `json:"maxAge"`
+		Filename string        `hconf:"filename"`
+		MaxAge   time.Duration `hconf:"maxAge"`
 	}
 
 	type logger struct {
-		InfoLog linfo  `json:"infoLog"`
-		WarnLog *linfo `json:"warnLog"`
+		InfoLog linfo  `hconf:"infoLog"`
+		WarnLog *linfo `hconf:"warnLog"`
 	}
 
 	Convey("test conf unmarshal", t, func() {

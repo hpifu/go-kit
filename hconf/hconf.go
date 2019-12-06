@@ -233,7 +233,7 @@ func interfaceToStructV2(d interface{}, v interface{}) error {
 		}
 		for i := 0; i < rv.NumField(); i++ {
 			field := rv.Field(i)
-			value := dv[rt.Field(i).Tag.Get("json")]
+			value := dv[rt.Field(i).Tag.Get("hconf")]
 			switch rt.Field(i).Type.Kind() {
 			case reflect.Ptr:
 				nv := reflect.New(field.Type().Elem())
@@ -301,7 +301,7 @@ func interfaceToStructV1(d interface{}, v interface{}) error {
 
 	for i := 0; i < rv.NumField(); i++ {
 		field := rv.Field(i)
-		value := dv[rt.Field(i).Tag.Get("json")]
+		value := dv[rt.Field(i).Tag.Get("hconf")]
 		switch rt.Field(i).Type.Kind() {
 		case reflect.Int:
 			i, err := cast.ToIntE(value)
