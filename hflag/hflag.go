@@ -637,6 +637,10 @@ func (f *FlagSet) addFlags(v interface{}, prefix string) error {
 		tag := rt.Field(i).Tag.Get("hflag")
 		t := rt.Field(i).Type
 
+		if tag == "" || tag == "-" {
+			continue
+		}
+
 		typeStr, value, err := interfaceToType(rv.Field(i))
 		if err == nil {
 			name, shorthand, usage, required, defaultValue, position, err := parseTag(tag)
