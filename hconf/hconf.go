@@ -149,19 +149,108 @@ func (h *HConf) Set(key string, val interface{}) error {
 	return nil
 }
 
-//func (h HConf) Unmarshal(v interface{}) error {
-//	buf, err := json5.Marshal(h.data)
-//	if err != nil {
-//		return err
-//	}
-//	return json5.Unmarshal(buf, v)
-//}
-
 func (h HConf) Unmarshal(v interface{}) error {
-	return interfaceToStruct(h.data, v)
+	return interfaceToStructV2(h.data, v)
 }
 
-func interfaceToStruct(d interface{}, v interface{}) error {
+func interfaceToStructV2(d interface{}, v interface{}) error {
+	if reflect.ValueOf(v).Kind() != reflect.Ptr {
+		return fmt.Errorf("invalid value type")
+	}
+
+	rv := reflect.ValueOf(v).Elem()
+	rt := reflect.TypeOf(v).Elem()
+	switch rt.Kind() {
+	case reflect.Int:
+		i, err := cast.ToIntE(d)
+		if err != nil {
+			return err
+		}
+		rv.Set(reflect.ValueOf(i))
+	case reflect.Int64:
+		if rt == reflect.TypeOf(time.Duration(0)) {
+			i, err := cast.ToStringE(d)
+			if err != nil {
+				return err
+			}
+			t, err := time.ParseDuration(i)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(t))
+		} else {
+			i, err := cast.ToInt64E(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(i))
+		}
+	case reflect.Uint64:
+		i, err := cast.ToUint64E(d)
+		if err != nil {
+			return err
+		}
+		rv.Set(reflect.ValueOf(i))
+	case reflect.Float64:
+		i, err := cast.ToFloat64E(d)
+		if err != nil {
+			return err
+		}
+		rv.Set(reflect.ValueOf(i))
+	case reflect.Float32:
+		i, err := cast.ToFloat32E(d)
+		if err != nil {
+			return err
+		}
+		rv.Set(reflect.ValueOf(i))
+	case reflect.String:
+		i, err := cast.ToStringE(d)
+		if err != nil {
+			return err
+		}
+		rv.Set(reflect.ValueOf(i))
+	case reflect.Struct:
+		dv, ok := d.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("convert data to map[string]interface{} failed. which is %v", reflect.TypeOf(d))
+		}
+		for i := 0; i < rv.NumField(); i++ {
+			field := rv.Field(i)
+			value := dv[rt.Field(i).Tag.Get("json")]
+			switch rt.Field(i).Type.Kind() {
+			case reflect.Ptr:
+				nv := reflect.New(field.Type().Elem())
+				if err := interfaceToStructV2(value, nv.Interface()); err != nil {
+					return err
+				}
+				field.Set(nv)
+			default:
+				if err := interfaceToStructV2(value, field.Addr().Interface()); err != nil {
+					return err
+				}
+			}
+		}
+	case reflect.Slice:
+		dv, ok := d.([]interface{})
+		if !ok {
+			return fmt.Errorf("convert data to []interface{} failed. which is %v", reflect.TypeOf(d))
+		}
+		nv := reflect.New(rt.Elem())
+		for _, di := range dv {
+			err := interfaceToStructV2(di, nv.Interface())
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.Append(rv, nv.Elem()))
+		}
+	default:
+		return fmt.Errorf("unspport type %v", rt)
+	}
+
+	return nil
+}
+
+func interfaceToStructV1(d interface{}, v interface{}) error {
 	if reflect.ValueOf(v).Kind() != reflect.Ptr {
 		return fmt.Errorf("invalid value type")
 	}
@@ -178,7 +267,7 @@ func interfaceToStruct(d interface{}, v interface{}) error {
 
 		nv := reflect.New(rt.Elem())
 		for _, di := range dv {
-			err := interfaceToStruct(di, nv.Interface())
+			err := interfaceToStructV1(di, nv.Interface())
 			if err != nil {
 				return err
 			}
@@ -195,7 +284,6 @@ func interfaceToStruct(d interface{}, v interface{}) error {
 
 	for i := 0; i < rv.NumField(); i++ {
 		field := rv.Field(i)
-
 		value := dv[rt.Field(i).Tag.Get("json")]
 		switch rt.Field(i).Type.Kind() {
 		case reflect.Int:
@@ -241,15 +329,15 @@ func interfaceToStruct(d interface{}, v interface{}) error {
 			}
 			field.Set(reflect.ValueOf(i))
 		case reflect.Struct:
-			if err := interfaceToStruct(value, field.Addr().Interface()); err != nil {
+			if err := interfaceToStructV1(value, field.Addr().Interface()); err != nil {
 				return err
 			}
 		case reflect.Ptr:
 			nv := reflect.New(field.Type().Elem())
-			field.Set(nv)
-			if err := interfaceToStruct(value, field.Interface()); err != nil {
+			if err := interfaceToStructV1(value, nv.Interface()); err != nil {
 				return err
 			}
+			field.Set(nv)
 		}
 	}
 
