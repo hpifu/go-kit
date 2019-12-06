@@ -30,6 +30,7 @@ require (
 	github.com/lestrrat-go/strftime v0.0.0-20190725011945-5c849dd2c51d // indirect
 	github.com/sirupsen/logrus v1.4.2
 	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337
+	github.com/spf13/cast v1.3.0
 	github.com/spf13/viper v1.4.0
 	github.com/tebeka/strftime v0.1.3 // indirect
 	github.com/yosuke-furukawa/json5 v0.1.1

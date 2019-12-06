@@ -2,7 +2,9 @@ package hconf
 
 import (
 	"fmt"
+	"github.com/spf13/cast"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -147,12 +149,99 @@ func (h *HConf) Set(key string, val interface{}) error {
 	return nil
 }
 
+//func (h HConf) Unmarshal(v interface{}) error {
+//	buf, err := json5.Marshal(h.data)
+//	if err != nil {
+//		return err
+//	}
+//	return json5.Unmarshal(buf, v)
+//}
+
 func (h HConf) Unmarshal(v interface{}) error {
-	buf, err := json5.Marshal(h.data)
-	if err != nil {
-		return err
+	return interfaceToStruct(h.data, v)
+}
+
+func interfaceToStruct(d interface{}, v interface{}) error {
+	if reflect.ValueOf(v).Kind() != reflect.Ptr {
+		return fmt.Errorf("invalid value type")
 	}
-	return json5.Unmarshal(buf, v)
+
+	rv := reflect.ValueOf(v).Elem()
+	rt := reflect.TypeOf(v).Elem()
+
+	if reflect.ValueOf(v).Elem().Kind() == reflect.Slice {
+		dv, ok := d.([]interface{})
+		fmt.Println(rt.Elem())
+		if !ok {
+			return fmt.Errorf("convert data to []interface{} failed. which is %v", reflect.TypeOf(d))
+		}
+
+		nv := reflect.New(rt.Elem())
+		for _, di := range dv {
+			err := interfaceToStruct(di, nv.Interface())
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.Append(rv, nv.Elem()))
+		}
+
+		return nil
+	}
+
+	dv, ok := d.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("convert data to map[string]interface{} failed. which is %v", reflect.TypeOf(d))
+	}
+
+	for i := 0; i < rv.NumField(); i++ {
+		field := rv.Field(i)
+
+		value := dv[rt.Field(i).Tag.Get("json")]
+		switch rt.Field(i).Type.Kind() {
+		case reflect.Int:
+			i, err := cast.ToIntE(value)
+			if err != nil {
+				return err
+			}
+			field.Set(reflect.ValueOf(i))
+		case reflect.Int64:
+			if field.Type() == reflect.TypeOf(time.Duration(0)) {
+				i, err := cast.ToStringE(value)
+				if err != nil {
+					return err
+				}
+				t, err := time.ParseDuration(i)
+				if err != nil {
+					return err
+				}
+				field.Set(reflect.ValueOf(t))
+			} else {
+				i, err := cast.ToInt64E(value)
+				if err != nil {
+					return err
+				}
+				field.Set(reflect.ValueOf(i))
+			}
+		case reflect.String:
+			i, err := cast.ToStringE(value)
+			if err != nil {
+				return err
+			}
+			field.Set(reflect.ValueOf(i))
+		case reflect.Struct:
+			if err := interfaceToStruct(value, field.Addr().Interface()); err != nil {
+				return err
+			}
+		case reflect.Ptr:
+			nv := reflect.New(field.Type().Elem())
+			field.Set(nv)
+			if err := interfaceToStruct(value, field.Interface()); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 func (h HConf) GetDefaultInt(keys string, defaultValue ...int) int {

@@ -126,6 +126,16 @@ func TestHConfUnMarshal(t *testing.T) {
 		Retry    int    `json:"retry"`
 	}
 
+	type linfo struct {
+		Filename string        `json:"filename"`
+		MaxAge   time.Duration `json:"maxAge"`
+	}
+
+	type logger struct {
+		InfoLog linfo  `json:"infoLog"`
+		WarnLog *linfo `json:"warnLog"`
+	}
+
 	Convey("test conf unmarshal", t, func() {
 		CreateFile()
 		conf, err := NewHConfWithFile("test.json")
@@ -151,6 +161,19 @@ func TestHConfUnMarshal(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(c.Unmarshal(&info), ShouldBeNil)
 			So(info.Retry, ShouldEqual, 3)
+			So(info.Address, ShouldEqual, "http://influxdb:8086")
+			So(info.Database, ShouldEqual, "monitor")
+		}
+
+		{
+			var info logger
+			c, err := conf.Sub("logger")
+			So(c, ShouldNotBeNil)
+			So(err, ShouldBeNil)
+			So(c.Unmarshal(&info), ShouldBeNil)
+			So(info.InfoLog.Filename, ShouldEqual, "log/monitor.info")
+			So(info.WarnLog.Filename, ShouldEqual, "log/monitor.warn")
+			So(info.InfoLog.MaxAge, ShouldEqual, 24*time.Hour)
 		}
 	})
 }
