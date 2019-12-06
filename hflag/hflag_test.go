@@ -169,3 +169,75 @@ func TestHFlagParse(t *testing.T) {
 		So(*configfile, ShouldEqual, "configs/monitor.json")
 	})
 }
+
+func TestHFlagAddFlags(t *testing.T) {
+	Convey("test add flags", t, func() {
+		flagSet := NewFlagSet("test flag")
+		type MySubFlags struct {
+			F1 int    `hflag:"--f1; default:20; usage:f1 flag"`
+			F2 string `hflag:"--f2; default:hatlonely; usage:f2 flag"`
+		}
+		type MyFlags struct {
+			IntOption int         `hflag:"--int-option, -i; default:10; required; usage:int flag"`
+			StrOption string      `hflag:"--str-option, -s; required; usage:str flag"`
+			Key       float64     `hflag:"--key, -k; required; usage:float flag"`
+			All       bool        `hflag:"--all, -a; required; usage:bool flag"`
+			User      bool        `hflag:"--user, -u; required; usage:user flag"`
+			Password  string      `hflag:"--password, -p; default:654321; usage:password flag"`
+			Vs        []string    `hflag:"--vs, -v; default:dog,cat; usage:vs flag"`
+			Pos1      string      `hflag:"pos1; usage:string pos flag"`
+			Pos2      string      `hflag:"pos2; usage:int pos flag"`
+			Sub       *MySubFlags `hflag:"sub"`
+		}
+		f := &MyFlags{}
+		So(flagSet.AddFlags(f), ShouldBeNil)
+
+		Convey("check default value", func() {
+			So(f.IntOption, ShouldEqual, 10)
+			So(f.StrOption, ShouldEqual, "")
+			So(f.Key, ShouldEqual, 0.0)
+			So(f.All, ShouldBeFalse)
+			So(f.User, ShouldBeFalse)
+			So(f.Password, ShouldEqual, "654321")
+			So(f.Vs, ShouldResemble, []string{"dog", "cat"})
+			So(f.Pos1, ShouldEqual, "")
+			So(f.Pos2, ShouldEqual, "")
+			So(f.Sub.F1, ShouldEqual, 20)
+		})
+
+		Convey("parse case 1", func() {
+			err := flagSet.Parse([]string{
+				"val1",
+				"--int-option=123",
+				"--str-option", "apple,banana,orange",
+				"-k", "3.14",
+				"-au",
+				"-p123456",
+				"val2",
+				"-vs", "one,two,three",
+				"--sub-f1", "120",
+			})
+			So(err, ShouldBeNil)
+
+			So(f.IntOption, ShouldEqual, 123)
+			So(f.StrOption, ShouldEqual, "apple,banana,orange")
+			So(flagSet.GetStringSlice("str-option"), ShouldResemble, []string{
+				"apple", "banana", "orange",
+			})
+			So(f.Key, ShouldAlmostEqual, 3.14)
+			So(f.All, ShouldBeTrue)
+			So(f.User, ShouldBeTrue)
+			So(f.Password, ShouldEqual, "123456")
+			So(f.Vs, ShouldResemble, []string{"one", "two", "three"})
+			So(f.Pos1, ShouldEqual, "val1")
+			So(f.Pos2, ShouldEqual, "val2")
+
+			So(flagSet.Args(), ShouldResemble, []string{
+				"val1", "val2",
+			})
+			So(flagSet.Arg(0), ShouldEqual, "val1")
+			So(flagSet.Arg(1), ShouldEqual, "val2")
+			So(f.Sub.F1, ShouldEqual, 120)
+		})
+	})
+}

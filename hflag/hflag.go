@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"net"
 	"path"
+	"reflect"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+	"unsafe"
 )
 
 type Flag struct {
@@ -540,4 +542,150 @@ func isBoolValue(val string) bool {
 		return false
 	}
 	return true
+}
+
+func parseTag(tag string) (name string, shorthand string, usage string, required bool, defaultValue string, position bool, err error) {
+	for _, field := range strings.Split(tag, ";") {
+		field = strings.Trim(field, " ")
+		if field == "required" { // required
+			required = true
+		} else if strings.HasPrefix(field, "--") { // --int-option, -i
+			names := strings.Split(field, ",")
+			name = strings.Trim(names[0], " ")[2:]
+			if len(names) > 2 {
+				err = fmt.Errorf("expected name field format is '--<name>[, -<shorthand>]', got [%v]", field)
+				return
+			} else if len(names) == 2 {
+				shorthand = strings.Trim(names[1], " ")
+				if !strings.HasPrefix(shorthand, "-") {
+					err = fmt.Errorf("expected name field format is '--<name>[, -<shorthand>]', got [%v]", field)
+					return
+				}
+				shorthand = shorthand[1:]
+			}
+		} else if strings.Contains(field, ":") { // default: 10; usage: int flag
+			kvs := strings.Split(field, ":")
+			if len(kvs) != 2 {
+				err = fmt.Errorf("expected format '<key>:<value>', got [%v]", field)
+				return
+			}
+			key := strings.Trim(kvs[0], " ")
+			val := strings.Trim(kvs[1], " ")
+			switch key {
+			case "default":
+				defaultValue = val
+			case "usage":
+				usage = val
+			}
+		} else { // pos
+			name = strings.Trim(field, " ")
+			position = true
+		}
+	}
+
+	return
+}
+
+func interfaceToType(v reflect.Value) (string, Value, error) {
+	switch v.Type() {
+	case reflect.TypeOf(""):
+		return "string", (*stringValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case reflect.TypeOf(false):
+		return "bool", (*boolValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case reflect.TypeOf(int(0)):
+		return "int", (*intValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case reflect.TypeOf(float64(0.0)):
+		return "float", (*floatValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case reflect.TypeOf(time.Duration(0)):
+		return "duration", (*durationValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case reflect.TypeOf(uint(0)):
+		return "uint", (*uintValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case reflect.TypeOf(int64(0)):
+		return "int64", (*int64Value)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case reflect.TypeOf(uint64(0)):
+		return "uint64", (*uint64Value)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case reflect.TypeOf([]int{}):
+		return "[]int", (*intSliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case reflect.TypeOf([]string{}):
+		return "[]string", (*stringSliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case reflect.TypeOf(time.Time{}):
+		return "time", (*timeValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case reflect.TypeOf(net.IP{}):
+		return "ip", (*ipValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	default:
+		return "", nil, fmt.Errorf("unsupport type [%v]", v.Type())
+	}
+}
+
+func (f *FlagSet) AddFlags(v interface{}) error {
+	return f.addFlags(v, "")
+}
+
+func (f *FlagSet) addFlags(v interface{}, prefix string) error {
+	if reflect.ValueOf(v).Kind() != reflect.Ptr {
+		return fmt.Errorf("expected a pointer, got [%v]", reflect.TypeOf(v))
+	}
+
+	rv := reflect.ValueOf(v).Elem()
+	rt := reflect.TypeOf(v).Elem()
+
+	if rt.Kind() != reflect.Struct {
+		return fmt.Errorf("expected a struct, got [%v]", rt)
+	}
+
+	for i := 0; i < rv.NumField(); i++ {
+		tag := rt.Field(i).Tag.Get("hflag")
+		t := rt.Field(i).Type
+
+		typeStr, value, err := interfaceToType(rv.Field(i))
+		if err == nil {
+			name, shorthand, usage, required, defaultValue, position, err := parseTag(tag)
+			if err != nil {
+				return err
+			}
+			if prefix != "" {
+				name = prefix + "-" + name
+			}
+			if position {
+				if err := f.addPosFlag(name, usage, typeStr, required, defaultValue); err != nil {
+					return err
+				}
+			} else {
+				if err := f.addFlag(name, usage, shorthand, typeStr, required, defaultValue); err != nil {
+					return err
+				}
+			}
+			f.nameToFlag[name].Value = value
+			if defaultValue != "" {
+				if err := f.nameToFlag[name].Set(defaultValue); err != nil {
+					return err
+				}
+			}
+		} else if t.Kind() == reflect.Struct {
+			p := prefix
+			if prefix != "" {
+				p = prefix + "-" + tag
+			} else {
+				p = tag
+			}
+			if err := f.addFlags(rv.Field(i).Addr().Interface(), p); err != nil {
+				return err
+			}
+		} else if t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Struct {
+			rv.Field(i).Set(reflect.New(rv.Field(i).Type().Elem()))
+			p := prefix
+			if prefix != "" {
+				p = prefix + "-" + tag
+			} else {
+				p = tag
+			}
+			if err := f.addFlags(rv.Field(i).Interface(), p); err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+
+	return nil
 }

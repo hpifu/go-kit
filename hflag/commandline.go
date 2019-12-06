@@ -211,3 +211,7 @@ func AddPosFlag(name string, usage string, opts ...FlagOption) {
 func Usage() string {
 	return CommandLine.Usage()
 }
+
+func AddFlags(v interface{}) error {
+	return CommandLine.AddFlags(v)
+}
