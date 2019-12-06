@@ -222,6 +222,18 @@ func interfaceToStruct(d interface{}, v interface{}) error {
 				}
 				field.Set(reflect.ValueOf(i))
 			}
+		case reflect.Uint64:
+			i, err := cast.ToUint64E(value)
+			if err != nil {
+				return err
+			}
+			field.Set(reflect.ValueOf(i))
+		case reflect.Float64:
+			i, err := cast.ToFloat64E(value)
+			if err != nil {
+				return err
+			}
+			field.Set(reflect.ValueOf(i))
 		case reflect.String:
 			i, err := cast.ToStringE(value)
 			if err != nil {
