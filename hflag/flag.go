@@ -1,3 +1,5 @@
+// 这个文件用来兼容标准库 flag 提供的 api
+
 package hflag
 
 import (
