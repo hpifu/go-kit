@@ -9,6 +9,7 @@
 - 支持位置参数，位置参数可以出现在任意位置
 - 支持 bool 参数简写 (`-aux` 和 `-a -u -x` 等效)
 - 支持值参数缩写 (`-p123456` 和 `-p 123456` 等效)
+- 支持结构体 Flags
 - 更多类型的支持，支持 `net.IP`，`time.Time`，`time.Duration`，`[]int`, `[]string` 的解析
 - 更友好的用法帮助
 - 提供一套更简洁的 api
@@ -16,9 +17,74 @@
 
 ## 用法
 
-`hflag` 提供两套 `api`，一套完全兼容标准库的 `flag` 接口，另一套类似 `python` 的 `argparse` 先定义 `flag`，在使用时从 `flag` 中获取
+`hflag` 有三种用法：
 
-### 新接口
+1. 结构体用法
+2. 类似 `python` 的 `argparse` 先定义 `flag`，在使用时从 `flag` 中获取
+3. 完全兼容标准库的 `flag` 接口，
+
+### 结构体接口
+
+``` go
+package main
+
+import (
+	"fmt"
+	"net"
+	"time"
+
+	"github.com/hpifu/go-kit/hflag"
+)
+
+type MySubFlags struct {
+	F1 int    `hflag:"--f1; default:20; usage:f1 flag"`
+	F2 string `hflag:"--f2; default:hatlonely; usage:f2 flag"`
+}
+
+type MyFlags struct {
+	I        int        `hflag:"--int, -i; required; default: 123; usage: int flag"`
+	S        string     `hflag:"--str, -s; required; usage: str flag"`
+	IntSlice []int      `hflag:"--int-slice; default: 1,2,3; usage: int slice flag"`
+	IP       net.IP     `hflag:"--ip; usage: ip flag"`
+	Time     time.Time  `hflag:"--time; usage: time flag; default: 2019-11-27"`
+	Pos      string     `hflag:"pos; usage: pos flag"`
+	Sub      MySubFlags `hflag:"sub"`
+}
+
+func main() {
+	mf := &MyFlags{}
+	if err := hflag.AddFlags(mf); err != nil {
+		panic(err)
+	}
+	if err := hflag.Parse(); err != nil {
+		fmt.Println(hflag.Usage())
+		panic(err)
+	}
+
+	fmt.Println("int =>", mf.I)
+	fmt.Println("str =>", mf.S)
+	fmt.Println("int-slice =>", mf.IntSlice)
+	fmt.Println("ip =>", mf.IP)
+	fmt.Println("time =>", mf.Time)
+	fmt.Println("sub.f1 =>", mf.Sub.F1)
+	fmt.Println("sub.f2 =>", mf.Sub.F2)
+}
+```
+
+`go run hflag1.go -str abc -ip 192.168.0.1 --int-slice 4,5,6 posflag -sub-f1 140` 将得到如下输出：
+
+```
+int => 123
+str => abc
+int-slice => [4 5 6]
+ip => 192.168.0.1
+time => 2019-11-27 00:00:00 +0000 UTC
+pos => posflag
+sub.f1 => 140
+sub.f2 => hatlonely
+```
+
+### Add/Get 接口
 
 ``` go
 package main
@@ -59,7 +125,7 @@ time => 2019-11-27 00:00:00 +0000 UTC
 pos => posflag
 ```
 
-### flag 接口
+### 标准 flag 接口
 
 ``` go
 package main
