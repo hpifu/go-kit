@@ -3,13 +3,12 @@ package hconf
 import (
 	"fmt"
 	"github.com/spf13/cast"
+	"github.com/yosuke-furukawa/json5/encoding/json5"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/yosuke-furukawa/json5/encoding/json5"
 )
 
 func NewHConfWithFile(filename string) (*HConf, error) {
