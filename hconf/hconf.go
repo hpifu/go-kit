@@ -191,6 +191,24 @@ func interfaceToStructV2(d interface{}, v interface{}) error {
 			return err
 		}
 		rv.Set(reflect.ValueOf(i))
+	case reflect.Int32:
+		i, err := cast.ToInt32E(d)
+		if err != nil {
+			return err
+		}
+		rv.Set(reflect.ValueOf(i))
+	case reflect.Uint32:
+		i, err := cast.ToUint32E(d)
+		if err != nil {
+			return err
+		}
+		rv.Set(reflect.ValueOf(i))
+	case reflect.Bool:
+		i, err := cast.ToBoolE(d)
+		if err != nil {
+			return err
+		}
+		rv.Set(reflect.ValueOf(i))
 	case reflect.Float64:
 		i, err := cast.ToFloat64E(d)
 		if err != nil {
