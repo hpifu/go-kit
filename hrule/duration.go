@@ -17,7 +17,7 @@ func NewDurationRule(expr string) (Rule, error) {
 }
 
 func RegisterDurationRuleGenerator(fun string, generator RuleGenerator) {
-	Int64RuleGenerator[fun] = generator
+	DurationRuleGenerator[fun] = generator
 }
 
 var DurationRuleGenerator = map[string]RuleGenerator{

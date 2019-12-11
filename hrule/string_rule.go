@@ -17,7 +17,7 @@ func NewStringRule(expr string) (Rule, error) {
 }
 
 func RegisterStringRuleGenerator(fun string, generator RuleGenerator) {
-	Int64RuleGenerator[fun] = generator
+	StringRuleGenerator[fun] = generator
 }
 
 var StringRuleGenerator = map[string]RuleGenerator{

@@ -16,7 +16,7 @@ func NewTimeRule(expr string) (Rule, error) {
 }
 
 func RegisterTimeRuleGenerator(fun string, generator RuleGenerator) {
-	Int64RuleGenerator[fun] = generator
+	TimeRuleGenerator[fun] = generator
 }
 
 func parseTime(str string) (time.Time, error) {
