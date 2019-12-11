@@ -76,9 +76,9 @@ So(MyStructRule.Evaluate(&MyStruct{S: "114.243.208.244"}), ShouldBeTrue)
 - `<`: 小于
 - `>=`: 大于等于
 - `<=`: 小于等于
-- `in(vals...)`: 是 vals 中的一个
-- `mod(a,b)`: 对 a 取模得 b
-- `range(a,b)`: 在 [a,b] 区间内
+- `in <vals...>`: 是 vals 中的一个
+- `mod <a>,<b>`: 对 a 取模得 b
+- `range <a>,<b>`: 在 [a,b] 区间内
 
 ### 字符串
 
@@ -105,7 +105,7 @@ So(MyStructRule.Evaluate(&MyStruct{S: "114.243.208.244"}), ShouldBeTrue)
 - `<`: 小于
 - `>=`: 大于等于
 - `<=`: 小于等于
-- `in(vals...)`: 是 vals 中的一个
+- `in <vals...>`: 是 vals 中的一个
 
 ### time.Time
 
