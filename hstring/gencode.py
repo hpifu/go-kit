@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-slice_tpl = """func To{name}Slice(str string) ([]{type}, error) {{
+string_to_slice_tpl = """func To{name}Slice(str string) ([]{type}, error) {{
 	vals := strings.Split(str, ",")
 	res := make([]{type}, 0, len(vals))
 	for _, val := range vals {{
@@ -11,6 +11,18 @@ slice_tpl = """func To{name}Slice(str string) ([]{type}, error) {{
 		res = append(res, v)
 	}}
 	return res, nil
+}}
+"""
+
+slice_to_string_tpl = """func {name}SliceTo(vs []{type}) string {{
+	var buffer bytes.Buffer
+	for idx, v := range vs {{
+		buffer.WriteString({name}To(v))
+		if idx != len(vs)-1 {{
+			buffer.WriteString(",")
+		}}
+	}}
+	return buffer.String()
 }}
 """
 
@@ -36,7 +48,20 @@ def gen_to_string(types):
     return to_string_tpl.format(body=body)
 
 
-def gen_slice_code(type):
+def gen_slice_to_string(type):
+    if type == "string":
+        return """
+func StringSliceTo(vs []string) string {
+	return strings.Join(vs, ",")
+}
+"""
+
+    temp = type.split(".")[-1]
+    name = temp[0].upper() + temp[1:]
+    return slice_to_string_tpl.format(type=type, name=name)
+
+
+def gen_string_to_slice(type):
     if type == "string":
         return """
 func ToStringSlice(str string) ([]string, error) {
@@ -48,7 +73,7 @@ func ToStringSlice(str string) ([]string, error) {
 """
     temp = type.split(".")[-1]
     name = temp[0].upper() + temp[1:]
-    return slice_tpl.format(type=type, name=name)
+    return string_to_slice_tpl.format(type=type, name=name)
 
 
 def main():
@@ -57,9 +82,11 @@ def main():
         "uint64", "uint32", "uint16", "uint8", "float64", "float32",
         "time.Duration", "time.Time", "net.IP"
     ]
-    print(gen_to_string(types))
+    # print(gen_to_string(types))
     # for type in types:
-    #     print(gen_slice_code(type))
+    #     print(gen_string_to_slice(type))
+    for type in types:
+        print(gen_slice_to_string(type))
 
 
 if __name__ == "__main__":
