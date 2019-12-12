@@ -15,6 +15,14 @@ func ToInt(str string) (int, error) {
 	return strconv.Atoi(str)
 }
 
+func ToUint(str string) (uint, error) {
+	i, err := strconv.ParseUint(str, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return uint(i), nil
+}
+
 func ToInt64(str string) (int64, error) {
 	return strconv.ParseInt(str, 10, 64)
 }

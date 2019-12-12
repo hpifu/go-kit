@@ -52,6 +52,19 @@ func ToInt64Slice(str string) ([]int64, error) {
 	return res, nil
 }
 
+func ToUintSlice(str string) ([]uint, error) {
+	vals := strings.Split(str, ",")
+	res := make([]uint, 0, len(vals))
+	for _, val := range vals {
+		v, err := ToUint(val)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, v)
+	}
+	return res, nil
+}
+
 func ToInt32Slice(str string) ([]int32, error) {
 	vals := strings.Split(str, ",")
 	res := make([]int32, 0, len(vals))

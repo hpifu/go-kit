@@ -131,7 +131,7 @@ func (f *FlagSet) Float64(name string, defaultValue float64, usage string) *floa
 	if err := f.addFlagAutoShorthand(name, usage, "float", fmt.Sprintf("%f", defaultValue)); err != nil {
 		panic(err)
 	}
-	return (*float64)(f.nameToFlag[name].Value.(*floatValue))
+	return (*float64)(f.nameToFlag[name].Value.(*float64Value))
 }
 
 func (f *FlagSet) IntSlice(name string, defaultValue []int, usage string) *[]int {
@@ -227,7 +227,7 @@ func (f *FlagSet) Float64Var(v *float64, name string, defaultValue float64, usag
 	if err := f.addFlagAutoShorthand(name, usage, "float", fmt.Sprintf("%f", defaultValue)); err != nil {
 		panic(err)
 	}
-	f.nameToFlag[name].Value = (*floatValue)(v)
+	f.nameToFlag[name].Value = (*float64Value)(v)
 }
 
 func (f *FlagSet) IntSliceVar(v *[]int, name string, defaultValue []int, usage string) {

@@ -85,7 +85,7 @@ func (f *FlagSet) GetFloat(name string) float64 {
 	if flag.Type != "float" && flag.Type != "float64" {
 		return 0.0
 	}
-	return float64(*flag.Value.(*floatValue))
+	return float64(*flag.Value.(*float64Value))
 }
 
 func (f *FlagSet) GetString(name string) string {
@@ -595,11 +595,11 @@ func interfaceToType(v reflect.Value) (string, Value, error) {
 	case reflect.TypeOf(int(0)):
 		return "int", (*intValue)(unsafe.Pointer(v.Addr().Pointer())), nil
 	case reflect.TypeOf(float64(0.0)):
-		return "float", (*floatValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+		return "float", (*float64Value)(unsafe.Pointer(v.Addr().Pointer())), nil
 	case reflect.TypeOf(time.Duration(0)):
 		return "duration", (*durationValue)(unsafe.Pointer(v.Addr().Pointer())), nil
 	case reflect.TypeOf(uint(0)):
-		return "uint", (*uintValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+		return "uint", (*uint64Value)(unsafe.Pointer(v.Addr().Pointer())), nil
 	case reflect.TypeOf(int64(0)):
 		return "int64", (*int64Value)(unsafe.Pointer(v.Addr().Pointer())), nil
 	case reflect.TypeOf(uint64(0)):

@@ -33,7 +33,11 @@ def gen_slice_code(type):
 
 
 def main():
-    for type in ["bool", "int", "int64", "int32", "int16", "int8", "uint64", "uint32", "uint16", "uint8", "float64", "float32", "time.Duration", "time.Time", "net.IP"]:
+    for type in [
+        "bool", "int", "uint", "int64", "int32", "int16", "int8",
+        "uint64", "uint32", "uint16", "uint8", "float64", "float32",
+        "time.Duration", "time.Time", "net.IP"
+    ]:
         print(gen_slice_code(type))
 
 
