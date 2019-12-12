@@ -27,6 +27,15 @@ func NewValueType(typeStr string) Value {{
 }}
 """
 
+interface_to_type_tpl = """
+func interfaceToType(v reflect.Value) (string, Value, error) {{
+	switch v.Interface().(type) {{{body}
+	default:
+		return "", nil, fmt.Errorf("unsupport type [%v]", v.Type())
+	}}
+}}
+"""
+
 
 def vtype(type):
     return type.split(".")[-1].lower()
@@ -90,6 +99,21 @@ def gen_new_value_type(types):
     return new_value_type_tpl.format(body=body)
 
 
+def gen_interface_to_type(types):
+    body = ""
+    tpl = """
+	case {type}:
+		return "{vtype}", (*{vtype}Value)(unsafe.Pointer(v.Addr().Pointer())), nil"""
+    for type in types:
+        body += tpl.format(type=type, vtype=vtype(type))
+    tpl = """
+	case []{type}:
+		return "[]{vtype}", (*{vtype}SliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil"""
+    for type in types:
+        body += tpl.format(type=type, vtype=vtype(type))
+    return interface_to_type_tpl.format(body=body)
+
+
 def main():
     types = [
         "bool", "int", "uint", "int64", "int32", "int16", "int8",
@@ -110,8 +134,10 @@ def main():
     #     print(gen_value_string(type))
     # for type in types:
     #     print(gen_slice_value_string(type))
+    # print(gen_new_value_type(types))
 
-    print(gen_new_value_type(types))
+    # hflag.go
+    print(gen_interface_to_type(types))
 
 
 if __name__ == "__main__":

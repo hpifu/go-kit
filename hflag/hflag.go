@@ -587,31 +587,75 @@ func parseTag(tag string) (name string, shorthand string, usage string, required
 }
 
 func interfaceToType(v reflect.Value) (string, Value, error) {
-	switch v.Type() {
-	case reflect.TypeOf(""):
-		return "string", (*stringValue)(unsafe.Pointer(v.Addr().Pointer())), nil
-	case reflect.TypeOf(false):
+	switch v.Interface().(type) {
+	case bool:
 		return "bool", (*boolValue)(unsafe.Pointer(v.Addr().Pointer())), nil
-	case reflect.TypeOf(int(0)):
+	case int:
 		return "int", (*intValue)(unsafe.Pointer(v.Addr().Pointer())), nil
-	case reflect.TypeOf(float64(0.0)):
-		return "float", (*float64Value)(unsafe.Pointer(v.Addr().Pointer())), nil
-	case reflect.TypeOf(time.Duration(0)):
-		return "duration", (*durationValue)(unsafe.Pointer(v.Addr().Pointer())), nil
-	case reflect.TypeOf(uint(0)):
-		return "uint", (*uint64Value)(unsafe.Pointer(v.Addr().Pointer())), nil
-	case reflect.TypeOf(int64(0)):
+	case uint:
+		return "uint", (*uintValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case int64:
 		return "int64", (*int64Value)(unsafe.Pointer(v.Addr().Pointer())), nil
-	case reflect.TypeOf(uint64(0)):
+	case int32:
+		return "int32", (*int32Value)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case int16:
+		return "int16", (*int16Value)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case int8:
+		return "int8", (*int8Value)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case uint64:
 		return "uint64", (*uint64Value)(unsafe.Pointer(v.Addr().Pointer())), nil
-	case reflect.TypeOf([]int{}):
-		return "[]int", (*intSliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
-	case reflect.TypeOf([]string{}):
-		return "[]string", (*stringSliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
-	case reflect.TypeOf(time.Time{}):
+	case uint32:
+		return "uint32", (*uint32Value)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case uint16:
+		return "uint16", (*uint16Value)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case uint8:
+		return "uint8", (*uint8Value)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case float64:
+		return "float64", (*float64Value)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case float32:
+		return "float32", (*float32Value)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case time.Duration:
+		return "duration", (*durationValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case time.Time:
 		return "time", (*timeValue)(unsafe.Pointer(v.Addr().Pointer())), nil
-	case reflect.TypeOf(net.IP{}):
+	case net.IP:
 		return "ip", (*ipValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case string:
+		return "string", (*stringValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []bool:
+		return "[]bool", (*boolSliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []int:
+		return "[]int", (*intSliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []uint:
+		return "[]uint", (*uintSliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []int64:
+		return "[]int64", (*int64SliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []int32:
+		return "[]int32", (*int32SliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []int16:
+		return "[]int16", (*int16SliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []int8:
+		return "[]int8", (*int8SliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []uint64:
+		return "[]uint64", (*uint64SliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []uint32:
+		return "[]uint32", (*uint32SliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []uint16:
+		return "[]uint16", (*uint16SliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []uint8:
+		return "[]uint8", (*uint8SliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []float64:
+		return "[]float64", (*float64SliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []float32:
+		return "[]float32", (*float32SliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []time.Duration:
+		return "[]duration", (*durationSliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []time.Time:
+		return "[]time", (*timeSliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []net.IP:
+		return "[]ip", (*ipSliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
+	case []string:
+		return "[]string", (*stringSliceValue)(unsafe.Pointer(v.Addr().Pointer())), nil
 	default:
 		return "", nil, fmt.Errorf("unsupport type [%v]", v.Type())
 	}
