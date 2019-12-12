@@ -107,5 +107,8 @@ func TimeTo(v time.Time) string {
 }
 
 func IPTo(v net.IP) string {
+	if v == nil {
+		return ""
+	}
 	return v.String()
 }

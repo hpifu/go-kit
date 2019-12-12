@@ -77,6 +77,44 @@ func (f *FlagSet) Get{name}Slice(name string) (v []{type}) {{
 }}
 """
 
+flagset_type_tpl = """
+func (f *FlagSet) {name}(name string, defaultValue {type}, usage string) *{type} {{
+	if err := f.addFlagAutoShorthand(name, usage, "{vtype}", hstring.{name}To(defaultValue)); err != nil {{
+		panic(err)
+	}}
+	return (*{type})(f.nameToFlag[name].Value.(*{vtype}Value))
+}}
+"""
+
+flagset_slice_type_tpl = """
+func (f *FlagSet) {name}Slice(name string, defaultValue []{type}, usage string) *[]{type} {{
+	if err := f.addFlagAutoShorthand(name, usage, "[]{vtype}", hstring.{name}SliceTo(defaultValue)); err != nil {{
+		panic(err)
+	}}
+	return (*[]{type})(f.nameToFlag[name].Value.(*{vtype}SliceValue))
+}}
+"""
+
+flagset_type_var_tpl = """
+func (f *FlagSet) {name}Var(v *{type}, name string, defaultValue {type}, usage string) {{
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "{vtype}", hstring.{name}To(defaultValue)); err != nil {{
+		panic(err)
+	}}
+	f.nameToFlag[name].Value = (*{vtype}Value)(v)
+}}
+"""
+
+flagset_slice_type_var_tpl = """
+func (f *FlagSet) {name}SliceVar(v *[]{type}, name string, defaultValue []{type}, usage string) {{
+	*v = defaultValue
+	if err := f.addFlagAutoShorthand(name, usage, "[]{vtype}", hstring.{name}SliceTo(defaultValue)); err != nil {{
+		panic(err)
+	}}
+	f.nameToFlag[name].Value = (*{vtype}SliceValue)(v)
+}}
+"""
+
 
 def vtype(type):
     return type.split(".")[-1].lower()
@@ -173,6 +211,22 @@ def gen_flagset_get_slice_tpl(type):
     return flagset_get_slice_tpl.format(name=name(type), type=type, vtype=vtype(type))
 
 
+def gen_flagset_type_tpl(type):
+    return flagset_type_tpl.format(name=name(type), type=type, vtype=vtype(type))
+
+
+def gen_flagset_slice_type_tpl(type):
+    return flagset_slice_type_tpl.format(name=name(type), type=type, vtype=vtype(type))
+
+
+def gen_flagset_type_var_tpl(type):
+    return flagset_type_var_tpl.format(name=name(type), type=type, vtype=vtype(type))
+
+
+def gen_flagset_slice_type_var_tpl(type):
+    return flagset_slice_type_var_tpl.format(name=name(type), type=type, vtype=vtype(type))
+
+
 def main():
     types = [
         "bool", "int", "uint", "int64", "int32", "int16", "int8",
@@ -198,10 +252,21 @@ def main():
     # hflag.go
     # print(gen_interface_to_type(types))
 
+    # get.go
+    # for type in types:
+    #     print(gen_flagset_get_tpl(type))
+    # for type in types:
+    #     print(gen_flagset_get_slice_tpl(type))
+
     for type in types:
-        print(gen_flagset_get_tpl(type))
+        print(gen_flagset_type_tpl(type))
     for type in types:
-        print(gen_flagset_get_slice_tpl(type))
+        print(gen_flagset_slice_type_tpl(type))
+
+    for type in types:
+        print(gen_flagset_type_var_tpl(type))
+    for type in types:
+        print(gen_flagset_slice_type_var_tpl(type))
 
 
 if __name__ == "__main__":
