@@ -115,6 +115,24 @@ func (f *FlagSet) {name}SliceVar(v *[]{type}, name string, defaultValue []{type}
 }}
 """
 
+commandline_type_tpl = """
+func {name}(name string, defaultValue {type}, usage string) *{type} {{
+	return CommandLine.{name}(name, defaultValue, usage)
+}}
+"""
+
+commandline_type_var_tpl = """
+func {name}Var(v *{type}, name string, defaultValue {type}, usage string) {{
+	CommandLine.{name}Var(v, name, defaultValue, usage)
+}}
+"""
+
+commandline_get_type_tpl = """
+func Get{name}(name string) {type} {{
+	return CommandLine.Get{name}(name)
+}}
+"""
+
 
 def vtype(type):
     return type.split(".")[-1].lower()
@@ -227,6 +245,30 @@ def gen_flagset_slice_type_var_tpl(type):
     return flagset_slice_type_var_tpl.format(name=name(type), type=type, vtype=vtype(type))
 
 
+def gen_commandline_type(type):
+    return commandline_type_tpl.format(type=type, name=name(type))
+
+
+def gen_commandline_slice_type(type):
+    return commandline_type_tpl.format(type="[]" + type, name=name(type) + "Slice")
+
+
+def gen_commandline_type_var(type):
+    return commandline_type_var_tpl.format(type=type, name=name(type))
+
+
+def gen_commandline_slice_type_var(type):
+    return commandline_type_var_tpl.format(type="[]" + type, name=name(type) + "Slice")
+
+
+def gen_commandline_get_type(type):
+    return commandline_get_type_tpl.format(type=type, name=name(type))
+
+
+def gen_commandline_get_slice_type(type):
+    return commandline_get_type_tpl.format(type="[]" + type, name=name(type) + "Slice")
+
+
 def main():
     types = [
         "bool", "int", "uint", "int64", "int32", "int16", "int8",
@@ -258,15 +300,29 @@ def main():
     # for type in types:
     #     print(gen_flagset_get_slice_tpl(type))
 
-    for type in types:
-        print(gen_flagset_type_tpl(type))
-    for type in types:
-        print(gen_flagset_slice_type_tpl(type))
+    # flag.go
+    # for type in types:
+    #     print(gen_flagset_type_tpl(type))
+    # for type in types:
+    #     print(gen_flagset_slice_type_tpl(type))
+    # for type in types:
+    #     print(gen_flagset_type_var_tpl(type))
+    # for type in types:
+    #     print(gen_flagset_slice_type_var_tpl(type))
 
+    # commandline.go
+    # for type in types:
+    #     print(gen_commandline_type(type))
+    # for type in types:
+    #     print(gen_commandline_slice_type(type))
+    # for type in types:
+    #     print(gen_commandline_type_var(type))
+    # for type in types:
+    #     print(gen_commandline_slice_type_var(type))
     for type in types:
-        print(gen_flagset_type_var_tpl(type))
+        print(gen_commandline_get_type(type))
     for type in types:
-        print(gen_flagset_slice_type_var_tpl(type))
+        print(gen_commandline_get_slice_type(type))
 
 
 if __name__ == "__main__":
