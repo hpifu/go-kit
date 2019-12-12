@@ -13,8 +13,6 @@ func TestHFlag(t *testing.T) {
 	Convey("test flag", t, func() {
 		flagSet := NewFlagSet("test flag")
 		i := flagSet.Int("i", 10, "int flag")
-		//i := new(int)
-		//flagSet.IntVar(i, "i", 10, "int flag")
 		f := flagSet.Float64("f", 11.11, "float flag")
 		s := flagSet.String("s", "hello world", "string flag")
 		d := flagSet.Duration("d", time.Duration(30)*time.Second, "string flag")
