@@ -11,6 +11,36 @@ func ToString(v interface{}) string {
 	switch v.(type) {
 	case bool:
 		return BoolTo(v.(bool))
+	case int:
+		return IntTo(v.(int))
+	case uint:
+		return UintTo(v.(uint))
+	case int64:
+		return Int64To(v.(int64))
+	case int32:
+		return Int32To(v.(int32))
+	case int16:
+		return Int16To(v.(int16))
+	case int8:
+		return Int8To(v.(int8))
+	case uint64:
+		return Uint64To(v.(uint64))
+	case uint32:
+		return Uint32To(v.(uint32))
+	case uint16:
+		return Uint16To(v.(uint16))
+	case uint8:
+		return Uint8To(v.(uint8))
+	case float64:
+		return Float64To(v.(float64))
+	case float32:
+		return Float32To(v.(float32))
+	case time.Duration:
+		return DurationTo(v.(time.Duration))
+	case time.Time:
+		return TimeTo(v.(time.Time))
+	case net.IP:
+		return IPTo(v.(net.IP))
 	default:
 		return fmt.Sprintf("%v", v)
 	}
