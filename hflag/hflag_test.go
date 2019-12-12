@@ -96,7 +96,7 @@ func TestHFlagParse(t *testing.T) {
 		flagSet := NewFlagSet("test flag")
 		flagSet.AddFlag("int-option", "usage", Shorthand("i"), Type("int"), Required(), DefaultValue("10"))
 		flagSet.AddFlag("str-option", "usage", Shorthand("s"), Required())
-		flagSet.AddFlag("key", "usage", Shorthand("k"), Type("float"), Required())
+		flagSet.AddFlag("key", "usage", Shorthand("k"), Type("float64"), Required())
 		flagSet.AddFlag("all", "usage", Shorthand("a"), Type("bool"), Required())
 		flagSet.AddFlag("user", "usage", Shorthand("u"), Type("bool"), Required())
 		flagSet.AddFlag("password", "usage", Shorthand("p"), Type("string"), DefaultValue("654321"))

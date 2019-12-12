@@ -30,7 +30,7 @@ func NewValueType(typeStr string) Value {
 		return new(uint16Value)
 	case "uint8":
 		return new(uint8Value)
-	case "float64", "float":
+	case "float64":
 		return new(float64Value)
 	case "float32":
 		return new(float32Value)
