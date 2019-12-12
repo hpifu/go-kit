@@ -37,7 +37,7 @@ func interfaceToType(v reflect.Value) (string, Value, error) {{
 """
 
 
-get_tpl = """
+flagset_get_tpl = """
 func (f *FlagSet) Get{name}(name string) (v {type}) {{
 	flag := f.Lookup(name)
 	if flag == nil {{
@@ -57,7 +57,7 @@ func (f *FlagSet) Get{name}(name string) (v {type}) {{
 }}
 """
 
-get_slice_tpl = """
+flagset_get_slice_tpl = """
 func (f *FlagSet) Get{name}Slice(name string) (v []{type}) {{
 	flag := f.Lookup(name)
 	if flag == nil {{
@@ -155,7 +155,7 @@ def gen_interface_to_type(types):
     return interface_to_type_tpl.format(body=body)
 
 
-def gen_get_tpl(type):
+def gen_flagset_get_tpl(type):
     if type == "string":
         return """
 func (f *FlagSet) GetString(name string) string {
@@ -166,11 +166,11 @@ func (f *FlagSet) GetString(name string) string {
 	return flag.Value.String()
 }
 """
-    return get_tpl.format(name=name(type), type=type, vtype=vtype(type))
+    return flagset_get_tpl.format(name=name(type), type=type, vtype=vtype(type))
 
 
-def gen_get_slice_tpl(type):
-    return get_slice_tpl.format(name=name(type), type=type, vtype=vtype(type))
+def gen_flagset_get_slice_tpl(type):
+    return flagset_get_slice_tpl.format(name=name(type), type=type, vtype=vtype(type))
 
 
 def main():
@@ -199,9 +199,9 @@ def main():
     # print(gen_interface_to_type(types))
 
     for type in types:
-        print(gen_get_tpl(type))
+        print(gen_flagset_get_tpl(type))
     for type in types:
-        print(gen_get_slice_tpl(type))
+        print(gen_flagset_get_slice_tpl(type))
 
 
 if __name__ == "__main__":
