@@ -149,8 +149,8 @@ func GetInt(name string) int {
 	return CommandLine.GetInt(name)
 }
 
-func GetFloat(name string) float64 {
-	return CommandLine.GetFloat(name)
+func GetFloat64(name string) float64 {
+	return CommandLine.GetFloat64(name)
 }
 
 func GetString(name string) string {

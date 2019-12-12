@@ -107,7 +107,7 @@ func TestHFlagParse(t *testing.T) {
 		Convey("check default value", func() {
 			So(flagSet.GetInt("int-option"), ShouldEqual, 10)
 			So(flagSet.GetString("str-option"), ShouldEqual, "")
-			So(flagSet.GetFloat("key"), ShouldEqual, 0.0)
+			So(flagSet.GetFloat64("key"), ShouldEqual, 0.0)
 			So(flagSet.GetBool("all"), ShouldBeFalse)
 			So(flagSet.GetBool("user"), ShouldBeFalse)
 			So(flagSet.GetString("password"), ShouldEqual, "654321")
@@ -134,7 +134,7 @@ func TestHFlagParse(t *testing.T) {
 			So(flagSet.GetStringSlice("str-option"), ShouldResemble, []string{
 				"apple", "banana", "orange",
 			})
-			So(flagSet.GetFloat("key"), ShouldAlmostEqual, 3.14)
+			So(flagSet.GetFloat64("key"), ShouldAlmostEqual, 3.14)
 			So(flagSet.GetBool("all"), ShouldBeTrue)
 			So(flagSet.GetBool("user"), ShouldBeTrue)
 			So(flagSet.GetString("password"), ShouldEqual, "123456")

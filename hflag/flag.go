@@ -128,7 +128,7 @@ func (f *FlagSet) Duration(name string, defaultValue time.Duration, usage string
 }
 
 func (f *FlagSet) Float64(name string, defaultValue float64, usage string) *float64 {
-	if err := f.addFlagAutoShorthand(name, usage, "float", fmt.Sprintf("%f", defaultValue)); err != nil {
+	if err := f.addFlagAutoShorthand(name, usage, "float64", fmt.Sprintf("%f", defaultValue)); err != nil {
 		panic(err)
 	}
 	return (*float64)(f.nameToFlag[name].Value.(*float64Value))

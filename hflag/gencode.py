@@ -37,6 +37,47 @@ func interfaceToType(v reflect.Value) (string, Value, error) {{
 """
 
 
+get_tpl = """
+func (f *FlagSet) Get{name}(name string) (v {type}) {{
+	flag := f.Lookup(name)
+	if flag == nil {{
+		return
+	}}
+	if flag.Type == "string" {{
+		val, err := hstring.To{name}(flag.Value.String())
+		if err != nil {{
+			return
+		}}
+		return val
+	}}
+	if flag.Type != "{vtype}" {{
+		return
+	}}
+	return {type}(*flag.Value.(*{vtype}Value))
+}}
+"""
+
+get_slice_tpl = """
+func (f *FlagSet) Get{name}Slice(name string) (v []{type}) {{
+	flag := f.Lookup(name)
+	if flag == nil {{
+		return
+	}}
+	if flag.Type == "string" {{
+		val, err := hstring.To{name}Slice(flag.Value.String())
+		if err != nil {{
+			return
+		}}
+		return val
+	}}
+	if flag.Type != "[]{vtype}" {{
+		return
+	}}
+	return []{type}(*flag.Value.(*{vtype}SliceValue))
+}}
+"""
+
+
 def vtype(type):
     return type.split(".")[-1].lower()
 
@@ -114,6 +155,24 @@ def gen_interface_to_type(types):
     return interface_to_type_tpl.format(body=body)
 
 
+def gen_get_tpl(type):
+    if type == "string":
+        return """
+func (f *FlagSet) GetString(name string) string {
+	flag := f.Lookup(name)
+	if flag == nil {
+		return ""
+	}
+	return flag.Value.String()
+}
+"""
+    return get_tpl.format(name=name(type), type=type, vtype=vtype(type))
+
+
+def gen_get_slice_tpl(type):
+    return get_slice_tpl.format(name=name(type), type=type, vtype=vtype(type))
+
+
 def main():
     types = [
         "bool", "int", "uint", "int64", "int32", "int16", "int8",
@@ -137,7 +196,12 @@ def main():
     # print(gen_new_value_type(types))
 
     # hflag.go
-    print(gen_interface_to_type(types))
+    # print(gen_interface_to_type(types))
+
+    for type in types:
+        print(gen_get_tpl(type))
+    for type in types:
+        print(gen_get_slice_tpl(type))
 
 
 if __name__ == "__main__":
