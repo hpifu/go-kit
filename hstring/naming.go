@@ -2,6 +2,7 @@ package hstring
 
 import (
 	"bytes"
+	"strings"
 )
 
 func IsUpper(ch uint8) bool {
@@ -147,6 +148,14 @@ func SnakeName(str string) string {
 
 func KebabName(str string) string {
 	return snakeName(str, '-')
+}
+
+func SnakeNameAllCaps(str string) string {
+	return strings.ToUpper(SnakeName(str))
+}
+
+func KebabNameAllCaps(str string) string {
+	return strings.ToUpper(KebabName(str))
 }
 
 func snakeName(str string, separator uint8) string {

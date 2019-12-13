@@ -46,6 +46,7 @@ func TestNaming(t *testing.T) {
 			So(SnakeName("MyIPAddress"), ShouldEqual, "my_ip_address")
 			So(SnakeName("IP-Address"), ShouldEqual, "ip_address")
 			So(SnakeName("IP-AddressAPP"), ShouldEqual, "ip_address_app")
+			So(SnakeNameAllCaps("hello_world"), ShouldEqual, "HELLO_WORLD")
 		})
 
 		Convey("kebab name", func() {
@@ -59,6 +60,7 @@ func TestNaming(t *testing.T) {
 			So(KebabName("MyIPAddress"), ShouldEqual, "my-ip-address")
 			So(KebabName("IP-Address"), ShouldEqual, "ip-address")
 			So(KebabName("IP-AddressAPP"), ShouldEqual, "ip-address-app")
+			So(KebabNameAllCaps("hello_world"), ShouldEqual, "HELLO-WORLD")
 		})
 	})
 }
