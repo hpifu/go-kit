@@ -34,6 +34,24 @@ to_string_tpl = """func ToString(v interface{{}}) string {{
 }}"""
 
 
+to_interface_tpl = """func ToInterface(str string, v interface{{}}) error {{
+	switch v.(type) {{{body}
+	default:
+		return fmt.Errorf("unsupport type [%v]", v)
+	}}
+}}
+"""
+
+
+def vtype(type):
+    return type.split(".")[-1].lower()
+
+
+def name(type):
+    temp = type.split(".")[-1]
+    return temp[0].upper() + temp[1:]
+
+
 def gen_to_string(types):
     body = ""
     tpl = """
@@ -42,16 +60,12 @@ def gen_to_string(types):
     for type in types:
         if type == "string":
             continue
-        temp = type.split(".")[-1]
-        name = temp[0].upper() + temp[1:]
-        body += tpl.format(type=type, name=name)
+        body += tpl.format(type=type, name=name(type))
     tpl = """
 	case []{type}:
 		return {name}SliceTo(v.([]{type}))"""
     for type in types:
-        temp = type.split(".")[-1]
-        name = temp[0].upper() + temp[1:]
-        body += tpl.format(type=type, name=name)
+        body += tpl.format(type=type, name=name(type))
     return to_string_tpl.format(body=body)
 
 
@@ -62,10 +76,7 @@ func StringSliceTo(vs []string) string {
 	return strings.Join(vs, ",")
 }
 """
-
-    temp = type.split(".")[-1]
-    name = temp[0].upper() + temp[1:]
-    return slice_to_string_tpl.format(type=type, name=name)
+    return slice_to_string_tpl.format(type=type, name=name(type))
 
 
 def gen_string_to_slice(type):
@@ -78,9 +89,29 @@ func ToStringSlice(str string) ([]string, error) {
 	return strings.Split(str, ","), nil
 }
 """
-    temp = type.split(".")[-1]
-    name = temp[0].upper() + temp[1:]
-    return string_to_slice_tpl.format(type=type, name=name)
+    return string_to_slice_tpl.format(type=type, name=name(type))
+
+
+def gen_to_interface(types):
+    body = ""
+    tpl = """
+	case *{type}:
+		val, err := To{name}(str)
+		if err != nil {{
+			return err
+		}}
+		*v.(*{type}) = val
+		return nil"""
+    for type in types:
+        if type == "string":
+            body += """
+	case *string:
+		*v.(*string) = str
+		return nil"""
+            continue
+        body += tpl.format(type=type, name=name(type))
+
+    return to_interface_tpl.format(body=body)
 
 
 def main():
@@ -89,9 +120,17 @@ def main():
         "uint64", "uint32", "uint16", "uint8", "float64", "float32",
         "time.Duration", "time.Time", "net.IP"
     ]
-    print(gen_to_string(types))
+    # type_to_string.go
+    # print(gen_to_string(types))
+
+    # string_to_type.go
+    print(gen_to_interface(types))
+
+    # string_to_slice.go
     # for type in types:
     #     print(gen_string_to_slice(type))
+
+    # slice_to_string.go
     # for type in types:
     #     print(gen_slice_to_string(type))
 

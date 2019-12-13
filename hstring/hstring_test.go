@@ -154,5 +154,11 @@ func TestHString(t *testing.T) {
 			So(v, ShouldResemble, []string{})
 			So(err, ShouldBeNil)
 		}
+		{
+			var t time.Duration
+			err := ToInterface("5s", &t)
+			So(err, ShouldBeNil)
+			So(t, ShouldEqual, 5*time.Second)
+		}
 	})
 }
