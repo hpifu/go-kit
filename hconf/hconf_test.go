@@ -129,11 +129,13 @@ func TestHConfUnMarshal(t *testing.T) {
 	type linfo struct {
 		Filename string        `hconf:"filename"`
 		MaxAge   time.Duration `hconf:"maxAge"`
+		Format   string        `hconf:"format"`
 	}
 
 	type logger struct {
 		InfoLog linfo  `hconf:"infoLog"`
 		WarnLog *linfo `hconf:"warnLog"`
+		ErrLog  linfo  `hconf:"errLog"`
 	}
 
 	Convey("test conf unmarshal", t, func() {

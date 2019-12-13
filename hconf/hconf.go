@@ -153,6 +153,9 @@ func (h HConf) Unmarshal(v interface{}) error {
 }
 
 func interfaceToStructV2(d interface{}, v interface{}) error {
+	if d == nil {
+		return nil
+	}
 	if reflect.ValueOf(v).Kind() != reflect.Ptr {
 		return fmt.Errorf("invalid value type")
 	}
