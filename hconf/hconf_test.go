@@ -74,7 +74,7 @@ func TestHConfGet(t *testing.T) {
 		So(conf.GetDefaultInt("reporter.notexist"), ShouldEqual, 0)
 		So(conf.GetDefaultDuration("collector[1].interval", time.Duration(0)), ShouldEqual, 30*time.Second)
 		So(conf.GetDefaultDuration("logger.accessLog.maxAge"), ShouldEqual, 24*time.Hour)
-		So(conf.GetDefaultFloat("scheduler.batch"), ShouldAlmostEqual, 5.0)
+		So(conf.GetDefaultFloat64("scheduler.batch"), ShouldAlmostEqual, 5.0)
 		So(conf.GetDefaultString("collector[1].class"), ShouldEqual, "MemoryCollector")
 		DeleteFile()
 	})

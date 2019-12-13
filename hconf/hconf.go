@@ -149,10 +149,10 @@ func (h *HConf) Set(key string, val interface{}) error {
 }
 
 func (h HConf) Unmarshal(v interface{}) error {
-	return interfaceToStructV2(h.data, v)
+	return interfaceToStruct(h.data, v)
 }
 
-func interfaceToStructV2(d interface{}, v interface{}) error {
+func interfaceToStruct(d interface{}, v interface{}) error {
 	if d == nil {
 		return nil
 	}
@@ -183,11 +183,11 @@ func interfaceToStructV2(d interface{}, v interface{}) error {
 					nv := reflect.New(field.Type().Elem())
 					field.Set(nv)
 				}
-				if err := interfaceToStructV2(value, field.Interface()); err != nil {
+				if err := interfaceToStruct(value, field.Interface()); err != nil {
 					return err
 				}
 			} else {
-				if err := interfaceToStructV2(value, field.Addr().Interface()); err != nil {
+				if err := interfaceToStruct(value, field.Addr().Interface()); err != nil {
 					return err
 				}
 			}
@@ -199,7 +199,7 @@ func interfaceToStructV2(d interface{}, v interface{}) error {
 		}
 		nv := reflect.New(rt.Elem())
 		for _, di := range dv {
-			err := interfaceToStructV2(di, nv.Interface())
+			err := interfaceToStruct(di, nv.Interface())
 			if err != nil {
 				return err
 			}
@@ -303,232 +303,6 @@ func interfaceToStructV2(d interface{}, v interface{}) error {
 	}
 
 	return nil
-}
-
-func interfaceToStructV1(d interface{}, v interface{}) error {
-	if reflect.ValueOf(v).Kind() != reflect.Ptr {
-		return fmt.Errorf("invalid value type")
-	}
-
-	rv := reflect.ValueOf(v).Elem()
-	rt := reflect.TypeOf(v).Elem()
-
-	if reflect.ValueOf(v).Elem().Kind() == reflect.Slice {
-		dv, ok := d.([]interface{})
-		fmt.Println(rt.Elem())
-		if !ok {
-			return fmt.Errorf("convert data to []interface{} failed. which is %v", reflect.TypeOf(d))
-		}
-
-		nv := reflect.New(rt.Elem())
-		for _, di := range dv {
-			err := interfaceToStructV1(di, nv.Interface())
-			if err != nil {
-				return err
-			}
-			rv.Set(reflect.Append(rv, nv.Elem()))
-		}
-
-		return nil
-	}
-
-	dv, ok := d.(map[string]interface{})
-	if !ok {
-		return fmt.Errorf("convert data to map[string]interface{} failed. which is %v", reflect.TypeOf(d))
-	}
-
-	for i := 0; i < rv.NumField(); i++ {
-		field := rv.Field(i)
-		value := dv[rt.Field(i).Tag.Get("hconf")]
-		switch rt.Field(i).Type.Kind() {
-		case reflect.Int:
-			i, err := cast.ToIntE(value)
-			if err != nil {
-				return err
-			}
-			field.Set(reflect.ValueOf(i))
-		case reflect.Int64:
-			if field.Type() == reflect.TypeOf(time.Duration(0)) {
-				i, err := cast.ToStringE(value)
-				if err != nil {
-					return err
-				}
-				t, err := time.ParseDuration(i)
-				if err != nil {
-					return err
-				}
-				field.Set(reflect.ValueOf(t))
-			} else {
-				i, err := cast.ToInt64E(value)
-				if err != nil {
-					return err
-				}
-				field.Set(reflect.ValueOf(i))
-			}
-		case reflect.Uint64:
-			i, err := cast.ToUint64E(value)
-			if err != nil {
-				return err
-			}
-			field.Set(reflect.ValueOf(i))
-		case reflect.Float64:
-			i, err := cast.ToFloat64E(value)
-			if err != nil {
-				return err
-			}
-			field.Set(reflect.ValueOf(i))
-		case reflect.String:
-			i, err := cast.ToStringE(value)
-			if err != nil {
-				return err
-			}
-			field.Set(reflect.ValueOf(i))
-		case reflect.Struct:
-			if err := interfaceToStructV1(value, field.Addr().Interface()); err != nil {
-				return err
-			}
-		case reflect.Ptr:
-			nv := reflect.New(field.Type().Elem())
-			if err := interfaceToStructV1(value, nv.Interface()); err != nil {
-				return err
-			}
-			field.Set(nv)
-		}
-	}
-
-	return nil
-}
-
-func (h HConf) GetDefaultInt(keys string, defaultValue ...int) int {
-	v, err := h.GetInt(keys)
-	if err != nil {
-		if len(defaultValue) == 0 {
-			return 0
-		}
-		return defaultValue[0]
-	}
-
-	return v
-}
-
-func (h HConf) GetDefaultFloat(keys string, defaultValue ...float64) float64 {
-	v, err := h.GetFloat(keys)
-	if err != nil {
-		if len(defaultValue) == 0 {
-			return 0.0
-		}
-		return defaultValue[0]
-	}
-
-	return v
-}
-
-func (h HConf) GetDefaultString(keys string, defaultValue ...string) string {
-	v, err := h.GetString(keys)
-	if err != nil {
-		if len(defaultValue) == 0 {
-			return ""
-		}
-		return defaultValue[0]
-	}
-
-	return v
-}
-
-func (h HConf) GetDefaultDuration(keys string, defaultValue ...time.Duration) time.Duration {
-	v, err := h.GetDuration(keys)
-	if err != nil {
-		if len(defaultValue) == 0 {
-			return 0
-		}
-		return defaultValue[0]
-	}
-
-	return v
-}
-
-func (h HConf) GetInt(keys string) (int, error) {
-	v, err := h.Get(keys)
-	if err != nil {
-		return 0, err
-	}
-
-	switch v.(type) {
-	case int:
-		return v.(int), nil
-	case float64:
-		return int(v.(float64)), nil
-	case float32:
-		return int(v.(float32)), nil
-	case string:
-		i, err := strconv.Atoi(v.(string))
-		if err != nil {
-			return 0, err
-		}
-		return i, nil
-	}
-
-	return 0, fmt.Errorf("convert to int failed")
-}
-
-func (h HConf) GetFloat(keys string) (float64, error) {
-	v, err := h.Get(keys)
-	if err != nil {
-		return 0.0, err
-	}
-
-	switch v.(type) {
-	case int:
-		return float64(v.(int)), nil
-	case float64:
-		return v.(float64), nil
-	case float32:
-		return float64(v.(float32)), nil
-	case string:
-		f, err := strconv.ParseFloat(v.(string), 64)
-		if err != nil {
-			return 0.0, err
-		}
-		return f, nil
-	}
-
-	return 0.0, fmt.Errorf("convert to float64 failed")
-}
-
-func (h HConf) GetString(keys string) (string, error) {
-	v, err := h.Get(keys)
-	if err != nil {
-		return "", err
-	}
-
-	switch v.(type) {
-	case int:
-		return strconv.Itoa(v.(int)), nil
-	case float64:
-		return fmt.Sprintf("%f", v.(float64)), nil
-	case float32:
-		return fmt.Sprintf("%f", v.(float32)), nil
-	case string:
-		return v.(string), nil
-	}
-
-	return "", fmt.Errorf("convert to string failed")
-}
-
-func (h HConf) GetDuration(keys string) (time.Duration, error) {
-	v, err := h.Get(keys)
-	if err != nil {
-		return 0, err
-	}
-
-	switch v.(type) {
-	case string:
-		return time.ParseDuration(v.(string))
-	case int:
-		return time.Duration(v.(int)) * time.Second, nil
-	}
-
-	return 0, fmt.Errorf("convert to duration failed")
 }
 
 func (h HConf) Sub(keys string) (*HConf, error) {
