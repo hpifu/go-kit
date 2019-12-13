@@ -10,7 +10,7 @@
 - 支持 bool 参数简写 (`-aux` 和 `-a -u -x` 等效)
 - 支持值参数缩写 (`-p123456` 和 `-p 123456` 等效)
 - 支持结构体 Flags
-- 更多类型的支持，支持 `net.IP`，`time.Time`，`time.Duration`，`[]int`, `[]string` 的解析
+- 更多类型的支持，支持 `net.IP`，`time.Time`，`time.Duration`，`[]int`, `[]string` 等常用类型的解析
 - 更友好的用法帮助
 - 提供一套更简洁的 api
 - 完全兼容 flag 接口
@@ -205,6 +205,14 @@ options:
 - `ip` => `net.IP`
 - `[]int` => `[]int`
 - `[]string` => `[]string`
+
+所有一下所有的数据类型，以及其数组形式:
+
+``` go
+"bool", "int", "uint", "int64", "int32", "int16", "int8",
+"uint64", "uint32", "uint16", "uint8", "float64", "float32",
+"time.Duration", "time.Time", "net.IP"
+```
 
 常用的数据类型格式：
 
