@@ -1,7 +1,6 @@
 package hconf
 
 import (
-	"fmt"
 	"github.com/spf13/cast"
 	"time"
 )
@@ -14,7 +13,6 @@ func (h HConf) GetDefaultInt(keys string, defaultValue ...int) int {
 		}
 		return defaultValue[0]
 	}
-
 	return v
 }
 
@@ -26,7 +24,6 @@ func (h HConf) GetDefaultFloat64(keys string, defaultValue ...float64) float64 {
 		}
 		return defaultValue[0]
 	}
-
 	return v
 }
 
@@ -38,7 +35,6 @@ func (h HConf) GetDefaultString(keys string, defaultValue ...string) string {
 		}
 		return defaultValue[0]
 	}
-
 	return v
 }
 
@@ -50,7 +46,6 @@ func (h HConf) GetDefaultDuration(keys string, defaultValue ...time.Duration) ti
 		}
 		return defaultValue[0]
 	}
-
 	return v
 }
 
@@ -83,13 +78,5 @@ func (h HConf) GetDuration(keys string) (time.Duration, error) {
 	if err != nil {
 		return 0, err
 	}
-
-	switch v.(type) {
-	case string:
-		return time.ParseDuration(v.(string))
-	case int:
-		return time.Duration(v.(int)) * time.Second, nil
-	}
-
-	return 0, fmt.Errorf("convert to duration failed")
+	return cast.ToDurationE(v)
 }
