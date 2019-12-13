@@ -177,7 +177,7 @@ func interfaceToStruct(d interface{}, v interface{}) error {
 				continue
 			}
 			if key == "" {
-				key = rt.Field(i).Name
+				key = hstring.CamelName(rt.Field(i).Name)
 			}
 			value := dv[key]
 			if rt.Field(i).Type.Kind() == reflect.Ptr {

@@ -115,27 +115,27 @@ func TestHConfBindEnv(t *testing.T) {
 
 func TestHConfUnMarshal(t *testing.T) {
 	type cinfo struct {
-		Class    string `hconf:"class"`
-		Table    string `hconf:"table"`
-		Interval string `hconf:"interval"`
+		Type     string `hconf:"class"`
+		Table    string
+		Interval string
 	}
 
 	type rinfo struct {
-		Address  string `hconf:"address"`
-		Database string `hconf:"database"`
-		Retry    int    `hconf:"retry"`
+		Address  string
+		Database string
+		Retry    int
 	}
 
 	type linfo struct {
-		Filename string        `hconf:"filename"`
-		MaxAge   time.Duration `hconf:"maxAge"`
-		Format   string        `hconf:"format"`
+		Filename string
+		MaxAge   time.Duration
+		Format   string
 	}
 
 	type logger struct {
-		InfoLog linfo  `hconf:"infoLog"`
-		WarnLog *linfo `hconf:"warnLog"`
-		ErrLog  linfo  `hconf:"errLog"`
+		Info   linfo  `hconf:"infoLog"`
+		Warn   *linfo `hconf:"warnLog"`
+		ErrLog linfo  `hconf:"-"`
 	}
 
 	Convey("test conf unmarshal", t, func() {
@@ -151,7 +151,7 @@ func TestHConfUnMarshal(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(c.Unmarshal(&infos), ShouldBeNil)
 			So(len(infos), ShouldEqual, 4)
-			So(infos[0].Class, ShouldEqual, "CPUCollector")
+			So(infos[0].Type, ShouldEqual, "CPUCollector")
 			So(infos[0].Table, ShouldEqual, "cpu")
 			So(infos[0].Interval, ShouldEqual, "30s")
 		}
@@ -173,9 +173,9 @@ func TestHConfUnMarshal(t *testing.T) {
 			So(c, ShouldNotBeNil)
 			So(err, ShouldBeNil)
 			So(c.Unmarshal(&info), ShouldBeNil)
-			So(info.InfoLog.Filename, ShouldEqual, "log/monitor.info")
-			So(info.WarnLog.Filename, ShouldEqual, "log/monitor.warn")
-			So(info.InfoLog.MaxAge, ShouldEqual, 24*time.Hour)
+			So(info.Info.Filename, ShouldEqual, "log/monitor.info")
+			So(info.Warn.Filename, ShouldEqual, "log/monitor.warn")
+			So(info.Info.MaxAge, ShouldEqual, 24*time.Hour)
 		}
 	})
 }
