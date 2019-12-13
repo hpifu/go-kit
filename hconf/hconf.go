@@ -163,72 +163,6 @@ func interfaceToStructV2(d interface{}, v interface{}) error {
 	rv := reflect.ValueOf(v).Elem()
 	rt := reflect.TypeOf(v).Elem()
 	switch rt.Kind() {
-	case reflect.Int:
-		i, err := cast.ToIntE(d)
-		if err != nil {
-			return err
-		}
-		rv.Set(reflect.ValueOf(i))
-	case reflect.Int64:
-		if rt == reflect.TypeOf(time.Duration(0)) {
-			i, err := cast.ToStringE(d)
-			if err != nil {
-				return err
-			}
-			t, err := time.ParseDuration(i)
-			if err != nil {
-				return err
-			}
-			rv.Set(reflect.ValueOf(t))
-		} else {
-			i, err := cast.ToInt64E(d)
-			if err != nil {
-				return err
-			}
-			rv.Set(reflect.ValueOf(i))
-		}
-	case reflect.Uint64:
-		i, err := cast.ToUint64E(d)
-		if err != nil {
-			return err
-		}
-		rv.Set(reflect.ValueOf(i))
-	case reflect.Int32:
-		i, err := cast.ToInt32E(d)
-		if err != nil {
-			return err
-		}
-		rv.Set(reflect.ValueOf(i))
-	case reflect.Uint32:
-		i, err := cast.ToUint32E(d)
-		if err != nil {
-			return err
-		}
-		rv.Set(reflect.ValueOf(i))
-	case reflect.Bool:
-		i, err := cast.ToBoolE(d)
-		if err != nil {
-			return err
-		}
-		rv.Set(reflect.ValueOf(i))
-	case reflect.Float64:
-		i, err := cast.ToFloat64E(d)
-		if err != nil {
-			return err
-		}
-		rv.Set(reflect.ValueOf(i))
-	case reflect.Float32:
-		i, err := cast.ToFloat32E(d)
-		if err != nil {
-			return err
-		}
-		rv.Set(reflect.ValueOf(i))
-	case reflect.String:
-		i, err := cast.ToStringE(d)
-		if err != nil {
-			return err
-		}
-		rv.Set(reflect.ValueOf(i))
 	case reflect.Struct:
 		dv, ok := d.(map[string]interface{})
 		if !ok {
@@ -272,7 +206,100 @@ func interfaceToStructV2(d interface{}, v interface{}) error {
 			rv.Set(reflect.Append(rv, nv.Elem()))
 		}
 	default:
-		return fmt.Errorf("unsupport type %v", rt)
+		switch rv.Interface().(type) {
+		case string:
+			v, err := cast.ToStringE(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case bool:
+			v, err := cast.ToBoolE(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case int:
+			v, err := cast.ToIntE(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case uint:
+			v, err := cast.ToUintE(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case int64:
+			v, err := cast.ToInt64E(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case int32:
+			v, err := cast.ToInt32E(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case int16:
+			v, err := cast.ToInt16E(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case int8:
+			v, err := cast.ToInt8E(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case uint64:
+			v, err := cast.ToUint64E(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case uint32:
+			v, err := cast.ToUint32E(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case uint16:
+			v, err := cast.ToUint16E(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case uint8:
+			v, err := cast.ToUint8E(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case float64:
+			v, err := cast.ToFloat64E(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case float32:
+			v, err := cast.ToFloat32E(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case time.Duration:
+			v, err := cast.ToDurationE(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		default:
+			return fmt.Errorf("unsupport type %v", rt)
+		}
 	}
 
 	return nil
