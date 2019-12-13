@@ -9,8 +9,19 @@ import (
 	"time"
 )
 
-func (h HConf) GetDefaultInt(keys string, defaultValue ...int) int {
-	v, err := h.GetInt(keys)
+func (h HConf) GetDefaultBool(key string, defaultValue ...bool) bool {
+	v, err := h.GetBool(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return false
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultInt(key string, defaultValue ...int) int {
+	v, err := h.GetInt(key)
 	if err != nil {
 		if len(defaultValue) == 0 {
 			return 0
@@ -20,8 +31,107 @@ func (h HConf) GetDefaultInt(keys string, defaultValue ...int) int {
 	return v
 }
 
-func (h HConf) GetDefaultFloat64(keys string, defaultValue ...float64) float64 {
-	v, err := h.GetFloat64(keys)
+func (h HConf) GetDefaultUint(key string, defaultValue ...uint) uint {
+	v, err := h.GetUint(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return 0
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultInt64(key string, defaultValue ...int64) int64 {
+	v, err := h.GetInt64(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return 0
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultInt32(key string, defaultValue ...int32) int32 {
+	v, err := h.GetInt32(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return 0
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultInt16(key string, defaultValue ...int16) int16 {
+	v, err := h.GetInt16(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return 0
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultInt8(key string, defaultValue ...int8) int8 {
+	v, err := h.GetInt8(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return 0
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultUint64(key string, defaultValue ...uint64) uint64 {
+	v, err := h.GetUint64(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return 0
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultUint32(key string, defaultValue ...uint32) uint32 {
+	v, err := h.GetUint32(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return 0
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultUint16(key string, defaultValue ...uint16) uint16 {
+	v, err := h.GetUint16(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return 0
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultUint8(key string, defaultValue ...uint8) uint8 {
+	v, err := h.GetUint8(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return 0
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultFloat64(key string, defaultValue ...float64) float64 {
+	v, err := h.GetFloat64(key)
 	if err != nil {
 		if len(defaultValue) == 0 {
 			return 0.0
@@ -31,8 +141,19 @@ func (h HConf) GetDefaultFloat64(keys string, defaultValue ...float64) float64 {
 	return v
 }
 
-func (h HConf) GetDefaultString(keys string, defaultValue ...string) string {
-	v, err := h.GetString(keys)
+func (h HConf) GetDefaultFloat32(key string, defaultValue ...float32) float32 {
+	v, err := h.GetFloat32(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return 0.0
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultString(key string, defaultValue ...string) string {
+	v, err := h.GetString(key)
 	if err != nil {
 		if len(defaultValue) == 0 {
 			return ""
@@ -42,11 +163,33 @@ func (h HConf) GetDefaultString(keys string, defaultValue ...string) string {
 	return v
 }
 
-func (h HConf) GetDefaultDuration(keys string, defaultValue ...time.Duration) time.Duration {
-	v, err := h.GetDuration(keys)
+func (h HConf) GetDefaultDuration(key string, defaultValue ...time.Duration) time.Duration {
+	v, err := h.GetDuration(key)
 	if err != nil {
 		if len(defaultValue) == 0 {
 			return 0
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultTime(key string, defaultValue ...time.Time) time.Time {
+	v, err := h.GetTime(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return time.Unix(0, 0)
+		}
+		return defaultValue[0]
+	}
+	return v
+}
+
+func (h HConf) GetDefaultIP(key string, defaultValue ...net.IP) net.IP {
+	v, err := h.GetIP(key)
+	if err != nil {
+		if len(defaultValue) == 0 {
+			return nil
 		}
 		return defaultValue[0]
 	}
