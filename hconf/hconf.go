@@ -233,15 +233,23 @@ func interfaceToStructV2(d interface{}, v interface{}) error {
 		}
 		for i := 0; i < rv.NumField(); i++ {
 			field := rv.Field(i)
-			value := dv[rt.Field(i).Tag.Get("hconf")]
-			switch rt.Field(i).Type.Kind() {
-			case reflect.Ptr:
-				nv := reflect.New(field.Type().Elem())
-				if err := interfaceToStructV2(value, nv.Interface()); err != nil {
+			key := rt.Field(i).Tag.Get("hconf")
+			if key == "-" {
+				continue
+			}
+			if key == "" {
+				key = rt.Field(i).Name
+			}
+			value := dv[key]
+			if rt.Field(i).Type.Kind() == reflect.Ptr {
+				if field.IsNil() {
+					nv := reflect.New(field.Type().Elem())
+					field.Set(nv)
+				}
+				if err := interfaceToStructV2(value, field.Interface()); err != nil {
 					return err
 				}
-				field.Set(nv)
-			default:
+			} else {
 				if err := interfaceToStructV2(value, field.Addr().Interface()); err != nil {
 					return err
 				}
@@ -261,7 +269,7 @@ func interfaceToStructV2(d interface{}, v interface{}) error {
 			rv.Set(reflect.Append(rv, nv.Elem()))
 		}
 	default:
-		return fmt.Errorf("unspport type %v", rt)
+		return fmt.Errorf("unsupport type %v", rt)
 	}
 
 	return nil
