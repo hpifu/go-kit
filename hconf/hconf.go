@@ -2,8 +2,10 @@ package hconf
 
 import (
 	"fmt"
+	"github.com/hpifu/go-kit/hstring"
 	"github.com/spf13/cast"
 	"github.com/yosuke-furukawa/json5/encoding/json5"
+	"net"
 	"os"
 	"reflect"
 	"strconv"
@@ -297,6 +299,25 @@ func interfaceToStruct(d interface{}, v interface{}) error {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
+		case time.Time:
+			v, err := cast.ToTimeE(d)
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf(v))
+		case net.IP:
+			switch v.(type) {
+			case string:
+				v, err := hstring.ToIP(v.(string))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			case net.IP:
+				rv.Set(reflect.ValueOf(v.(net.IP)))
+			default:
+				return fmt.Errorf("convert type [%v] to ip failed", reflect.TypeOf(v))
+			}
 		default:
 			return fmt.Errorf("unsupport type %v", rt)
 		}
