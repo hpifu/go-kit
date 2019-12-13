@@ -41,6 +41,40 @@ func ToString(v interface{}) string {
 		return TimeTo(v.(time.Time))
 	case net.IP:
 		return IPTo(v.(net.IP))
+	case []string:
+		return StringSliceTo(v.([]string))
+	case []bool:
+		return BoolSliceTo(v.([]bool))
+	case []int:
+		return IntSliceTo(v.([]int))
+	case []uint:
+		return UintSliceTo(v.([]uint))
+	case []int64:
+		return Int64SliceTo(v.([]int64))
+	case []int32:
+		return Int32SliceTo(v.([]int32))
+	case []int16:
+		return Int16SliceTo(v.([]int16))
+	case []int8:
+		return Int8SliceTo(v.([]int8))
+	case []uint64:
+		return Uint64SliceTo(v.([]uint64))
+	case []uint32:
+		return Uint32SliceTo(v.([]uint32))
+	case []uint16:
+		return Uint16SliceTo(v.([]uint16))
+	case []uint8:
+		return Uint8SliceTo(v.([]uint8))
+	case []float64:
+		return Float64SliceTo(v.([]float64))
+	case []float32:
+		return Float32SliceTo(v.([]float32))
+	case []time.Duration:
+		return DurationSliceTo(v.([]time.Duration))
+	case []time.Time:
+		return TimeSliceTo(v.([]time.Time))
+	case []net.IP:
+		return IPSliceTo(v.([]net.IP))
 	default:
 		return fmt.Sprintf("%v", v)
 	}

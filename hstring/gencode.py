@@ -35,13 +35,20 @@ to_string_tpl = """func ToString(v interface{{}}) string {{
 
 
 def gen_to_string(types):
+    body = ""
     tpl = """
 	case {type}:
 		return {name}To(v.({type}))"""
-    body = ""
     for type in types:
         if type == "string":
             continue
+        temp = type.split(".")[-1]
+        name = temp[0].upper() + temp[1:]
+        body += tpl.format(type=type, name=name)
+    tpl = """
+	case []{type}:
+		return {name}SliceTo(v.([]{type}))"""
+    for type in types:
         temp = type.split(".")[-1]
         name = temp[0].upper() + temp[1:]
         body += tpl.format(type=type, name=name)
@@ -82,11 +89,11 @@ def main():
         "uint64", "uint32", "uint16", "uint8", "float64", "float32",
         "time.Duration", "time.Time", "net.IP"
     ]
-    # print(gen_to_string(types))
+    print(gen_to_string(types))
     # for type in types:
     #     print(gen_string_to_slice(type))
-    for type in types:
-        print(gen_slice_to_string(type))
+    # for type in types:
+    #     print(gen_slice_to_string(type))
 
 
 if __name__ == "__main__":
