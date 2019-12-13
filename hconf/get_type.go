@@ -388,3 +388,360 @@ func (h HConf) GetIntSlice(key string) ([]int, error) {
 		return nil, fmt.Errorf("convert to bool slice failed")
 	}
 }
+
+func (h HConf) GetUintSlice(key string) ([]uint, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToUintSlice(v.(string))
+	case []uint:
+		return v.([]uint), nil
+	case []interface{}:
+		var res []uint
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToUintE(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetInt64Slice(key string) ([]int64, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToInt64Slice(v.(string))
+	case []int64:
+		return v.([]int64), nil
+	case []interface{}:
+		var res []int64
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToInt64E(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetInt32Slice(key string) ([]int32, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToInt32Slice(v.(string))
+	case []int32:
+		return v.([]int32), nil
+	case []interface{}:
+		var res []int32
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToInt32E(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetInt16Slice(key string) ([]int16, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToInt16Slice(v.(string))
+	case []int16:
+		return v.([]int16), nil
+	case []interface{}:
+		var res []int16
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToInt16E(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetInt8Slice(key string) ([]int8, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToInt8Slice(v.(string))
+	case []int8:
+		return v.([]int8), nil
+	case []interface{}:
+		var res []int8
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToInt8E(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetUint64Slice(key string) ([]uint64, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToUint64Slice(v.(string))
+	case []uint64:
+		return v.([]uint64), nil
+	case []interface{}:
+		var res []uint64
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToUint64E(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetUint32Slice(key string) ([]uint32, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToUint32Slice(v.(string))
+	case []uint32:
+		return v.([]uint32), nil
+	case []interface{}:
+		var res []uint32
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToUint32E(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetUint16Slice(key string) ([]uint16, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToUint16Slice(v.(string))
+	case []uint16:
+		return v.([]uint16), nil
+	case []interface{}:
+		var res []uint16
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToUint16E(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetUint8Slice(key string) ([]uint8, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToUint8Slice(v.(string))
+	case []uint8:
+		return v.([]uint8), nil
+	case []interface{}:
+		var res []uint8
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToUint8E(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetFloat64Slice(key string) ([]float64, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToFloat64Slice(v.(string))
+	case []float64:
+		return v.([]float64), nil
+	case []interface{}:
+		var res []float64
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToFloat64E(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetFloat32Slice(key string) ([]float32, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToFloat32Slice(v.(string))
+	case []float32:
+		return v.([]float32), nil
+	case []interface{}:
+		var res []float32
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToFloat32E(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetDurationSlice(key string) ([]time.Duration, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToDurationSlice(v.(string))
+	case []time.Duration:
+		return v.([]time.Duration), nil
+	case []interface{}:
+		var res []time.Duration
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToDurationE(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetTimeSlice(key string) ([]time.Time, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToTimeSlice(v.(string))
+	case []time.Time:
+		return v.([]time.Time), nil
+	case []interface{}:
+		var res []time.Time
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToTimeE(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
+
+func (h HConf) GetIPSlice(key string) ([]net.IP, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToIPSlice(v.(string))
+	case []net.IP:
+		return v.([]net.IP), nil
+	case []interface{}:
+		var res []net.IP
+		for _, val := range v.([]interface{}) {
+			switch val.(type) {
+			case string:
+				d, err := hstring.ToIP(val.(string))
+				if err != nil {
+					return nil, err
+				}
+				res = append(res, d)
+			case net.IP:
+				res = append(res, val.(net.IP))
+			default:
+				return nil, fmt.Errorf("convert type [%v] to ip failed", reflect.TypeOf(v))
+			}
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
