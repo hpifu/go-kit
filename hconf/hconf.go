@@ -326,14 +326,14 @@ func interfaceToStruct(d interface{}, v interface{}) error {
 	return nil
 }
 
-func (h HConf) Sub(keys string) (*HConf, error) {
-	i, err := h.Get(keys)
+func (h HConf) Sub(key string) (*HConf, error) {
+	v, err := h.Get(key)
 	if err != nil {
 		return nil, err
 	}
 
 	return &HConf{
-		data:      i,
+		data:      v,
 		separator: h.separator,
 	}, nil
 }
