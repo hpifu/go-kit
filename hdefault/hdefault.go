@@ -21,6 +21,10 @@ func SetDefault(v interface{}) error {
 	for i := 0; i < rv.NumField(); i++ {
 		field := rv.Field(i)
 		value := rt.Field(i).Tag.Get("hdef")
+		if value == "" || value == "-" {
+			continue
+		}
+
 		if field.Kind() == reflect.Ptr {
 			if field.IsNil() {
 				nv := reflect.New(rt.Field(i).Type.Elem())
