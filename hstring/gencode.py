@@ -42,6 +42,18 @@ to_interface_tpl = """func ToInterface(str string, v interface{{}}) error {{
 }}
 """
 
+set_value_tpl = """func SetValue(v reflect.Value, str string) error {{
+	if v.Kind() == reflect.Ptr {{
+		v = v.Elem()
+	}}
+
+	switch v.Interface().(type) {{{body}
+	default:
+		return fmt.Errorf("unsupport type [%v]", v)
+	}}
+}}
+"""
+
 
 def vtype(type):
     return type.split(".")[-1].lower()
@@ -111,7 +123,33 @@ def gen_to_interface(types):
             continue
         body += tpl.format(type=type, name=name(type))
 
+    for type in types:
+        body += tpl.format(type="[]"+type, name=name(type)+"Slice")
     return to_interface_tpl.format(body=body)
+
+
+def gen_set_value(types):
+    body = ""
+    tpl = """
+	case {type}:
+		val, err := To{name}(str)
+		if err != nil {{
+			return err
+		}}
+		v.Set(reflect.ValueOf(val))
+		return nil"""
+    for type in types:
+        if type == "string":
+            body += """
+	case string:
+		v.Set(reflect.ValueOf(str))
+		return nil"""
+            continue
+        body += tpl.format(type=type, name=name(type))
+
+    for type in types:
+        body += tpl.format(type="[]"+type, name=name(type)+"Slice")
+    return set_value_tpl.format(body=body)
 
 
 def main():
@@ -125,6 +163,7 @@ def main():
 
     # string_to_type.go
     print(gen_to_interface(types))
+    print(gen_set_value(types))
 
     # string_to_slice.go
     # for type in types:
