@@ -110,6 +110,18 @@ func NewLogger(options *Options) (*logrus.Logger, error) {
 	return log, nil
 }
 
+func NewLoggerGroup(options []*Options) ([]*logrus.Logger, error) {
+	var logs []*logrus.Logger
+	for _, option := range options {
+		log, err := NewLogger(option)
+		if err != nil {
+			return nil, err
+		}
+		logs = append(logs, log)
+	}
+	return logs, nil
+}
+
 func NewTextLogger(filename string, maxAge time.Duration) (*logrus.Logger, error) {
 	return NewLogger(&Options{
 		Filename:  filename,

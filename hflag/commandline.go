@@ -84,6 +84,10 @@ func Bind(v interface{}) error {
 	return CommandLine.Bind(v)
 }
 
+func Unmarshal(v interface{}) error {
+	return CommandLine.Unmarshal(v)
+}
+
 func Bool(name string, defaultValue bool, usage string) *bool {
 	return CommandLine.Bool(name, defaultValue, usage)
 }
