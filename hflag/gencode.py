@@ -133,6 +133,32 @@ func Get{name}(name string) {type} {{
 }}
 """
 
+unmarshal_tpl = """		case {type}:
+			if fl.Type == "string" {{
+				v, err := hstring.To{name}(string(*fl.Value.(*stringValue)))
+				if err != nil {{
+					return err
+				}}
+				rv.Set(reflect.ValueOf(v))
+			}} else if fl.Type == "{vtype}" {{
+				rv.Set(reflect.ValueOf({type}(*fl.Value.(*{vtype}Value))))
+			}} else {{
+				return fmt.Errorf("expect a {vtype}, got [%v]", fl.Type)
+			}}"""
+
+unmarshal_slice_tpl = """		case []{type}:
+			if fl.Type == "string" {{
+				v, err := hstring.To{name}Slice(string(*fl.Value.(*stringValue)))
+				if err != nil {{
+					return err
+				}}
+				rv.Set(reflect.ValueOf(v))
+			}} else if fl.Type == "[]{vtype}" {{
+				rv.Set(reflect.ValueOf([]{type}(*fl.Value.(*{vtype}SliceValue))))
+			}} else {{
+				return fmt.Errorf("expect a []{vtype}, got [%v]", fl.Type)
+			}}"""
+
 
 def vtype(type):
     return type.split(".")[-1].lower()
@@ -269,6 +295,14 @@ def gen_commandline_get_slice_type(type):
     return commandline_get_type_tpl.format(type="[]" + type, name=name(type) + "Slice")
 
 
+def gen_unmarshal(type):
+    return unmarshal_tpl.format(type=type, name=name(type), vtype=vtype(type))
+
+
+def gen_unmarshal_slice(type):
+    return unmarshal_slice_tpl.format(type=type, name=name(type), vtype=vtype(type))
+
+
 def main():
     types = [
         "bool", "int", "uint", "int64", "int32", "int16", "int8",
@@ -319,10 +353,15 @@ def main():
     #     print(gen_commandline_type_var(type))
     # for type in types:
     #     print(gen_commandline_slice_type_var(type))
+    # for type in types:
+    #     print(gen_commandline_get_type(type))
+    # for type in types:
+    #     print(gen_commandline_get_slice_type(type))
+
     for type in types:
-        print(gen_commandline_get_type(type))
+        print(gen_unmarshal(type))
     for type in types:
-        print(gen_commandline_get_slice_type(type))
+        print(gen_unmarshal_slice(type))
 
 
 if __name__ == "__main__":

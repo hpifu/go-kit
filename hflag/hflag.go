@@ -593,3 +593,457 @@ func (f *FlagSet) bind(v interface{}, prefix string) error {
 
 	return nil
 }
+
+func (f FlagSet) Unmarshal(v interface{}) error {
+	return f.unmarshal(v, "")
+}
+
+func (f FlagSet) unmarshal(v interface{}, prefix string) error {
+	if reflect.ValueOf(v).Kind() != reflect.Ptr {
+		return fmt.Errorf("invalid value type [%v]", reflect.TypeOf(v))
+	}
+	rv := reflect.ValueOf(v).Elem()
+	rt := reflect.TypeOf(v).Elem()
+	switch rt.Kind() {
+	case reflect.Struct:
+		for i := 0; i < rv.NumField(); i++ {
+			field := rv.Field(i)
+			tag := rt.Field(i).Tag.Get("hflag")
+			if tag == "-" {
+				continue
+			}
+			key, _, _, _, _, _, err := parseTag(tag)
+			if err != nil {
+				return err
+			}
+			if key == "" {
+				key = hstring.KebabName(rt.Field(i).Name)
+			}
+			if prefix != "" {
+				key = prefix + "-" + key
+			}
+			if rt.Field(i).Type.Kind() == reflect.Ptr {
+				if field.IsNil() {
+					nv := reflect.New(field.Type().Elem())
+					field.Set(nv)
+				}
+				if err := f.unmarshal(field.Interface(), key); err != nil {
+					return err
+				}
+			} else {
+				if err := f.unmarshal(field.Addr().Interface(), key); err != nil {
+					return err
+				}
+			}
+		}
+	default:
+		fl := f.Lookup(prefix)
+		if fl == nil {
+			return nil
+		}
+		switch rv.Interface().(type) {
+		case string:
+			if fl.Type != "string" {
+				return fmt.Errorf("expect a string, got [%v]", fl.Type)
+			}
+			rv.Set(reflect.ValueOf(string(*fl.Value.(*stringValue))))
+		case bool:
+			if fl.Type == "string" {
+				v, err := hstring.ToBool(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "bool" {
+				rv.Set(reflect.ValueOf(bool(*fl.Value.(*boolValue))))
+			} else {
+				return fmt.Errorf("expect a bool, got [%v]", fl.Type)
+			}
+		case int:
+			if fl.Type == "string" {
+				v, err := hstring.ToInt(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "int" {
+				rv.Set(reflect.ValueOf(int(*fl.Value.(*intValue))))
+			} else {
+				return fmt.Errorf("expect a int, got [%v]", fl.Type)
+			}
+		case uint:
+			if fl.Type == "string" {
+				v, err := hstring.ToUint(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "uint" {
+				rv.Set(reflect.ValueOf(uint(*fl.Value.(*uintValue))))
+			} else {
+				return fmt.Errorf("expect a uint, got [%v]", fl.Type)
+			}
+		case int64:
+			if fl.Type == "string" {
+				v, err := hstring.ToInt64(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "int64" {
+				rv.Set(reflect.ValueOf(int64(*fl.Value.(*int64Value))))
+			} else {
+				return fmt.Errorf("expect a int64, got [%v]", fl.Type)
+			}
+		case int32:
+			if fl.Type == "string" {
+				v, err := hstring.ToInt32(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "int32" {
+				rv.Set(reflect.ValueOf(int32(*fl.Value.(*int32Value))))
+			} else {
+				return fmt.Errorf("expect a int32, got [%v]", fl.Type)
+			}
+		case int16:
+			if fl.Type == "string" {
+				v, err := hstring.ToInt16(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "int16" {
+				rv.Set(reflect.ValueOf(int16(*fl.Value.(*int16Value))))
+			} else {
+				return fmt.Errorf("expect a int16, got [%v]", fl.Type)
+			}
+		case int8:
+			if fl.Type == "string" {
+				v, err := hstring.ToInt8(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "int8" {
+				rv.Set(reflect.ValueOf(int8(*fl.Value.(*int8Value))))
+			} else {
+				return fmt.Errorf("expect a int8, got [%v]", fl.Type)
+			}
+		case uint64:
+			if fl.Type == "string" {
+				v, err := hstring.ToUint64(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "uint64" {
+				rv.Set(reflect.ValueOf(uint64(*fl.Value.(*uint64Value))))
+			} else {
+				return fmt.Errorf("expect a uint64, got [%v]", fl.Type)
+			}
+		case uint32:
+			if fl.Type == "string" {
+				v, err := hstring.ToUint32(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "uint32" {
+				rv.Set(reflect.ValueOf(uint32(*fl.Value.(*uint32Value))))
+			} else {
+				return fmt.Errorf("expect a uint32, got [%v]", fl.Type)
+			}
+		case uint16:
+			if fl.Type == "string" {
+				v, err := hstring.ToUint16(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "uint16" {
+				rv.Set(reflect.ValueOf(uint16(*fl.Value.(*uint16Value))))
+			} else {
+				return fmt.Errorf("expect a uint16, got [%v]", fl.Type)
+			}
+		case uint8:
+			if fl.Type == "string" {
+				v, err := hstring.ToUint8(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "uint8" {
+				rv.Set(reflect.ValueOf(uint8(*fl.Value.(*uint8Value))))
+			} else {
+				return fmt.Errorf("expect a uint8, got [%v]", fl.Type)
+			}
+		case float64:
+			if fl.Type == "string" {
+				v, err := hstring.ToFloat64(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "float64" {
+				rv.Set(reflect.ValueOf(float64(*fl.Value.(*float64Value))))
+			} else {
+				return fmt.Errorf("expect a float64, got [%v]", fl.Type)
+			}
+		case float32:
+			if fl.Type == "string" {
+				v, err := hstring.ToFloat32(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "float32" {
+				rv.Set(reflect.ValueOf(float32(*fl.Value.(*float32Value))))
+			} else {
+				return fmt.Errorf("expect a float32, got [%v]", fl.Type)
+			}
+		case time.Duration:
+			if fl.Type == "string" {
+				v, err := hstring.ToDuration(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "duration" {
+				rv.Set(reflect.ValueOf(time.Duration(*fl.Value.(*durationValue))))
+			} else {
+				return fmt.Errorf("expect a duration, got [%v]", fl.Type)
+			}
+		case time.Time:
+			if fl.Type == "string" {
+				v, err := hstring.ToTime(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "time" {
+				rv.Set(reflect.ValueOf(time.Time(*fl.Value.(*timeValue))))
+			} else {
+				return fmt.Errorf("expect a time, got [%v]", fl.Type)
+			}
+		case net.IP:
+			if fl.Type == "string" {
+				v, err := hstring.ToIP(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "ip" {
+				rv.Set(reflect.ValueOf(net.IP(*fl.Value.(*ipValue))))
+			} else {
+				return fmt.Errorf("expect a ip, got [%v]", fl.Type)
+			}
+		case []bool:
+			if fl.Type == "string" {
+				v, err := hstring.ToBoolSlice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]bool" {
+				rv.Set(reflect.ValueOf([]bool(*fl.Value.(*boolSliceValue))))
+			} else {
+				return fmt.Errorf("expect a []bool, got [%v]", fl.Type)
+			}
+		case []int:
+			if fl.Type == "string" {
+				v, err := hstring.ToIntSlice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]int" {
+				rv.Set(reflect.ValueOf([]int(*fl.Value.(*intSliceValue))))
+			} else {
+				return fmt.Errorf("expect a []int, got [%v]", fl.Type)
+			}
+		case []uint:
+			if fl.Type == "string" {
+				v, err := hstring.ToUintSlice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]uint" {
+				rv.Set(reflect.ValueOf([]uint(*fl.Value.(*uintSliceValue))))
+			} else {
+				return fmt.Errorf("expect a []uint, got [%v]", fl.Type)
+			}
+		case []int64:
+			if fl.Type == "string" {
+				v, err := hstring.ToInt64Slice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]int64" {
+				rv.Set(reflect.ValueOf([]int64(*fl.Value.(*int64SliceValue))))
+			} else {
+				return fmt.Errorf("expect a []int64, got [%v]", fl.Type)
+			}
+		case []int32:
+			if fl.Type == "string" {
+				v, err := hstring.ToInt32Slice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]int32" {
+				rv.Set(reflect.ValueOf([]int32(*fl.Value.(*int32SliceValue))))
+			} else {
+				return fmt.Errorf("expect a []int32, got [%v]", fl.Type)
+			}
+		case []int16:
+			if fl.Type == "string" {
+				v, err := hstring.ToInt16Slice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]int16" {
+				rv.Set(reflect.ValueOf([]int16(*fl.Value.(*int16SliceValue))))
+			} else {
+				return fmt.Errorf("expect a []int16, got [%v]", fl.Type)
+			}
+		case []int8:
+			if fl.Type == "string" {
+				v, err := hstring.ToInt8Slice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]int8" {
+				rv.Set(reflect.ValueOf([]int8(*fl.Value.(*int8SliceValue))))
+			} else {
+				return fmt.Errorf("expect a []int8, got [%v]", fl.Type)
+			}
+		case []uint64:
+			if fl.Type == "string" {
+				v, err := hstring.ToUint64Slice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]uint64" {
+				rv.Set(reflect.ValueOf([]uint64(*fl.Value.(*uint64SliceValue))))
+			} else {
+				return fmt.Errorf("expect a []uint64, got [%v]", fl.Type)
+			}
+		case []uint32:
+			if fl.Type == "string" {
+				v, err := hstring.ToUint32Slice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]uint32" {
+				rv.Set(reflect.ValueOf([]uint32(*fl.Value.(*uint32SliceValue))))
+			} else {
+				return fmt.Errorf("expect a []uint32, got [%v]", fl.Type)
+			}
+		case []uint16:
+			if fl.Type == "string" {
+				v, err := hstring.ToUint16Slice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]uint16" {
+				rv.Set(reflect.ValueOf([]uint16(*fl.Value.(*uint16SliceValue))))
+			} else {
+				return fmt.Errorf("expect a []uint16, got [%v]", fl.Type)
+			}
+		case []uint8:
+			if fl.Type == "string" {
+				v, err := hstring.ToUint8Slice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]uint8" {
+				rv.Set(reflect.ValueOf([]uint8(*fl.Value.(*uint8SliceValue))))
+			} else {
+				return fmt.Errorf("expect a []uint8, got [%v]", fl.Type)
+			}
+		case []float64:
+			if fl.Type == "string" {
+				v, err := hstring.ToFloat64Slice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]float64" {
+				rv.Set(reflect.ValueOf([]float64(*fl.Value.(*float64SliceValue))))
+			} else {
+				return fmt.Errorf("expect a []float64, got [%v]", fl.Type)
+			}
+		case []float32:
+			if fl.Type == "string" {
+				v, err := hstring.ToFloat32Slice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]float32" {
+				rv.Set(reflect.ValueOf([]float32(*fl.Value.(*float32SliceValue))))
+			} else {
+				return fmt.Errorf("expect a []float32, got [%v]", fl.Type)
+			}
+		case []time.Duration:
+			if fl.Type == "string" {
+				v, err := hstring.ToDurationSlice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]duration" {
+				rv.Set(reflect.ValueOf([]time.Duration(*fl.Value.(*durationSliceValue))))
+			} else {
+				return fmt.Errorf("expect a []duration, got [%v]", fl.Type)
+			}
+		case []time.Time:
+			if fl.Type == "string" {
+				v, err := hstring.ToTimeSlice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]time" {
+				rv.Set(reflect.ValueOf([]time.Time(*fl.Value.(*timeSliceValue))))
+			} else {
+				return fmt.Errorf("expect a []time, got [%v]", fl.Type)
+			}
+		case []net.IP:
+			if fl.Type == "string" {
+				v, err := hstring.ToIPSlice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]ip" {
+				rv.Set(reflect.ValueOf([]net.IP(*fl.Value.(*ipSliceValue))))
+			} else {
+				return fmt.Errorf("expect a []ip, got [%v]", fl.Type)
+			}
+		case []string:
+			if fl.Type == "string" {
+				v, err := hstring.ToStringSlice(string(*fl.Value.(*stringValue)))
+				if err != nil {
+					return err
+				}
+				rv.Set(reflect.ValueOf(v))
+			} else if fl.Type == "[]string" {
+				rv.Set(reflect.ValueOf([]string(*fl.Value.(*stringSliceValue))))
+			} else {
+				return fmt.Errorf("expect a []string, got [%v]", fl.Type)
+			}
+		}
+	}
+	return nil
+}

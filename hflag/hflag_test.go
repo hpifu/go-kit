@@ -236,6 +236,19 @@ func TestHFlagAddFlags(t *testing.T) {
 			So(flagSet.Arg(0), ShouldEqual, "val1")
 			So(flagSet.Arg(1), ShouldEqual, "val2")
 			So(f.Sub.F1, ShouldEqual, 120)
+
+			mf := &MyFlags{}
+			So(flagSet.Unmarshal(mf), ShouldBeNil)
+			So(mf.IntOption, ShouldEqual, 123)
+			So(mf.StrOption, ShouldEqual, "apple,banana,orange")
+			So(mf.Key, ShouldAlmostEqual, 3.14)
+			So(mf.All, ShouldBeTrue)
+			So(mf.User, ShouldBeTrue)
+			So(mf.Password, ShouldEqual, "123456")
+			So(mf.Vs, ShouldResemble, []string{"one", "two", "three"})
+			So(mf.Pos1, ShouldEqual, "val1")
+			So(mf.Pos2, ShouldEqual, "val2")
+			So(mf.Sub.F1, ShouldEqual, 120)
 		})
 	})
 }
