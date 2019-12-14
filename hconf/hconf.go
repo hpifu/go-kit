@@ -1,6 +1,7 @@
 package hconf
 
 import (
+	"context"
 	"fmt"
 	"github.com/hpifu/go-kit/hstring"
 	"github.com/sirupsen/logrus"
@@ -11,6 +12,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -41,6 +43,10 @@ type HConf struct {
 	envPrefix string
 	handlers  []OnChangeHandler
 	log       *logrus.Logger
+
+	ctx    context.Context
+	cancel context.CancelFunc
+	wg     sync.WaitGroup
 }
 
 func (h *HConf) SetSeparator(separator string) {
