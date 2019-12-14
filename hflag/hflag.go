@@ -638,7 +638,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 		}
 	default:
 		fl := f.Lookup(prefix)
-		if fl == nil {
+		if fl == nil || !fl.Assigned {
 			return nil
 		}
 		switch rv.Interface().(type) {
