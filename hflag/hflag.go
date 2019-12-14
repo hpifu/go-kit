@@ -3,6 +3,7 @@ package hflag
 import (
 	"bytes"
 	"fmt"
+	"github.com/hpifu/go-kit/hstring"
 	"net"
 	"path"
 	"reflect"
@@ -393,6 +394,10 @@ func isBoolValue(val string) bool {
 }
 
 func parseTag(tag string) (name string, shorthand string, usage string, required bool, defaultValue string, position bool, err error) {
+	if strings.Trim(tag, " ") == "" {
+		position = false
+		return
+	}
 	for _, field := range strings.Split(tag, ";") {
 		field = strings.Trim(field, " ")
 		if field == "required" { // required
@@ -509,11 +514,11 @@ func interfaceToType(v reflect.Value) (string, Value, error) {
 	}
 }
 
-func (f *FlagSet) AddFlags(v interface{}) error {
-	return f.addFlags(v, "")
+func (f *FlagSet) Bind(v interface{}) error {
+	return f.bind(v, "")
 }
 
-func (f *FlagSet) addFlags(v interface{}, prefix string) error {
+func (f *FlagSet) bind(v interface{}, prefix string) error {
 	if reflect.ValueOf(v).Kind() != reflect.Ptr {
 		return fmt.Errorf("expected a pointer, got [%v]", reflect.TypeOf(v))
 	}
@@ -529,7 +534,7 @@ func (f *FlagSet) addFlags(v interface{}, prefix string) error {
 		tag := rt.Field(i).Tag.Get("hflag")
 		t := rt.Field(i).Type
 
-		if tag == "" || tag == "-" {
+		if tag == "-" {
 			continue
 		}
 
@@ -538,6 +543,9 @@ func (f *FlagSet) addFlags(v interface{}, prefix string) error {
 			name, shorthand, usage, required, defaultValue, position, err := parseTag(tag)
 			if err != nil {
 				return err
+			}
+			if name == "" {
+				name = hstring.KebabName(rt.Field(i).Name)
 			}
 			if prefix != "" {
 				name = prefix + "-" + name
@@ -564,7 +572,7 @@ func (f *FlagSet) addFlags(v interface{}, prefix string) error {
 			} else {
 				p = tag
 			}
-			if err := f.addFlags(rv.Field(i).Addr().Interface(), p); err != nil {
+			if err := f.bind(rv.Field(i).Addr().Interface(), p); err != nil {
 				return err
 			}
 		} else if t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Struct {
@@ -575,7 +583,7 @@ func (f *FlagSet) addFlags(v interface{}, prefix string) error {
 			} else {
 				p = tag
 			}
-			if err := f.addFlags(rv.Field(i).Interface(), p); err != nil {
+			if err := f.bind(rv.Field(i).Interface(), p); err != nil {
 				return err
 			}
 		} else {

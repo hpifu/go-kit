@@ -188,7 +188,7 @@ func TestHFlagAddFlags(t *testing.T) {
 			Sub       *MySubFlags `hflag:"sub"`
 		}
 		f := &MyFlags{}
-		So(flagSet.AddFlags(f), ShouldBeNil)
+		So(flagSet.Bind(f), ShouldBeNil)
 
 		Convey("check default value", func() {
 			So(f.IntOption, ShouldEqual, 10)

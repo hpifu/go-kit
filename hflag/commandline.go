@@ -80,8 +80,8 @@ func Usage() string {
 	return CommandLine.Usage()
 }
 
-func AddFlags(v interface{}) error {
-	return CommandLine.AddFlags(v)
+func Bind(v interface{}) error {
+	return CommandLine.Bind(v)
 }
 
 func Bool(name string, defaultValue bool, usage string) *bool {

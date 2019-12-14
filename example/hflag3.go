@@ -25,7 +25,7 @@ type MyFlags struct {
 
 func main() {
 	mf := &MyFlags{}
-	if err := hflag.AddFlags(mf); err != nil {
+	if err := hflag.Bind(mf); err != nil {
 		panic(err)
 	}
 	if err := hflag.Parse(); err != nil {
