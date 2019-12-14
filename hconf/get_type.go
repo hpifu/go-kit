@@ -745,3 +745,28 @@ func (h HConf) GetIPSlice(key string) ([]net.IP, error) {
 		return nil, fmt.Errorf("convert to bool slice failed")
 	}
 }
+
+func (h HConf) GetStringSlice(key string) ([]string, error) {
+	v, err := h.Get(key)
+	if err != nil {
+		return nil, err
+	}
+	switch v.(type) {
+	case string:
+		return hstring.ToStringSlice(v.(string))
+	case []string:
+		return v.([]string), nil
+	case []interface{}:
+		var res []string
+		for _, val := range v.([]interface{}) {
+			d, err := cast.ToStringE(val)
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, d)
+		}
+		return res, nil
+	default:
+		return nil, fmt.Errorf("convert to bool slice failed")
+	}
+}
