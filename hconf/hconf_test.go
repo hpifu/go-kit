@@ -113,7 +113,7 @@ func TestHConfBindEnv(t *testing.T) {
 	})
 }
 
-func TestHConfUnMarshal(t *testing.T) {
+func TestHConfUnmarshal(t *testing.T) {
 	type cinfo struct {
 		Type     string `hconf:"class"`
 		Table    string

@@ -74,9 +74,9 @@ func (f *JSONFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 }
 
 type Options struct {
-	Filename  string
-	MaxAge    time.Duration
-	Formatter string
+	Filename  string        `hflag:"output filename"`
+	MaxAge    time.Duration `hflag:"keep time for retention"`
+	Formatter string        `hflag:"output format, json or text" hrule:"in json,text"`
 }
 
 func NewLogger(options *Options) (*logrus.Logger, error) {

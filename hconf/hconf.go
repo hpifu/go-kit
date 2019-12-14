@@ -199,8 +199,9 @@ func interfaceToStruct(d interface{}, v interface{}) error {
 		if !ok {
 			return fmt.Errorf("convert data to []interface{} failed. which is %v", reflect.TypeOf(d))
 		}
-		nv := reflect.New(rt.Elem())
+		rv.Set(reflect.MakeSlice(rt, 0, rv.Cap()))
 		for _, di := range dv {
+			nv := reflect.New(rt.Elem())
 			err := interfaceToStruct(di, nv.Interface())
 			if err != nil {
 				return err
