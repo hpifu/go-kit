@@ -3,6 +3,7 @@ package hconf
 import (
 	"fmt"
 	"github.com/hpifu/go-kit/hstring"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cast"
 	"github.com/yosuke-furukawa/json5/encoding/json5"
 	"net"
@@ -25,17 +26,29 @@ func NewHConfWithFile(filename string) (*HConf, error) {
 		return nil, err
 	}
 
-	return &HConf{data: data, separator: "."}, nil
+	return &HConf{
+		filename:  filename,
+		data:      data,
+		separator: ".",
+		log:       logrus.New(),
+	}, nil
 }
 
 type HConf struct {
+	filename  string
 	data      interface{}
 	separator string
 	envPrefix string
+	handlers  []OnChangeHandler
+	log       *logrus.Logger
 }
 
 func (h *HConf) SetSeparator(separator string) {
 	h.separator = separator
+}
+
+func (h *HConf) SetLogger(log *logrus.Logger) {
+	h.log = log
 }
 
 const MapMod = 1
