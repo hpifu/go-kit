@@ -5,12 +5,12 @@ import (
 	"reflect"
 )
 
-func Evaluate(v interface{}) (bool, error) {
+func Evaluate(v interface{}) error {
 	rg, err := Compile(v)
 	if err != nil {
-		return false, err
+		return err
 	}
-	return rg.Evaluate(v), nil
+	return rg.Evaluate(v)
 }
 
 type RuleGroup struct {
@@ -31,47 +31,87 @@ func Compile(v interface{}) (*RuleGroup, error) {
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}
-
-	rg := &RuleGroup{
-		t:       t,
-		condMap: map[string]*Cond{},
+	condMap := map[string]*Cond{}
+	if err := interfaceToRules(condMap, t, ""); err != nil {
+		return nil, err
 	}
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		tag := field.Tag.Get("hrule")
+
+	return &RuleGroup{
+		t:       t,
+		condMap: condMap,
+	}, nil
+}
+
+func interfaceToRules(condMap map[string]*Cond, rt reflect.Type, prefix string) error {
+	if rt.Kind() == reflect.Ptr {
+		rt = rt.Elem()
+	}
+	for i := 0; i < rt.NumField(); i++ {
+		t := rt.Field(i).Type
+		if t.Kind() == reflect.Ptr {
+			t = t.Elem()
+		}
+		tag := rt.Field(i).Tag.Get("hrule")
+		if tag == "-" {
+			continue
+		}
+
+		key := rt.Field(i).Name
+		if prefix != "" {
+			key = prefix + "." + key
+		}
+		if t.Kind() == reflect.Struct {
+			if err := interfaceToRules(condMap, t, key); err != nil {
+				return err
+			}
+			continue
+		}
 		if tag == "" {
 			continue
 		}
-		cond, err := NewCond(field.Tag.Get("hrule"), field.Type)
+		cond, err := NewCond(tag, t)
 		if err != nil {
-			return nil, fmt.Errorf("new cond failed. field: [%v], tag: [%v], err: [%v]", field.Name, tag, err)
+			return fmt.Errorf("new cond failed. field: [%v], tag: [%v], err: [%v]", key, tag, err)
 		}
-		rg.condMap[field.Name] = cond
+		condMap[key] = cond
 	}
-
-	return rg, nil
+	return nil
 }
 
-func (g *RuleGroup) Evaluate(v interface{}) bool {
-	val := reflect.ValueOf(v)
-	if val.Kind() == reflect.Ptr {
-		val = val.Elem()
-	}
-	if g.t != val.Type() {
-		return false
-	}
-	t := val.Type()
+func (g *RuleGroup) Evaluate(v interface{}) error {
+	return g.evaluate(v, "")
+}
 
-	for i := 0; i < val.NumField(); i++ {
-		field := val.Field(i)
-		cond, ok := g.condMap[t.Field(i).Name]
-		if !ok {
-			continue
+func (g *RuleGroup) evaluate(v interface{}, prefix string) error {
+	rt := reflect.TypeOf(v)
+	rv := reflect.ValueOf(v)
+	if rt.Kind() == reflect.Ptr {
+		if rv.IsNil() {
+			return nil
 		}
-		if !cond.Evaluate(field.Interface()) {
-			return false
-		}
+		rt = rt.Elem()
+		rv = rv.Elem()
 	}
 
-	return true
+	if rt.Kind() == reflect.Struct {
+		for i := 0; i < rt.NumField(); i++ {
+			key := rt.Field(i).Name
+			if prefix != "" {
+				key = prefix + "." + key
+			}
+			if err := g.evaluate(rv.Field(i).Interface(), key); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	cond, ok := g.condMap[prefix]
+	if !ok {
+		return nil
+	}
+	if !cond.Evaluate(rv.Interface()) {
+		return fmt.Errorf("evaluate [%v] not pass", prefix)
+	}
+	return nil
 }
