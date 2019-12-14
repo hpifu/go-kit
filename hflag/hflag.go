@@ -537,9 +537,34 @@ func (f *FlagSet) bind(v interface{}, prefix string) error {
 		if tag == "-" {
 			continue
 		}
-
-		typeStr, value, err := interfaceToType(rv.Field(i))
-		if err == nil {
+		if t.Kind() == reflect.Struct {
+			key := tag
+			if key == "" {
+				key = hstring.KebabName(rt.Field(i).Name)
+			}
+			if prefix != "" {
+				key = prefix + "-" + key
+			}
+			if err := f.bind(rv.Field(i).Addr().Interface(), key); err != nil {
+				return err
+			}
+		} else if t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Struct {
+			rv.Field(i).Set(reflect.New(rv.Field(i).Type().Elem()))
+			key := tag
+			if key == "" {
+				key = hstring.KebabName(rt.Field(i).Name)
+			}
+			if prefix != "" {
+				key = prefix + "-" + key
+			}
+			if err := f.bind(rv.Field(i).Interface(), key); err != nil {
+				return err
+			}
+		} else {
+			typeStr, value, err := interfaceToType(rv.Field(i))
+			if err != nil {
+				return err
+			}
 			name, shorthand, usage, required, defaultValue, position, err := parseTag(tag)
 			if err != nil {
 				return err
@@ -565,29 +590,6 @@ func (f *FlagSet) bind(v interface{}, prefix string) error {
 					return err
 				}
 			}
-		} else if t.Kind() == reflect.Struct {
-			p := prefix
-			if prefix != "" {
-				p = prefix + "-" + tag
-			} else {
-				p = tag
-			}
-			if err := f.bind(rv.Field(i).Addr().Interface(), p); err != nil {
-				return err
-			}
-		} else if t.Kind() == reflect.Ptr && t.Elem().Kind() == reflect.Struct {
-			rv.Field(i).Set(reflect.New(rv.Field(i).Type().Elem()))
-			p := prefix
-			if prefix != "" {
-				p = prefix + "-" + tag
-			} else {
-				p = tag
-			}
-			if err := f.bind(rv.Field(i).Interface(), p); err != nil {
-				return err
-			}
-		} else {
-			return err
 		}
 	}
 
