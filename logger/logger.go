@@ -73,15 +73,25 @@ func (f *JSONFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return append(buf, '\n'), nil
 }
 
-func NewTextLogger(filename string, maxAge time.Duration) (*logrus.Logger, error) {
+type Options struct {
+	Filename  string
+	MaxAge    time.Duration
+	Formatter string
+}
+
+func NewLogger(options *Options) (*logrus.Logger, error) {
 	log := logrus.New()
-	log.Formatter = &TextFormatter{}
-	log.AddHook(&CallerHook{})
-	if filename == "" || filename == "stdout" {
+	if options.Formatter == "json" {
+		log.Formatter = &JSONFormatter{}
+	} else {
+		log.Formatter = &TextFormatter{}
+		log.AddHook(&CallerHook{})
+	}
+	if options.Filename == "" || options.Filename == "stdout" {
 		return log, nil
 	}
 
-	abs, err := filepath.Abs(filename)
+	abs, err := filepath.Abs(options.Filename)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +100,7 @@ func NewTextLogger(filename string, maxAge time.Duration) (*logrus.Logger, error
 		abs+".%Y%m%d%H",
 		rotatelogs.WithRotationTime(time.Hour),
 		rotatelogs.WithLinkName(abs),
-		rotatelogs.WithMaxAge(maxAge),
+		rotatelogs.WithMaxAge(options.MaxAge),
 	)
 	if err != nil {
 		return nil, err
@@ -100,30 +110,20 @@ func NewTextLogger(filename string, maxAge time.Duration) (*logrus.Logger, error
 	return log, nil
 }
 
+func NewTextLogger(filename string, maxAge time.Duration) (*logrus.Logger, error) {
+	return NewLogger(&Options{
+		Filename:  filename,
+		MaxAge:    maxAge,
+		Formatter: "text",
+	})
+}
+
 func NewJsonLogger(filename string, maxAge time.Duration) (*logrus.Logger, error) {
-	log := logrus.New()
-	log.Formatter = &JSONFormatter{}
-	if filename == "" || filename == "stdout" {
-		return log, nil
-	}
-
-	abs, err := filepath.Abs(filename)
-	if err != nil {
-		return nil, err
-	}
-
-	out, err := rotatelogs.New(
-		abs+".%Y%m%d%H",
-		rotatelogs.WithRotationTime(time.Hour),
-		rotatelogs.WithLinkName(abs),
-		rotatelogs.WithMaxAge(maxAge),
-	)
-	if err != nil {
-		return nil, err
-	}
-	log.Out = out
-
-	return log, nil
+	return NewLogger(&Options{
+		Filename:  filename,
+		MaxAge:    maxAge,
+		Formatter: "json",
+	})
 }
 
 func NewTextLoggerWithViper(v *viper.Viper) (*logrus.Logger, error) {
