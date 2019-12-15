@@ -8,6 +8,8 @@ func NewDecoder(name string) (Decoder, error) {
 		return &Json5Decoder{}, nil
 	case "yml", "yaml":
 		return &YamlDecoder{}, nil
+	case "toml":
+		return &TomlDecoder{}, nil
 	}
 
 	return nil, fmt.Errorf("unsupport decoder. name: [%v]", name)

@@ -39,17 +39,26 @@ func (s InterfaceStorage) Get(key string) (interface{}, error) {
 					return nil, fmt.Errorf("no such key")
 				}
 			default:
-				return nil, fmt.Errorf("data is not a map. data: [%v]", data)
+				return nil, fmt.Errorf("data is not a map. type: [%v], data: %v", reflect.TypeOf(data), data)
 			}
 		} else {
-			val, ok := data.([]interface{})
-			if !ok {
-				return nil, fmt.Errorf("data is not a array. data: [%v]", data)
+			switch data.(type) {
+			case []interface{}:
+				val := data.([]interface{})
+				if len(val) <= info.idx {
+					return nil, fmt.Errorf("index out of bounds. index: [%v], data: [%v]", info.idx, data)
+				}
+				data = val[info.idx]
+			case []map[string]interface{}:
+				val := data.([]map[string]interface{})
+				if len(val) <= info.idx {
+					return nil, fmt.Errorf("index out of bounds. index: [%v], data: [%v]", info.idx, data)
+				}
+				data = val[info.idx]
+			//case []map[interface{}]interface{}:
+			default:
+				return nil, fmt.Errorf("data is not a array. type: [%v], data: %v", reflect.TypeOf(data), data)
 			}
-			if len(val) <= info.idx {
-				return nil, fmt.Errorf("index out of bounds. index: [%v], data: [%v]", info.idx, data)
-			}
-			data = val[info.idx]
 		}
 	}
 
