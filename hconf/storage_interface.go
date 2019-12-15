@@ -28,12 +28,18 @@ func (s InterfaceStorage) Get(key string) (interface{}, error) {
 
 	for _, info := range infos {
 		if info.mod == MapMod {
-			val, ok := data.(map[string]interface{})
-			if !ok {
+			var ok bool
+			switch data.(type) {
+			case map[string]interface{}:
+				if data, ok = data.(map[string]interface{})[info.key]; !ok {
+					return nil, fmt.Errorf("no such key")
+				}
+			case map[interface{}]interface{}:
+				if data, ok = data.(map[interface{}]interface{})[info.key]; !ok {
+					return nil, fmt.Errorf("no such key")
+				}
+			default:
 				return nil, fmt.Errorf("data is not a map. data: [%v]", data)
-			}
-			if data, ok = val[info.key]; !ok {
-				return nil, fmt.Errorf("no such key")
 			}
 		} else {
 			val, ok := data.([]interface{})
