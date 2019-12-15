@@ -1,6 +1,7 @@
 package hconf
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/hpifu/go-kit/hstring"
@@ -17,19 +18,23 @@ import (
 )
 
 func NewHConfWithFile(filename string) (*HConf, error) {
-	fp, err := os.Open(filename)
+	provider, err := NewLocalProvider(filename)
 	if err != nil {
 		return nil, err
 	}
-	defer fp.Close()
 
 	var data interface{}
-	if err = json5.NewDecoder(fp).Decode(&data); err != nil {
+	buf, err := provider.Get()
+	if err != nil {
+		return nil, err
+	}
+	if err = json5.NewDecoder(bytes.NewReader(buf)).Decode(&data); err != nil {
 		return nil, err
 	}
 
 	return &HConf{
 		filename:  filename,
+		provider:  provider,
 		data:      data,
 		separator: ".",
 		log:       logrus.New(),
@@ -37,6 +42,7 @@ func NewHConfWithFile(filename string) (*HConf, error) {
 }
 
 type HConf struct {
+	provider  Provider
 	filename  string
 	data      interface{}
 	separator string

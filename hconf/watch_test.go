@@ -17,7 +17,7 @@ func TestWatch(t *testing.T) {
 			fmt.Println("hello world")
 		})
 		So(h.Watch(), ShouldBeNil)
-		time.Sleep(10 * time.Second)
+		time.Sleep(60 * time.Second)
 		h.Stop()
 		DeleteFile()
 	})
