@@ -27,7 +27,6 @@ func NewHConfWithFile(filename string) (*HConf, error) {
 	}
 
 	return &HConf{
-		//filename: filename,
 		provider: provider,
 		storage:  storage,
 		decoder:  decoder,
@@ -40,9 +39,6 @@ type HConf struct {
 	storage  Storage
 	decoder  Decoder
 
-	//filename string
-	//data interface{}
-	//separator string
 	envPrefix string
 	handlers  []OnChangeHandler
 	log       *logrus.Logger
