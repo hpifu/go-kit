@@ -11,5 +11,5 @@ func (d *TomlDecoder) Decode(buf []byte) (Storage, error) {
 	if _, err := toml.Decode(string(buf), &data); err != nil {
 		return nil, err
 	}
-	return NewInterfaceStorage(data)
+	return NewInterfaceStorage(data), nil
 }

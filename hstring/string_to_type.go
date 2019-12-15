@@ -245,7 +245,7 @@ func ToInterface(str string, v interface{}) error {
 		*v.(*[]net.IP) = val
 		return nil
 	default:
-		return fmt.Errorf("unsupport type [%v]", v)
+		return fmt.Errorf("unsupport type [%v]", reflect.TypeOf(v))
 	}
 }
 

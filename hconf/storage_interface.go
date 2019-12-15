@@ -9,10 +9,10 @@ import (
 	"time"
 )
 
-func NewInterfaceStorage(data interface{}) (*InterfaceStorage, error) {
+func NewInterfaceStorage(data interface{}) *InterfaceStorage {
 	return &InterfaceStorage{
 		data: data,
-	}, nil
+	}
 }
 
 type InterfaceStorage struct {
@@ -114,7 +114,7 @@ func interfaceToStruct(d interface{}, v interface{}) error {
 		return nil
 	}
 	if reflect.ValueOf(v).Kind() != reflect.Ptr {
-		return fmt.Errorf("invalid value type")
+		return fmt.Errorf("invalid value type, expect a pointer, got %v", reflect.TypeOf(v))
 	}
 
 	rv := reflect.ValueOf(v).Elem()

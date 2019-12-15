@@ -12,5 +12,5 @@ func (d *Json5Decoder) Decode(buf []byte) (Storage, error) {
 	if err := json5.NewDecoder(bytes.NewReader(buf)).Decode(&data); err != nil {
 		return nil, err
 	}
-	return NewInterfaceStorage(data)
+	return NewInterfaceStorage(data), nil
 }

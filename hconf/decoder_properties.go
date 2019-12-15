@@ -1,12 +1,10 @@
 package hconf
 
-import (
-	"gopkg.in/yaml.v2"
-)
+import "gopkg.in/yaml.v2"
 
-type YamlDecoder struct{}
+type PropDecoder struct{}
 
-func (d *YamlDecoder) Decode(buf []byte) (Storage, error) {
+func (d *PropDecoder) Decode(buf []byte) (Storage, error) {
 	var data interface{}
 	if err := yaml.Unmarshal(buf, &data); err != nil {
 		return nil, err
