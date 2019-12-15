@@ -5,11 +5,11 @@ import (
 	"github.com/yosuke-furukawa/json5/encoding/json5"
 )
 
+type Json5Decoder struct{}
+
 type Decoder interface {
 	Decode(buf []byte) (Storage, error)
 }
-
-type Json5Decoder struct{}
 
 func (d *Json5Decoder) Decode(buf []byte) (Storage, error) {
 	var data interface{}
