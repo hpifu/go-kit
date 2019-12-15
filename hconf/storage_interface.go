@@ -32,11 +32,11 @@ func (s InterfaceStorage) Get(key string) (interface{}, error) {
 			switch data.(type) {
 			case map[string]interface{}:
 				if data, ok = data.(map[string]interface{})[info.key]; !ok {
-					return nil, fmt.Errorf("no such key")
+					return nil, fmt.Errorf("no such key [%v]", key)
 				}
 			case map[interface{}]interface{}:
 				if data, ok = data.(map[interface{}]interface{})[info.key]; !ok {
-					return nil, fmt.Errorf("no such key")
+					return nil, fmt.Errorf("no such key [%v]", key)
 				}
 			default:
 				return nil, fmt.Errorf("data is not a map. type: [%v], data: %v", reflect.TypeOf(data), data)
