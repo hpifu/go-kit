@@ -1,11 +1,9 @@
 package hconf
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"github.com/sirupsen/logrus"
-	"github.com/yosuke-furukawa/json5/encoding/json5"
 	"os"
 	"strconv"
 	"strings"
@@ -18,24 +16,21 @@ func NewHConfWithFile(filename string) (*HConf, error) {
 		return nil, err
 	}
 
-	var data interface{}
 	buf, err := provider.Get()
 	if err != nil {
 		return nil, err
 	}
-	if err = json5.NewDecoder(bytes.NewReader(buf)).Decode(&data); err != nil {
-		return nil, err
-	}
-
-	storage, err := NewInterfaceStorage(data)
+	decoder := &Json5Decoder{}
+	storage, err := decoder.Decode(buf)
 	if err != nil {
 		return nil, err
 	}
 
 	return &HConf{
-		filename: filename,
+		//filename: filename,
 		provider: provider,
 		storage:  storage,
+		decoder:  decoder,
 		log:      logrus.New(),
 	}, nil
 }
@@ -43,9 +38,9 @@ func NewHConfWithFile(filename string) (*HConf, error) {
 type HConf struct {
 	provider Provider
 	storage  Storage
+	decoder  Decoder
 
-	filename string
-
+	//filename string
 	//data interface{}
 	//separator string
 	envPrefix string

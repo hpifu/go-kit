@@ -21,13 +21,20 @@ func (h *HConf) Watch() error {
 		for {
 			select {
 			case <-h.provider.Events():
-				nh, err := NewHConfWithFile(h.filename)
+				for len(h.provider.Events()) != 0 {
+					<-h.provider.Events()
+				}
+				buf, err := h.provider.Get()
 				if err != nil {
-					log.Warnf("reload file failed. filename: [%v]", h.filename)
+					log.Warnf("provider get failed. err: [%v]", err)
 					continue
 				}
-				log.Infof("reload file success. filename: [%v]", h.filename)
-				h.storage = nh.storage
+				storage, err := h.decoder.Decode(buf)
+				if err != nil {
+					log.Warnf("decoder decode failed. err: [%v]", err)
+				}
+				log.Infof("reload config success. storage: %v", h.storage)
+				h.storage = storage
 				for _, handler := range h.handlers {
 					handler(h)
 				}
