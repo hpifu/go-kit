@@ -182,9 +182,8 @@ func TestHConfUnmarshal(t *testing.T) {
 
 func TestHConfParse(t *testing.T) {
 	Convey("test conf parse", t, func() {
-		conf := &HConf{separator: "."}
 		Convey("pass case1", func() {
-			infos, err := conf.parseKey("key1.key2[3][4].key3")
+			infos, err := parseKey("key1.key2[3][4].key3", ".")
 			So(err, ShouldBeNil)
 			So(len(infos), ShouldEqual, 5)
 			So(infos[0].key, ShouldEqual, "key1")
@@ -200,7 +199,7 @@ func TestHConfParse(t *testing.T) {
 		})
 
 		Convey("pass case2", func() {
-			infos, err := conf.parseKey("[1][2].key3[4].key5")
+			infos, err := parseKey("[1][2].key3[4].key5", ".")
 			So(err, ShouldBeNil)
 			So(len(infos), ShouldEqual, 5)
 			So(infos[0].idx, ShouldEqual, 1)
@@ -216,7 +215,7 @@ func TestHConfParse(t *testing.T) {
 		})
 
 		Convey("fail case1", func() {
-			infos, err := conf.parseKey("[1][key2].key3[4].key5")
+			infos, err := parseKey("[1][key2].key3[4].key5", ".")
 			So(err, ShouldNotBeNil)
 			So(infos, ShouldBeNil)
 		})

@@ -27,7 +27,7 @@ func (h *HConf) Watch() error {
 					continue
 				}
 				log.Infof("reload file success. filename: [%v]", h.filename)
-				h.data = nh.data
+				h.storage = nh.storage
 				for _, handler := range h.handlers {
 					handler(h)
 				}
