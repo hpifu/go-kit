@@ -10,6 +10,8 @@ func NewDecoder(name string) (Decoder, error) {
 		return &YamlDecoder{}, nil
 	case "toml":
 		return &TomlDecoder{}, nil
+	case "properties", "prop":
+		return &PropDecoder{}, nil
 	}
 
 	return nil, fmt.Errorf("unsupport decoder. name: [%v]", name)

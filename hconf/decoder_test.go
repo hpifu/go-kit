@@ -110,7 +110,7 @@ song:
 }
 
 func TestTomlDecoder(t *testing.T) {
-	Convey("test yaml decoder", t, func() {
+	Convey("test toml decoder", t, func() {
 		d, err := NewDecoder("toml")
 		So(err, ShouldBeNil)
 		storage, err := d.Decode([]byte(`
@@ -159,5 +159,43 @@ duration = "8m03s"
 		song1name, err := storage.Get("song[1].name")
 		So(err, ShouldBeNil)
 		So(song1name, ShouldEqual, "Stairway to Heaven")
+	})
+}
+
+func TestPropertiesDecoder(t *testing.T) {
+	Convey("test toml decoder", t, func() {
+		d, err := NewDecoder("properties")
+		So(err, ShouldBeNil)
+		storage, err := d.Decode([]byte(`
+i = 10
+b = true
+# ignore
+s = hello
+
+sub.vs = 1,\
+		2,\
+		3
+
+sub.f = 123.456
+`))
+		So(err, ShouldBeNil)
+		i, err := storage.Get("i")
+		So(err, ShouldBeNil)
+		So(i, ShouldEqual, "10")
+		b, err := storage.Get("b")
+		So(err, ShouldBeNil)
+		So(b, ShouldEqual, "true")
+		s, err := storage.Get("s")
+		So(err, ShouldBeNil)
+		So(s, ShouldEqual, "hello")
+		f, err := storage.Get("sub.f")
+		So(err, ShouldBeNil)
+		So(f, ShouldEqual, "123.456")
+		vs, err := storage.Get("sub.vs")
+		So(err, ShouldBeNil)
+		So(vs, ShouldEqual, "1,2,3")
+		v, err := storage.Get("v")
+		So(err, ShouldNotBeNil)
+		So(v, ShouldBeNil)
 	})
 }
