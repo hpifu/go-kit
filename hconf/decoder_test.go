@@ -225,6 +225,52 @@ duration = "8m03s"
 	})
 }
 
+func TestIniDecoder(t *testing.T) {
+	Convey("test toml decoder", t, func() {
+		d, err := NewDecoder("ini")
+		So(err, ShouldBeNil)
+		storage, err := d.Decode([]byte(`
+i = 10
+b = true
+s = hello
+
+[sub]
+f = 123.456
+vs = 1,2
+
+; comment
+[sub.song]
+name = "Thunder Road"
+duration = 4m49s
+`))
+		So(err, ShouldBeNil)
+		i, err := storage.Get("i")
+		So(err, ShouldBeNil)
+		So(i, ShouldEqual, "10")
+		b, err := storage.Get("b")
+		So(err, ShouldBeNil)
+		So(b, ShouldEqual, "true")
+		s, err := storage.Get("s")
+		So(err, ShouldBeNil)
+		So(s, ShouldEqual, "hello")
+		f, err := storage.Get("sub.f")
+		So(err, ShouldBeNil)
+		So(f, ShouldEqual, "123.456")
+		v0, err := storage.Get("sub.vs")
+		So(err, ShouldBeNil)
+		So(v0, ShouldEqual, "1,2")
+		name, err := storage.Get("sub.song.name")
+		So(err, ShouldBeNil)
+		So(name, ShouldEqual, "Thunder Road")
+		duration, err := storage.Get("sub.song.duration")
+		So(err, ShouldBeNil)
+		So(duration, ShouldEqual, "4m49s")
+		v, err := storage.Get("v")
+		So(err, ShouldNotBeNil)
+		So(v, ShouldBeNil)
+	})
+}
+
 func TestPropertiesDecoder(t *testing.T) {
 	Convey("test toml decoder", t, func() {
 		d, err := NewDecoder("properties")

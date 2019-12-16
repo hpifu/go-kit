@@ -14,7 +14,7 @@ func (d *PropDecoder) Decode(buf []byte) (Storage, error) {
 		return r == '\n' || r == '\r'
 	})
 	for i := 0; i < len(lines); i++ {
-		line := strings.Trim(lines[i], " \t")
+		line := strings.TrimSpace(lines[i])
 		if line == "" {
 			continue
 		}

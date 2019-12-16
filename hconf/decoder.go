@@ -14,6 +14,8 @@ func NewDecoder(name string) (Decoder, error) {
 		return &PropDecoder{}, nil
 	case "xml":
 		return &XmlDecoder{}, nil
+	case "ini", "conf", "cfg":
+		return &IniDecoder{}, nil
 	}
 
 	return nil, fmt.Errorf("unsupport decoder. name: [%v]", name)
