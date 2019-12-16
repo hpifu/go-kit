@@ -2,6 +2,7 @@ package hconf
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -29,6 +30,13 @@ func (d *PropDecoder) Decode(buf []byte) (Storage, error) {
 		idx := strings.IndexAny(line, ":=")
 		key := strings.Trim(line[:idx], " ")
 		val := strings.Trim(line[idx+1:], " ")
+		var err error
+		if key, err = strconv.Unquote("\"" + key + "\""); err != nil {
+			return nil, err
+		}
+		if val, err = strconv.Unquote("\"" + val + "\""); err != nil {
+			return nil, err
+		}
 		kvs[key] = val
 	}
 	fmt.Println(kvs)
