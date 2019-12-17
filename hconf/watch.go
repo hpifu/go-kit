@@ -40,7 +40,7 @@ func (h *HConf) Watch() error {
 				}
 			case err := <-h.provider.Errors():
 				log.Warnf("provider error [%v]", err)
-			case <-time.Tick(time.Duration(8) * time.Second):
+			case <-time.Tick(time.Duration(300) * time.Second):
 				log.Info("tick")
 			case <-h.ctx.Done():
 				log.Info("stop watch. exit")
