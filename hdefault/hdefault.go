@@ -2,7 +2,7 @@ package hdefault
 
 import (
 	"fmt"
-	"github.com/hpifu/go-kit/hstring"
+	"github.com/hpifu/go-kit/hstr"
 	"reflect"
 )
 
@@ -37,7 +37,7 @@ func SetDefault(v interface{}) error {
 			if value == "" || value == "-" {
 				continue
 			}
-			err := hstring.SetValue(field, value)
+			err := hstr.SetValue(field, value)
 			if err != nil {
 				return err
 			}

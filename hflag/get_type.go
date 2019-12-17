@@ -1,7 +1,7 @@
 package hflag
 
 import (
-	"github.com/hpifu/go-kit/hstring"
+	"github.com/hpifu/go-kit/hstr"
 	"net"
 	"time"
 )
@@ -12,7 +12,7 @@ func (f *FlagSet) GetBool(name string) (v bool) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToBool(flag.Value.String())
+		val, err := hstr.ToBool(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -30,7 +30,7 @@ func (f *FlagSet) GetInt(name string) (v int) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToInt(flag.Value.String())
+		val, err := hstr.ToInt(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -48,7 +48,7 @@ func (f *FlagSet) GetUint(name string) (v uint) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToUint(flag.Value.String())
+		val, err := hstr.ToUint(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -66,7 +66,7 @@ func (f *FlagSet) GetInt64(name string) (v int64) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToInt64(flag.Value.String())
+		val, err := hstr.ToInt64(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -84,7 +84,7 @@ func (f *FlagSet) GetInt32(name string) (v int32) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToInt32(flag.Value.String())
+		val, err := hstr.ToInt32(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -102,7 +102,7 @@ func (f *FlagSet) GetInt16(name string) (v int16) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToInt16(flag.Value.String())
+		val, err := hstr.ToInt16(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -120,7 +120,7 @@ func (f *FlagSet) GetInt8(name string) (v int8) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToInt8(flag.Value.String())
+		val, err := hstr.ToInt8(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -138,7 +138,7 @@ func (f *FlagSet) GetUint64(name string) (v uint64) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToUint64(flag.Value.String())
+		val, err := hstr.ToUint64(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -156,7 +156,7 @@ func (f *FlagSet) GetUint32(name string) (v uint32) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToUint32(flag.Value.String())
+		val, err := hstr.ToUint32(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -174,7 +174,7 @@ func (f *FlagSet) GetUint16(name string) (v uint16) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToUint16(flag.Value.String())
+		val, err := hstr.ToUint16(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -192,7 +192,7 @@ func (f *FlagSet) GetUint8(name string) (v uint8) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToUint8(flag.Value.String())
+		val, err := hstr.ToUint8(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -210,7 +210,7 @@ func (f *FlagSet) GetFloat64(name string) (v float64) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToFloat64(flag.Value.String())
+		val, err := hstr.ToFloat64(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -228,7 +228,7 @@ func (f *FlagSet) GetFloat32(name string) (v float32) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToFloat32(flag.Value.String())
+		val, err := hstr.ToFloat32(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -246,7 +246,7 @@ func (f *FlagSet) GetDuration(name string) (v time.Duration) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToDuration(flag.Value.String())
+		val, err := hstr.ToDuration(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -264,7 +264,7 @@ func (f *FlagSet) GetTime(name string) (v time.Time) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToTime(flag.Value.String())
+		val, err := hstr.ToTime(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -282,7 +282,7 @@ func (f *FlagSet) GetIP(name string) (v net.IP) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToIP(flag.Value.String())
+		val, err := hstr.ToIP(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -308,7 +308,7 @@ func (f *FlagSet) GetBoolSlice(name string) (v []bool) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToBoolSlice(flag.Value.String())
+		val, err := hstr.ToBoolSlice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -326,7 +326,7 @@ func (f *FlagSet) GetIntSlice(name string) (v []int) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToIntSlice(flag.Value.String())
+		val, err := hstr.ToIntSlice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -344,7 +344,7 @@ func (f *FlagSet) GetUintSlice(name string) (v []uint) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToUintSlice(flag.Value.String())
+		val, err := hstr.ToUintSlice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -362,7 +362,7 @@ func (f *FlagSet) GetInt64Slice(name string) (v []int64) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToInt64Slice(flag.Value.String())
+		val, err := hstr.ToInt64Slice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -380,7 +380,7 @@ func (f *FlagSet) GetInt32Slice(name string) (v []int32) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToInt32Slice(flag.Value.String())
+		val, err := hstr.ToInt32Slice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -398,7 +398,7 @@ func (f *FlagSet) GetInt16Slice(name string) (v []int16) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToInt16Slice(flag.Value.String())
+		val, err := hstr.ToInt16Slice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -416,7 +416,7 @@ func (f *FlagSet) GetInt8Slice(name string) (v []int8) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToInt8Slice(flag.Value.String())
+		val, err := hstr.ToInt8Slice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -434,7 +434,7 @@ func (f *FlagSet) GetUint64Slice(name string) (v []uint64) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToUint64Slice(flag.Value.String())
+		val, err := hstr.ToUint64Slice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -452,7 +452,7 @@ func (f *FlagSet) GetUint32Slice(name string) (v []uint32) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToUint32Slice(flag.Value.String())
+		val, err := hstr.ToUint32Slice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -470,7 +470,7 @@ func (f *FlagSet) GetUint16Slice(name string) (v []uint16) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToUint16Slice(flag.Value.String())
+		val, err := hstr.ToUint16Slice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -488,7 +488,7 @@ func (f *FlagSet) GetUint8Slice(name string) (v []uint8) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToUint8Slice(flag.Value.String())
+		val, err := hstr.ToUint8Slice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -506,7 +506,7 @@ func (f *FlagSet) GetFloat64Slice(name string) (v []float64) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToFloat64Slice(flag.Value.String())
+		val, err := hstr.ToFloat64Slice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -524,7 +524,7 @@ func (f *FlagSet) GetFloat32Slice(name string) (v []float32) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToFloat32Slice(flag.Value.String())
+		val, err := hstr.ToFloat32Slice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -542,7 +542,7 @@ func (f *FlagSet) GetDurationSlice(name string) (v []time.Duration) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToDurationSlice(flag.Value.String())
+		val, err := hstr.ToDurationSlice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -560,7 +560,7 @@ func (f *FlagSet) GetTimeSlice(name string) (v []time.Time) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToTimeSlice(flag.Value.String())
+		val, err := hstr.ToTimeSlice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -578,7 +578,7 @@ func (f *FlagSet) GetIPSlice(name string) (v []net.IP) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToIPSlice(flag.Value.String())
+		val, err := hstr.ToIPSlice(flag.Value.String())
 		if err != nil {
 			return
 		}
@@ -596,7 +596,7 @@ func (f *FlagSet) GetStringSlice(name string) (v []string) {
 		return
 	}
 	if flag.Type == "string" {
-		val, err := hstring.ToStringSlice(flag.Value.String())
+		val, err := hstr.ToStringSlice(flag.Value.String())
 		if err != nil {
 			return
 		}

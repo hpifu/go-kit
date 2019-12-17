@@ -2,7 +2,7 @@ package hconf
 
 import (
 	"fmt"
-	"github.com/hpifu/go-kit/hstring"
+	"github.com/hpifu/go-kit/hstr"
 	"github.com/spf13/cast"
 	"net"
 	"reflect"
@@ -134,7 +134,7 @@ func interfaceToStruct(d interface{}, v interface{}) error {
 				continue
 			}
 			if key == "" {
-				key = hstring.CamelName(rt.Field(i).Name)
+				key = hstr.CamelName(rt.Field(i).Name)
 			}
 			value := dv[key]
 			if rt.Field(i).Type.Kind() == reflect.Ptr {
@@ -266,7 +266,7 @@ func interfaceToStruct(d interface{}, v interface{}) error {
 		case net.IP:
 			switch v.(type) {
 			case string:
-				v, err := hstring.ToIP(v.(string))
+				v, err := hstr.ToIP(v.(string))
 				if err != nil {
 					return err
 				}

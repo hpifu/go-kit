@@ -1,4 +1,4 @@
-package hstring
+package hstr
 
 import (
 	. "github.com/smartystreets/goconvey/convey"

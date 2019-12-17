@@ -1,21 +1,9 @@
-package hstring
+package hstr
 
 import (
 	"bytes"
 	"strings"
 )
-
-func IsUpper(ch uint8) bool {
-	return ch >= 'A' && ch <= 'Z'
-}
-
-func IsLower(ch uint8) bool {
-	return ch >= 'a' && ch <= 'z'
-}
-
-func IsDigit(ch uint8) bool {
-	return ch >= '0' && ch <= '9'
-}
 
 func ToLower(ch uint8) uint8 {
 	if IsUpper(ch) {

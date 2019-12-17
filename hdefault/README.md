@@ -32,7 +32,7 @@ So(ms.Sub2.Int, ShouldEqual, 456)
 So(ms.Sub2.Float, ShouldEqual, float32(123.456))
 ```
 
-目前仅提供一个接口 `SetDefault`，根据结构体的 tag 自动设置结构体的值，支持所有 [hstring](../hstring/README.md) 支持的数据类型
+目前仅提供一个接口 `SetDefault`，根据结构体的 tag 自动设置结构体的值，支持所有 [hstring](../hstr/README.md) 支持的数据类型
 
 ## 链接
 

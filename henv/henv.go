@@ -2,7 +2,7 @@ package henv
 
 import (
 	"fmt"
-	"github.com/hpifu/go-kit/hstring"
+	"github.com/hpifu/go-kit/hstr"
 	"net"
 	"os"
 	"reflect"
@@ -63,7 +63,7 @@ func mapToStruct(kvs map[string]string, v interface{}, prefix string) error {
 				continue
 			}
 			if key == "" {
-				key = hstring.SnakeNameAllCaps(rt.Field(i).Name)
+				key = hstr.SnakeNameAllCaps(rt.Field(i).Name)
 			}
 			if prefix != "" {
 				key = prefix + "_" + key
@@ -91,199 +91,199 @@ func mapToStruct(kvs map[string]string, v interface{}, prefix string) error {
 		case string:
 			rv.Set(reflect.ValueOf(val))
 		case bool:
-			v, err := hstring.ToBool(val)
+			v, err := hstr.ToBool(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case int:
-			v, err := hstring.ToInt(val)
+			v, err := hstr.ToInt(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case uint:
-			v, err := hstring.ToUint(val)
+			v, err := hstr.ToUint(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case int64:
-			v, err := hstring.ToInt64(val)
+			v, err := hstr.ToInt64(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case int32:
-			v, err := hstring.ToInt32(val)
+			v, err := hstr.ToInt32(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case int16:
-			v, err := hstring.ToInt16(val)
+			v, err := hstr.ToInt16(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case int8:
-			v, err := hstring.ToInt8(val)
+			v, err := hstr.ToInt8(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case uint64:
-			v, err := hstring.ToUint64(val)
+			v, err := hstr.ToUint64(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case uint32:
-			v, err := hstring.ToUint32(val)
+			v, err := hstr.ToUint32(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case uint16:
-			v, err := hstring.ToUint16(val)
+			v, err := hstr.ToUint16(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case uint8:
-			v, err := hstring.ToUint8(val)
+			v, err := hstr.ToUint8(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case float64:
-			v, err := hstring.ToFloat64(val)
+			v, err := hstr.ToFloat64(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case float32:
-			v, err := hstring.ToFloat32(val)
+			v, err := hstr.ToFloat32(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case time.Duration:
-			v, err := hstring.ToDuration(val)
+			v, err := hstr.ToDuration(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case time.Time:
-			v, err := hstring.ToTime(val)
+			v, err := hstr.ToTime(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case net.IP:
-			v, err := hstring.ToIP(val)
+			v, err := hstr.ToIP(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []string:
-			v, err := hstring.ToStringSlice(val)
+			v, err := hstr.ToStringSlice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []bool:
-			v, err := hstring.ToBoolSlice(val)
+			v, err := hstr.ToBoolSlice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []int:
-			v, err := hstring.ToIntSlice(val)
+			v, err := hstr.ToIntSlice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []uint:
-			v, err := hstring.ToUintSlice(val)
+			v, err := hstr.ToUintSlice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []int64:
-			v, err := hstring.ToInt64Slice(val)
+			v, err := hstr.ToInt64Slice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []int32:
-			v, err := hstring.ToInt32Slice(val)
+			v, err := hstr.ToInt32Slice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []int16:
-			v, err := hstring.ToInt16Slice(val)
+			v, err := hstr.ToInt16Slice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []int8:
-			v, err := hstring.ToInt8Slice(val)
+			v, err := hstr.ToInt8Slice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []uint64:
-			v, err := hstring.ToUint64Slice(val)
+			v, err := hstr.ToUint64Slice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []uint32:
-			v, err := hstring.ToUint32Slice(val)
+			v, err := hstr.ToUint32Slice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []uint16:
-			v, err := hstring.ToUint16Slice(val)
+			v, err := hstr.ToUint16Slice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []uint8:
-			v, err := hstring.ToUint8Slice(val)
+			v, err := hstr.ToUint8Slice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []float64:
-			v, err := hstring.ToFloat64Slice(val)
+			v, err := hstr.ToFloat64Slice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []float32:
-			v, err := hstring.ToFloat32Slice(val)
+			v, err := hstr.ToFloat32Slice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []time.Duration:
-			v, err := hstring.ToDurationSlice(val)
+			v, err := hstr.ToDurationSlice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []time.Time:
-			v, err := hstring.ToTimeSlice(val)
+			v, err := hstr.ToTimeSlice(val)
 			if err != nil {
 				return err
 			}
 			rv.Set(reflect.ValueOf(v))
 		case []net.IP:
-			v, err := hstring.ToIPSlice(val)
+			v, err := hstr.ToIPSlice(val)
 			if err != nil {
 				return err
 			}

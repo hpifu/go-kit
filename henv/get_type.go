@@ -2,7 +2,7 @@ package henv
 
 import (
 	"errors"
-	"github.com/hpifu/go-kit/hstring"
+	"github.com/hpifu/go-kit/hstr"
 	"net"
 	"time"
 )
@@ -22,7 +22,7 @@ func (h HEnv) GetBool(key string) (bool, error) {
 	if !ok {
 		return false, NoSuchKeyErr
 	}
-	return hstring.ToBool(v)
+	return hstr.ToBool(v)
 }
 
 func (h HEnv) GetInt(key string) (int, error) {
@@ -30,7 +30,7 @@ func (h HEnv) GetInt(key string) (int, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToInt(v)
+	return hstr.ToInt(v)
 }
 
 func (h HEnv) GetUint(key string) (uint, error) {
@@ -38,7 +38,7 @@ func (h HEnv) GetUint(key string) (uint, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToUint(v)
+	return hstr.ToUint(v)
 }
 
 func (h HEnv) GetInt64(key string) (int64, error) {
@@ -46,7 +46,7 @@ func (h HEnv) GetInt64(key string) (int64, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToInt64(v)
+	return hstr.ToInt64(v)
 }
 
 func (h HEnv) GetInt32(key string) (int32, error) {
@@ -54,7 +54,7 @@ func (h HEnv) GetInt32(key string) (int32, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToInt32(v)
+	return hstr.ToInt32(v)
 }
 
 func (h HEnv) GetInt16(key string) (int16, error) {
@@ -62,7 +62,7 @@ func (h HEnv) GetInt16(key string) (int16, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToInt16(v)
+	return hstr.ToInt16(v)
 }
 
 func (h HEnv) GetInt8(key string) (int8, error) {
@@ -70,7 +70,7 @@ func (h HEnv) GetInt8(key string) (int8, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToInt8(v)
+	return hstr.ToInt8(v)
 }
 
 func (h HEnv) GetUint64(key string) (uint64, error) {
@@ -78,7 +78,7 @@ func (h HEnv) GetUint64(key string) (uint64, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToUint64(v)
+	return hstr.ToUint64(v)
 }
 
 func (h HEnv) GetUint32(key string) (uint32, error) {
@@ -86,7 +86,7 @@ func (h HEnv) GetUint32(key string) (uint32, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToUint32(v)
+	return hstr.ToUint32(v)
 }
 
 func (h HEnv) GetUint16(key string) (uint16, error) {
@@ -94,7 +94,7 @@ func (h HEnv) GetUint16(key string) (uint16, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToUint16(v)
+	return hstr.ToUint16(v)
 }
 
 func (h HEnv) GetUint8(key string) (uint8, error) {
@@ -102,7 +102,7 @@ func (h HEnv) GetUint8(key string) (uint8, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToUint8(v)
+	return hstr.ToUint8(v)
 }
 
 func (h HEnv) GetFloat64(key string) (float64, error) {
@@ -110,7 +110,7 @@ func (h HEnv) GetFloat64(key string) (float64, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToFloat64(v)
+	return hstr.ToFloat64(v)
 }
 
 func (h HEnv) GetFloat32(key string) (float32, error) {
@@ -118,7 +118,7 @@ func (h HEnv) GetFloat32(key string) (float32, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToFloat32(v)
+	return hstr.ToFloat32(v)
 }
 
 func (h HEnv) GetDuration(key string) (time.Duration, error) {
@@ -126,7 +126,7 @@ func (h HEnv) GetDuration(key string) (time.Duration, error) {
 	if !ok {
 		return 0, NoSuchKeyErr
 	}
-	return hstring.ToDuration(v)
+	return hstr.ToDuration(v)
 }
 
 func (h HEnv) GetTime(key string) (time.Time, error) {
@@ -134,7 +134,7 @@ func (h HEnv) GetTime(key string) (time.Time, error) {
 	if !ok {
 		return time.Time{}, NoSuchKeyErr
 	}
-	return hstring.ToTime(v)
+	return hstr.ToTime(v)
 }
 
 func (h HEnv) GetIP(key string) (net.IP, error) {
@@ -142,7 +142,7 @@ func (h HEnv) GetIP(key string) (net.IP, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToIP(v)
+	return hstr.ToIP(v)
 }
 
 func (h HEnv) GetStringSlice(key string) ([]string, error) {
@@ -150,7 +150,7 @@ func (h HEnv) GetStringSlice(key string) ([]string, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToStringSlice(v)
+	return hstr.ToStringSlice(v)
 }
 
 func (h HEnv) GetBoolSlice(key string) ([]bool, error) {
@@ -158,7 +158,7 @@ func (h HEnv) GetBoolSlice(key string) ([]bool, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToBoolSlice(v)
+	return hstr.ToBoolSlice(v)
 }
 
 func (h HEnv) GetIntSlice(key string) ([]int, error) {
@@ -166,7 +166,7 @@ func (h HEnv) GetIntSlice(key string) ([]int, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToIntSlice(v)
+	return hstr.ToIntSlice(v)
 }
 
 func (h HEnv) GetUintSlice(key string) ([]uint, error) {
@@ -174,7 +174,7 @@ func (h HEnv) GetUintSlice(key string) ([]uint, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToUintSlice(v)
+	return hstr.ToUintSlice(v)
 }
 
 func (h HEnv) GetInt64Slice(key string) ([]int64, error) {
@@ -182,7 +182,7 @@ func (h HEnv) GetInt64Slice(key string) ([]int64, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToInt64Slice(v)
+	return hstr.ToInt64Slice(v)
 }
 
 func (h HEnv) GetInt32Slice(key string) ([]int32, error) {
@@ -190,7 +190,7 @@ func (h HEnv) GetInt32Slice(key string) ([]int32, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToInt32Slice(v)
+	return hstr.ToInt32Slice(v)
 }
 
 func (h HEnv) GetInt16Slice(key string) ([]int16, error) {
@@ -198,7 +198,7 @@ func (h HEnv) GetInt16Slice(key string) ([]int16, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToInt16Slice(v)
+	return hstr.ToInt16Slice(v)
 }
 
 func (h HEnv) GetInt8Slice(key string) ([]int8, error) {
@@ -206,7 +206,7 @@ func (h HEnv) GetInt8Slice(key string) ([]int8, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToInt8Slice(v)
+	return hstr.ToInt8Slice(v)
 }
 
 func (h HEnv) GetUint64Slice(key string) ([]uint64, error) {
@@ -214,7 +214,7 @@ func (h HEnv) GetUint64Slice(key string) ([]uint64, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToUint64Slice(v)
+	return hstr.ToUint64Slice(v)
 }
 
 func (h HEnv) GetUint32Slice(key string) ([]uint32, error) {
@@ -222,7 +222,7 @@ func (h HEnv) GetUint32Slice(key string) ([]uint32, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToUint32Slice(v)
+	return hstr.ToUint32Slice(v)
 }
 
 func (h HEnv) GetUint16Slice(key string) ([]uint16, error) {
@@ -230,7 +230,7 @@ func (h HEnv) GetUint16Slice(key string) ([]uint16, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToUint16Slice(v)
+	return hstr.ToUint16Slice(v)
 }
 
 func (h HEnv) GetUint8Slice(key string) ([]uint8, error) {
@@ -238,7 +238,7 @@ func (h HEnv) GetUint8Slice(key string) ([]uint8, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToUint8Slice(v)
+	return hstr.ToUint8Slice(v)
 }
 
 func (h HEnv) GetFloat64Slice(key string) ([]float64, error) {
@@ -246,7 +246,7 @@ func (h HEnv) GetFloat64Slice(key string) ([]float64, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToFloat64Slice(v)
+	return hstr.ToFloat64Slice(v)
 }
 
 func (h HEnv) GetFloat32Slice(key string) ([]float32, error) {
@@ -254,7 +254,7 @@ func (h HEnv) GetFloat32Slice(key string) ([]float32, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToFloat32Slice(v)
+	return hstr.ToFloat32Slice(v)
 }
 
 func (h HEnv) GetDurationSlice(key string) ([]time.Duration, error) {
@@ -262,7 +262,7 @@ func (h HEnv) GetDurationSlice(key string) ([]time.Duration, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToDurationSlice(v)
+	return hstr.ToDurationSlice(v)
 }
 
 func (h HEnv) GetTimeSlice(key string) ([]time.Time, error) {
@@ -270,7 +270,7 @@ func (h HEnv) GetTimeSlice(key string) ([]time.Time, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToTimeSlice(v)
+	return hstr.ToTimeSlice(v)
 }
 
 func (h HEnv) GetIPSlice(key string) ([]net.IP, error) {
@@ -278,5 +278,5 @@ func (h HEnv) GetIPSlice(key string) ([]net.IP, error) {
 	if !ok {
 		return nil, NoSuchKeyErr
 	}
-	return hstring.ToIPSlice(v)
+	return hstr.ToIPSlice(v)
 }

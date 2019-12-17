@@ -1,7 +1,7 @@
 package hflag
 
 import (
-	"github.com/hpifu/go-kit/hstring"
+	"github.com/hpifu/go-kit/hstr"
 	"net"
 	"time"
 )
@@ -122,7 +122,7 @@ type ipSliceValue []net.IP
 type stringSliceValue []string
 
 func (v *boolValue) Set(str string) error {
-	val, err := hstring.ToBool(str)
+	val, err := hstr.ToBool(str)
 	if err != nil {
 		return err
 	}
@@ -131,7 +131,7 @@ func (v *boolValue) Set(str string) error {
 }
 
 func (v *intValue) Set(str string) error {
-	val, err := hstring.ToInt(str)
+	val, err := hstr.ToInt(str)
 	if err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ func (v *intValue) Set(str string) error {
 }
 
 func (v *uintValue) Set(str string) error {
-	val, err := hstring.ToUint(str)
+	val, err := hstr.ToUint(str)
 	if err != nil {
 		return err
 	}
@@ -149,7 +149,7 @@ func (v *uintValue) Set(str string) error {
 }
 
 func (v *int64Value) Set(str string) error {
-	val, err := hstring.ToInt64(str)
+	val, err := hstr.ToInt64(str)
 	if err != nil {
 		return err
 	}
@@ -158,7 +158,7 @@ func (v *int64Value) Set(str string) error {
 }
 
 func (v *int32Value) Set(str string) error {
-	val, err := hstring.ToInt32(str)
+	val, err := hstr.ToInt32(str)
 	if err != nil {
 		return err
 	}
@@ -167,7 +167,7 @@ func (v *int32Value) Set(str string) error {
 }
 
 func (v *int16Value) Set(str string) error {
-	val, err := hstring.ToInt16(str)
+	val, err := hstr.ToInt16(str)
 	if err != nil {
 		return err
 	}
@@ -176,7 +176,7 @@ func (v *int16Value) Set(str string) error {
 }
 
 func (v *int8Value) Set(str string) error {
-	val, err := hstring.ToInt8(str)
+	val, err := hstr.ToInt8(str)
 	if err != nil {
 		return err
 	}
@@ -185,7 +185,7 @@ func (v *int8Value) Set(str string) error {
 }
 
 func (v *uint64Value) Set(str string) error {
-	val, err := hstring.ToUint64(str)
+	val, err := hstr.ToUint64(str)
 	if err != nil {
 		return err
 	}
@@ -194,7 +194,7 @@ func (v *uint64Value) Set(str string) error {
 }
 
 func (v *uint32Value) Set(str string) error {
-	val, err := hstring.ToUint32(str)
+	val, err := hstr.ToUint32(str)
 	if err != nil {
 		return err
 	}
@@ -203,7 +203,7 @@ func (v *uint32Value) Set(str string) error {
 }
 
 func (v *uint16Value) Set(str string) error {
-	val, err := hstring.ToUint16(str)
+	val, err := hstr.ToUint16(str)
 	if err != nil {
 		return err
 	}
@@ -212,7 +212,7 @@ func (v *uint16Value) Set(str string) error {
 }
 
 func (v *uint8Value) Set(str string) error {
-	val, err := hstring.ToUint8(str)
+	val, err := hstr.ToUint8(str)
 	if err != nil {
 		return err
 	}
@@ -221,7 +221,7 @@ func (v *uint8Value) Set(str string) error {
 }
 
 func (v *float64Value) Set(str string) error {
-	val, err := hstring.ToFloat64(str)
+	val, err := hstr.ToFloat64(str)
 	if err != nil {
 		return err
 	}
@@ -230,7 +230,7 @@ func (v *float64Value) Set(str string) error {
 }
 
 func (v *float32Value) Set(str string) error {
-	val, err := hstring.ToFloat32(str)
+	val, err := hstr.ToFloat32(str)
 	if err != nil {
 		return err
 	}
@@ -239,7 +239,7 @@ func (v *float32Value) Set(str string) error {
 }
 
 func (v *durationValue) Set(str string) error {
-	val, err := hstring.ToDuration(str)
+	val, err := hstr.ToDuration(str)
 	if err != nil {
 		return err
 	}
@@ -248,7 +248,7 @@ func (v *durationValue) Set(str string) error {
 }
 
 func (v *timeValue) Set(str string) error {
-	val, err := hstring.ToTime(str)
+	val, err := hstr.ToTime(str)
 	if err != nil {
 		return err
 	}
@@ -257,7 +257,7 @@ func (v *timeValue) Set(str string) error {
 }
 
 func (v *ipValue) Set(str string) error {
-	val, err := hstring.ToIP(str)
+	val, err := hstr.ToIP(str)
 	if err != nil {
 		return err
 	}
@@ -271,7 +271,7 @@ func (v *stringValue) Set(str string) error {
 }
 
 func (v *boolSliceValue) Set(str string) error {
-	val, err := hstring.ToBoolSlice(str)
+	val, err := hstr.ToBoolSlice(str)
 	if err != nil {
 		return err
 	}
@@ -280,7 +280,7 @@ func (v *boolSliceValue) Set(str string) error {
 }
 
 func (v *intSliceValue) Set(str string) error {
-	val, err := hstring.ToIntSlice(str)
+	val, err := hstr.ToIntSlice(str)
 	if err != nil {
 		return err
 	}
@@ -289,7 +289,7 @@ func (v *intSliceValue) Set(str string) error {
 }
 
 func (v *uintSliceValue) Set(str string) error {
-	val, err := hstring.ToUintSlice(str)
+	val, err := hstr.ToUintSlice(str)
 	if err != nil {
 		return err
 	}
@@ -298,7 +298,7 @@ func (v *uintSliceValue) Set(str string) error {
 }
 
 func (v *int64SliceValue) Set(str string) error {
-	val, err := hstring.ToInt64Slice(str)
+	val, err := hstr.ToInt64Slice(str)
 	if err != nil {
 		return err
 	}
@@ -307,7 +307,7 @@ func (v *int64SliceValue) Set(str string) error {
 }
 
 func (v *int32SliceValue) Set(str string) error {
-	val, err := hstring.ToInt32Slice(str)
+	val, err := hstr.ToInt32Slice(str)
 	if err != nil {
 		return err
 	}
@@ -316,7 +316,7 @@ func (v *int32SliceValue) Set(str string) error {
 }
 
 func (v *int16SliceValue) Set(str string) error {
-	val, err := hstring.ToInt16Slice(str)
+	val, err := hstr.ToInt16Slice(str)
 	if err != nil {
 		return err
 	}
@@ -325,7 +325,7 @@ func (v *int16SliceValue) Set(str string) error {
 }
 
 func (v *int8SliceValue) Set(str string) error {
-	val, err := hstring.ToInt8Slice(str)
+	val, err := hstr.ToInt8Slice(str)
 	if err != nil {
 		return err
 	}
@@ -334,7 +334,7 @@ func (v *int8SliceValue) Set(str string) error {
 }
 
 func (v *uint64SliceValue) Set(str string) error {
-	val, err := hstring.ToUint64Slice(str)
+	val, err := hstr.ToUint64Slice(str)
 	if err != nil {
 		return err
 	}
@@ -343,7 +343,7 @@ func (v *uint64SliceValue) Set(str string) error {
 }
 
 func (v *uint32SliceValue) Set(str string) error {
-	val, err := hstring.ToUint32Slice(str)
+	val, err := hstr.ToUint32Slice(str)
 	if err != nil {
 		return err
 	}
@@ -352,7 +352,7 @@ func (v *uint32SliceValue) Set(str string) error {
 }
 
 func (v *uint16SliceValue) Set(str string) error {
-	val, err := hstring.ToUint16Slice(str)
+	val, err := hstr.ToUint16Slice(str)
 	if err != nil {
 		return err
 	}
@@ -361,7 +361,7 @@ func (v *uint16SliceValue) Set(str string) error {
 }
 
 func (v *uint8SliceValue) Set(str string) error {
-	val, err := hstring.ToUint8Slice(str)
+	val, err := hstr.ToUint8Slice(str)
 	if err != nil {
 		return err
 	}
@@ -370,7 +370,7 @@ func (v *uint8SliceValue) Set(str string) error {
 }
 
 func (v *float64SliceValue) Set(str string) error {
-	val, err := hstring.ToFloat64Slice(str)
+	val, err := hstr.ToFloat64Slice(str)
 	if err != nil {
 		return err
 	}
@@ -379,7 +379,7 @@ func (v *float64SliceValue) Set(str string) error {
 }
 
 func (v *float32SliceValue) Set(str string) error {
-	val, err := hstring.ToFloat32Slice(str)
+	val, err := hstr.ToFloat32Slice(str)
 	if err != nil {
 		return err
 	}
@@ -388,7 +388,7 @@ func (v *float32SliceValue) Set(str string) error {
 }
 
 func (v *durationSliceValue) Set(str string) error {
-	val, err := hstring.ToDurationSlice(str)
+	val, err := hstr.ToDurationSlice(str)
 	if err != nil {
 		return err
 	}
@@ -397,7 +397,7 @@ func (v *durationSliceValue) Set(str string) error {
 }
 
 func (v *timeSliceValue) Set(str string) error {
-	val, err := hstring.ToTimeSlice(str)
+	val, err := hstr.ToTimeSlice(str)
 	if err != nil {
 		return err
 	}
@@ -406,7 +406,7 @@ func (v *timeSliceValue) Set(str string) error {
 }
 
 func (v *ipSliceValue) Set(str string) error {
-	val, err := hstring.ToIPSlice(str)
+	val, err := hstr.ToIPSlice(str)
 	if err != nil {
 		return err
 	}
@@ -415,7 +415,7 @@ func (v *ipSliceValue) Set(str string) error {
 }
 
 func (v *stringSliceValue) Set(str string) error {
-	val, err := hstring.ToStringSlice(str)
+	val, err := hstr.ToStringSlice(str)
 	if err != nil {
 		return err
 	}
@@ -424,67 +424,67 @@ func (v *stringSliceValue) Set(str string) error {
 }
 
 func (v boolValue) String() string {
-	return hstring.BoolTo(bool(v))
+	return hstr.BoolTo(bool(v))
 }
 
 func (v intValue) String() string {
-	return hstring.IntTo(int(v))
+	return hstr.IntTo(int(v))
 }
 
 func (v uintValue) String() string {
-	return hstring.UintTo(uint(v))
+	return hstr.UintTo(uint(v))
 }
 
 func (v int64Value) String() string {
-	return hstring.Int64To(int64(v))
+	return hstr.Int64To(int64(v))
 }
 
 func (v int32Value) String() string {
-	return hstring.Int32To(int32(v))
+	return hstr.Int32To(int32(v))
 }
 
 func (v int16Value) String() string {
-	return hstring.Int16To(int16(v))
+	return hstr.Int16To(int16(v))
 }
 
 func (v int8Value) String() string {
-	return hstring.Int8To(int8(v))
+	return hstr.Int8To(int8(v))
 }
 
 func (v uint64Value) String() string {
-	return hstring.Uint64To(uint64(v))
+	return hstr.Uint64To(uint64(v))
 }
 
 func (v uint32Value) String() string {
-	return hstring.Uint32To(uint32(v))
+	return hstr.Uint32To(uint32(v))
 }
 
 func (v uint16Value) String() string {
-	return hstring.Uint16To(uint16(v))
+	return hstr.Uint16To(uint16(v))
 }
 
 func (v uint8Value) String() string {
-	return hstring.Uint8To(uint8(v))
+	return hstr.Uint8To(uint8(v))
 }
 
 func (v float64Value) String() string {
-	return hstring.Float64To(float64(v))
+	return hstr.Float64To(float64(v))
 }
 
 func (v float32Value) String() string {
-	return hstring.Float32To(float32(v))
+	return hstr.Float32To(float32(v))
 }
 
 func (v durationValue) String() string {
-	return hstring.DurationTo(time.Duration(v))
+	return hstr.DurationTo(time.Duration(v))
 }
 
 func (v timeValue) String() string {
-	return hstring.TimeTo(time.Time(v))
+	return hstr.TimeTo(time.Time(v))
 }
 
 func (v ipValue) String() string {
-	return hstring.IPTo(net.IP(v))
+	return hstr.IPTo(net.IP(v))
 }
 
 func (v stringValue) String() string {
@@ -492,69 +492,69 @@ func (v stringValue) String() string {
 }
 
 func (v boolSliceValue) String() string {
-	return hstring.BoolSliceTo([]bool(v))
+	return hstr.BoolSliceTo([]bool(v))
 }
 
 func (v intSliceValue) String() string {
-	return hstring.IntSliceTo([]int(v))
+	return hstr.IntSliceTo([]int(v))
 }
 
 func (v uintSliceValue) String() string {
-	return hstring.UintSliceTo([]uint(v))
+	return hstr.UintSliceTo([]uint(v))
 }
 
 func (v int64SliceValue) String() string {
-	return hstring.Int64SliceTo([]int64(v))
+	return hstr.Int64SliceTo([]int64(v))
 }
 
 func (v int32SliceValue) String() string {
-	return hstring.Int32SliceTo([]int32(v))
+	return hstr.Int32SliceTo([]int32(v))
 }
 
 func (v int16SliceValue) String() string {
-	return hstring.Int16SliceTo([]int16(v))
+	return hstr.Int16SliceTo([]int16(v))
 }
 
 func (v int8SliceValue) String() string {
-	return hstring.Int8SliceTo([]int8(v))
+	return hstr.Int8SliceTo([]int8(v))
 }
 
 func (v uint64SliceValue) String() string {
-	return hstring.Uint64SliceTo([]uint64(v))
+	return hstr.Uint64SliceTo([]uint64(v))
 }
 
 func (v uint32SliceValue) String() string {
-	return hstring.Uint32SliceTo([]uint32(v))
+	return hstr.Uint32SliceTo([]uint32(v))
 }
 
 func (v uint16SliceValue) String() string {
-	return hstring.Uint16SliceTo([]uint16(v))
+	return hstr.Uint16SliceTo([]uint16(v))
 }
 
 func (v uint8SliceValue) String() string {
-	return hstring.Uint8SliceTo([]uint8(v))
+	return hstr.Uint8SliceTo([]uint8(v))
 }
 
 func (v float64SliceValue) String() string {
-	return hstring.Float64SliceTo([]float64(v))
+	return hstr.Float64SliceTo([]float64(v))
 }
 
 func (v float32SliceValue) String() string {
-	return hstring.Float32SliceTo([]float32(v))
+	return hstr.Float32SliceTo([]float32(v))
 }
 
 func (v durationSliceValue) String() string {
-	return hstring.DurationSliceTo([]time.Duration(v))
+	return hstr.DurationSliceTo([]time.Duration(v))
 }
 
 func (v timeSliceValue) String() string {
-	return hstring.TimeSliceTo([]time.Time(v))
+	return hstr.TimeSliceTo([]time.Time(v))
 }
 
 func (v ipSliceValue) String() string {
-	return hstring.IPSliceTo([]net.IP(v))
+	return hstr.IPSliceTo([]net.IP(v))
 }
 
 func (v stringSliceValue) String() string {
-	return hstring.StringSliceTo([]string(v))
+	return hstr.StringSliceTo([]string(v))
 }

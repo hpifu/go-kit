@@ -2,7 +2,7 @@ package hconf
 
 import (
 	"fmt"
-	"github.com/hpifu/go-kit/hstring"
+	"github.com/hpifu/go-kit/hstr"
 	"github.com/spf13/cast"
 	"net"
 	"reflect"
@@ -331,7 +331,7 @@ func (h HConf) GetIP(key string) (net.IP, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToIP(v.(string))
+		return hstr.ToIP(v.(string))
 	case net.IP:
 		return v.(net.IP), nil
 	default:
@@ -346,7 +346,7 @@ func (h HConf) GetBoolSlice(key string) ([]bool, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToBoolSlice(v.(string))
+		return hstr.ToBoolSlice(v.(string))
 	case []bool:
 		return v.([]bool), nil
 	case []interface{}:
@@ -371,7 +371,7 @@ func (h HConf) GetIntSlice(key string) ([]int, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToIntSlice(v.(string))
+		return hstr.ToIntSlice(v.(string))
 	case []int:
 		return v.([]int), nil
 	case []interface{}:
@@ -396,7 +396,7 @@ func (h HConf) GetUintSlice(key string) ([]uint, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToUintSlice(v.(string))
+		return hstr.ToUintSlice(v.(string))
 	case []uint:
 		return v.([]uint), nil
 	case []interface{}:
@@ -421,7 +421,7 @@ func (h HConf) GetInt64Slice(key string) ([]int64, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToInt64Slice(v.(string))
+		return hstr.ToInt64Slice(v.(string))
 	case []int64:
 		return v.([]int64), nil
 	case []interface{}:
@@ -446,7 +446,7 @@ func (h HConf) GetInt32Slice(key string) ([]int32, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToInt32Slice(v.(string))
+		return hstr.ToInt32Slice(v.(string))
 	case []int32:
 		return v.([]int32), nil
 	case []interface{}:
@@ -471,7 +471,7 @@ func (h HConf) GetInt16Slice(key string) ([]int16, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToInt16Slice(v.(string))
+		return hstr.ToInt16Slice(v.(string))
 	case []int16:
 		return v.([]int16), nil
 	case []interface{}:
@@ -496,7 +496,7 @@ func (h HConf) GetInt8Slice(key string) ([]int8, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToInt8Slice(v.(string))
+		return hstr.ToInt8Slice(v.(string))
 	case []int8:
 		return v.([]int8), nil
 	case []interface{}:
@@ -521,7 +521,7 @@ func (h HConf) GetUint64Slice(key string) ([]uint64, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToUint64Slice(v.(string))
+		return hstr.ToUint64Slice(v.(string))
 	case []uint64:
 		return v.([]uint64), nil
 	case []interface{}:
@@ -546,7 +546,7 @@ func (h HConf) GetUint32Slice(key string) ([]uint32, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToUint32Slice(v.(string))
+		return hstr.ToUint32Slice(v.(string))
 	case []uint32:
 		return v.([]uint32), nil
 	case []interface{}:
@@ -571,7 +571,7 @@ func (h HConf) GetUint16Slice(key string) ([]uint16, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToUint16Slice(v.(string))
+		return hstr.ToUint16Slice(v.(string))
 	case []uint16:
 		return v.([]uint16), nil
 	case []interface{}:
@@ -596,7 +596,7 @@ func (h HConf) GetUint8Slice(key string) ([]uint8, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToUint8Slice(v.(string))
+		return hstr.ToUint8Slice(v.(string))
 	case []uint8:
 		return v.([]uint8), nil
 	case []interface{}:
@@ -621,7 +621,7 @@ func (h HConf) GetFloat64Slice(key string) ([]float64, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToFloat64Slice(v.(string))
+		return hstr.ToFloat64Slice(v.(string))
 	case []float64:
 		return v.([]float64), nil
 	case []interface{}:
@@ -646,7 +646,7 @@ func (h HConf) GetFloat32Slice(key string) ([]float32, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToFloat32Slice(v.(string))
+		return hstr.ToFloat32Slice(v.(string))
 	case []float32:
 		return v.([]float32), nil
 	case []interface{}:
@@ -671,7 +671,7 @@ func (h HConf) GetDurationSlice(key string) ([]time.Duration, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToDurationSlice(v.(string))
+		return hstr.ToDurationSlice(v.(string))
 	case []time.Duration:
 		return v.([]time.Duration), nil
 	case []interface{}:
@@ -696,7 +696,7 @@ func (h HConf) GetTimeSlice(key string) ([]time.Time, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToTimeSlice(v.(string))
+		return hstr.ToTimeSlice(v.(string))
 	case []time.Time:
 		return v.([]time.Time), nil
 	case []interface{}:
@@ -721,7 +721,7 @@ func (h HConf) GetIPSlice(key string) ([]net.IP, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToIPSlice(v.(string))
+		return hstr.ToIPSlice(v.(string))
 	case []net.IP:
 		return v.([]net.IP), nil
 	case []interface{}:
@@ -729,7 +729,7 @@ func (h HConf) GetIPSlice(key string) ([]net.IP, error) {
 		for _, val := range v.([]interface{}) {
 			switch val.(type) {
 			case string:
-				d, err := hstring.ToIP(val.(string))
+				d, err := hstr.ToIP(val.(string))
 				if err != nil {
 					return nil, err
 				}
@@ -753,7 +753,7 @@ func (h HConf) GetStringSlice(key string) ([]string, error) {
 	}
 	switch v.(type) {
 	case string:
-		return hstring.ToStringSlice(v.(string))
+		return hstr.ToStringSlice(v.(string))
 	case []string:
 		return v.([]string), nil
 	case []interface{}:

@@ -2,7 +2,7 @@
 
 value_set_tpl = """
 func (v *{vtype}Value) Set(str string) error {{
-	val, err := hstring.To{name}(str)
+	val, err := hstr.To{name}(str)
 	if err != nil {{
 		return err
 	}}
@@ -13,7 +13,7 @@ func (v *{vtype}Value) Set(str string) error {{
 
 value_string_tpl = """
 func (v {vtype}Value) String() string {{
-	return hstring.{name}To({type}(v))
+	return hstr.{name}To({type}(v))
 }}
 """
 
@@ -44,7 +44,7 @@ func (f *FlagSet) Get{name}(name string) (v {type}) {{
 		return
 	}}
 	if flag.Type == "string" {{
-		val, err := hstring.To{name}(flag.Value.String())
+		val, err := hstr.To{name}(flag.Value.String())
 		if err != nil {{
 			return
 		}}
@@ -64,7 +64,7 @@ func (f *FlagSet) Get{name}Slice(name string) (v []{type}) {{
 		return
 	}}
 	if flag.Type == "string" {{
-		val, err := hstring.To{name}Slice(flag.Value.String())
+		val, err := hstr.To{name}Slice(flag.Value.String())
 		if err != nil {{
 			return
 		}}
@@ -79,7 +79,7 @@ func (f *FlagSet) Get{name}Slice(name string) (v []{type}) {{
 
 flagset_type_tpl = """
 func (f *FlagSet) {name}(name string, defaultValue {type}, usage string) *{type} {{
-	if err := f.addFlagAutoShorthand(name, usage, "{vtype}", hstring.{name}To(defaultValue)); err != nil {{
+	if err := f.addFlagAutoShorthand(name, usage, "{vtype}", hstr.{name}To(defaultValue)); err != nil {{
 		panic(err)
 	}}
 	return (*{type})(f.nameToFlag[name].Value.(*{vtype}Value))
@@ -88,7 +88,7 @@ func (f *FlagSet) {name}(name string, defaultValue {type}, usage string) *{type}
 
 flagset_slice_type_tpl = """
 func (f *FlagSet) {name}Slice(name string, defaultValue []{type}, usage string) *[]{type} {{
-	if err := f.addFlagAutoShorthand(name, usage, "[]{vtype}", hstring.{name}SliceTo(defaultValue)); err != nil {{
+	if err := f.addFlagAutoShorthand(name, usage, "[]{vtype}", hstr.{name}SliceTo(defaultValue)); err != nil {{
 		panic(err)
 	}}
 	return (*[]{type})(f.nameToFlag[name].Value.(*{vtype}SliceValue))
@@ -98,7 +98,7 @@ func (f *FlagSet) {name}Slice(name string, defaultValue []{type}, usage string) 
 flagset_type_var_tpl = """
 func (f *FlagSet) {name}Var(v *{type}, name string, defaultValue {type}, usage string) {{
 	*v = defaultValue
-	if err := f.addFlagAutoShorthand(name, usage, "{vtype}", hstring.{name}To(defaultValue)); err != nil {{
+	if err := f.addFlagAutoShorthand(name, usage, "{vtype}", hstr.{name}To(defaultValue)); err != nil {{
 		panic(err)
 	}}
 	f.nameToFlag[name].Value = (*{vtype}Value)(v)
@@ -108,7 +108,7 @@ func (f *FlagSet) {name}Var(v *{type}, name string, defaultValue {type}, usage s
 flagset_slice_type_var_tpl = """
 func (f *FlagSet) {name}SliceVar(v *[]{type}, name string, defaultValue []{type}, usage string) {{
 	*v = defaultValue
-	if err := f.addFlagAutoShorthand(name, usage, "[]{vtype}", hstring.{name}SliceTo(defaultValue)); err != nil {{
+	if err := f.addFlagAutoShorthand(name, usage, "[]{vtype}", hstr.{name}SliceTo(defaultValue)); err != nil {{
 		panic(err)
 	}}
 	f.nameToFlag[name].Value = (*{vtype}SliceValue)(v)
@@ -135,7 +135,7 @@ func Get{name}(name string) {type} {{
 
 unmarshal_tpl = """		case {type}:
 			if fl.Type == "string" {{
-				v, err := hstring.To{name}(string(*fl.Value.(*stringValue)))
+				v, err := hstr.To{name}(string(*fl.Value.(*stringValue)))
 				if err != nil {{
 					return err
 				}}
@@ -148,7 +148,7 @@ unmarshal_tpl = """		case {type}:
 
 unmarshal_slice_tpl = """		case []{type}:
 			if fl.Type == "string" {{
-				v, err := hstring.To{name}Slice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.To{name}Slice(string(*fl.Value.(*stringValue)))
 				if err != nil {{
 					return err
 				}}

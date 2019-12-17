@@ -2,7 +2,7 @@ package hconf
 
 import (
 	"fmt"
-	"github.com/hpifu/go-kit/hstring"
+	"github.com/hpifu/go-kit/hstr"
 	"reflect"
 )
 
@@ -32,7 +32,7 @@ func (s *MapStorage) Set(key string, val interface{}) error {
 	if s.prefix != "" {
 		key = s.prefix + "." + key
 	}
-	s.kvs[key] = hstring.ToString(val)
+	s.kvs[key] = hstr.ToString(val)
 	return nil
 }
 
@@ -67,7 +67,7 @@ func mapToStruct(kvs map[string]string, v interface{}, prefix string) error {
 				continue
 			}
 			if key == "" {
-				key = hstring.CamelName(rt.Field(i).Name)
+				key = hstr.CamelName(rt.Field(i).Name)
 			}
 			if prefix != "" {
 				key = prefix + "." + key
@@ -95,7 +95,7 @@ func mapToStruct(kvs map[string]string, v interface{}, prefix string) error {
 		return nil
 	}
 
-	err := hstring.SetValue(rv, val)
+	err := hstr.SetValue(rv, val)
 	if err != nil {
 		return err
 	}

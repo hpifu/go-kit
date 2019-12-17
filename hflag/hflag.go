@@ -3,7 +3,7 @@ package hflag
 import (
 	"bytes"
 	"fmt"
-	"github.com/hpifu/go-kit/hstring"
+	"github.com/hpifu/go-kit/hstr"
 	"net"
 	"path"
 	"reflect"
@@ -540,7 +540,7 @@ func (f *FlagSet) bind(v interface{}, prefix string) error {
 		if t.Kind() == reflect.Struct {
 			key := tag
 			if key == "" {
-				key = hstring.KebabName(rt.Field(i).Name)
+				key = hstr.KebabName(rt.Field(i).Name)
 			}
 			if prefix != "" {
 				key = prefix + "-" + key
@@ -552,7 +552,7 @@ func (f *FlagSet) bind(v interface{}, prefix string) error {
 			rv.Field(i).Set(reflect.New(rv.Field(i).Type().Elem()))
 			key := tag
 			if key == "" {
-				key = hstring.KebabName(rt.Field(i).Name)
+				key = hstr.KebabName(rt.Field(i).Name)
 			}
 			if prefix != "" {
 				key = prefix + "-" + key
@@ -570,7 +570,7 @@ func (f *FlagSet) bind(v interface{}, prefix string) error {
 				return err
 			}
 			if name == "" {
-				name = hstring.KebabName(rt.Field(i).Name)
+				name = hstr.KebabName(rt.Field(i).Name)
 			}
 			if prefix != "" {
 				name = prefix + "-" + name
@@ -619,7 +619,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 				return err
 			}
 			if key == "" {
-				key = hstring.KebabName(rt.Field(i).Name)
+				key = hstr.KebabName(rt.Field(i).Name)
 			}
 			if prefix != "" {
 				key = prefix + "-" + key
@@ -651,7 +651,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			rv.Set(reflect.ValueOf(string(*fl.Value.(*stringValue))))
 		case bool:
 			if fl.Type == "string" {
-				v, err := hstring.ToBool(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToBool(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -663,7 +663,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case int:
 			if fl.Type == "string" {
-				v, err := hstring.ToInt(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToInt(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -675,7 +675,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case uint:
 			if fl.Type == "string" {
-				v, err := hstring.ToUint(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToUint(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -687,7 +687,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case int64:
 			if fl.Type == "string" {
-				v, err := hstring.ToInt64(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToInt64(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -699,7 +699,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case int32:
 			if fl.Type == "string" {
-				v, err := hstring.ToInt32(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToInt32(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -711,7 +711,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case int16:
 			if fl.Type == "string" {
-				v, err := hstring.ToInt16(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToInt16(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -723,7 +723,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case int8:
 			if fl.Type == "string" {
-				v, err := hstring.ToInt8(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToInt8(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -735,7 +735,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case uint64:
 			if fl.Type == "string" {
-				v, err := hstring.ToUint64(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToUint64(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -747,7 +747,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case uint32:
 			if fl.Type == "string" {
-				v, err := hstring.ToUint32(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToUint32(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -759,7 +759,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case uint16:
 			if fl.Type == "string" {
-				v, err := hstring.ToUint16(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToUint16(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -771,7 +771,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case uint8:
 			if fl.Type == "string" {
-				v, err := hstring.ToUint8(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToUint8(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -783,7 +783,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case float64:
 			if fl.Type == "string" {
-				v, err := hstring.ToFloat64(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToFloat64(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -795,7 +795,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case float32:
 			if fl.Type == "string" {
-				v, err := hstring.ToFloat32(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToFloat32(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -807,7 +807,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case time.Duration:
 			if fl.Type == "string" {
-				v, err := hstring.ToDuration(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToDuration(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -819,7 +819,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case time.Time:
 			if fl.Type == "string" {
-				v, err := hstring.ToTime(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToTime(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -831,7 +831,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case net.IP:
 			if fl.Type == "string" {
-				v, err := hstring.ToIP(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToIP(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -843,7 +843,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []bool:
 			if fl.Type == "string" {
-				v, err := hstring.ToBoolSlice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToBoolSlice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -855,7 +855,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []int:
 			if fl.Type == "string" {
-				v, err := hstring.ToIntSlice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToIntSlice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -867,7 +867,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []uint:
 			if fl.Type == "string" {
-				v, err := hstring.ToUintSlice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToUintSlice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -879,7 +879,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []int64:
 			if fl.Type == "string" {
-				v, err := hstring.ToInt64Slice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToInt64Slice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -891,7 +891,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []int32:
 			if fl.Type == "string" {
-				v, err := hstring.ToInt32Slice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToInt32Slice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -903,7 +903,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []int16:
 			if fl.Type == "string" {
-				v, err := hstring.ToInt16Slice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToInt16Slice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -915,7 +915,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []int8:
 			if fl.Type == "string" {
-				v, err := hstring.ToInt8Slice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToInt8Slice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -927,7 +927,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []uint64:
 			if fl.Type == "string" {
-				v, err := hstring.ToUint64Slice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToUint64Slice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -939,7 +939,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []uint32:
 			if fl.Type == "string" {
-				v, err := hstring.ToUint32Slice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToUint32Slice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -951,7 +951,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []uint16:
 			if fl.Type == "string" {
-				v, err := hstring.ToUint16Slice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToUint16Slice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -963,7 +963,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []uint8:
 			if fl.Type == "string" {
-				v, err := hstring.ToUint8Slice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToUint8Slice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -975,7 +975,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []float64:
 			if fl.Type == "string" {
-				v, err := hstring.ToFloat64Slice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToFloat64Slice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -987,7 +987,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []float32:
 			if fl.Type == "string" {
-				v, err := hstring.ToFloat32Slice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToFloat32Slice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -999,7 +999,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []time.Duration:
 			if fl.Type == "string" {
-				v, err := hstring.ToDurationSlice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToDurationSlice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -1011,7 +1011,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []time.Time:
 			if fl.Type == "string" {
-				v, err := hstring.ToTimeSlice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToTimeSlice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -1023,7 +1023,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []net.IP:
 			if fl.Type == "string" {
-				v, err := hstring.ToIPSlice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToIPSlice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
@@ -1035,7 +1035,7 @@ func (f FlagSet) unmarshal(v interface{}, prefix string) error {
 			}
 		case []string:
 			if fl.Type == "string" {
-				v, err := hstring.ToStringSlice(string(*fl.Value.(*stringValue)))
+				v, err := hstr.ToStringSlice(string(*fl.Value.(*stringValue)))
 				if err != nil {
 					return err
 				}
