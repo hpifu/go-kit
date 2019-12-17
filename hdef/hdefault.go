@@ -1,4 +1,4 @@
-package hdefault
+package hdef
 
 import (
 	"fmt"
