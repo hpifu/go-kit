@@ -37,17 +37,35 @@ func Any(str string, op func(uint8) bool) bool {
 	return false
 }
 
-func IsIntNum(str string) bool {
-	return All(str, IsDigit)
+var floatRegex = regexp.MustCompile(`^[+-]?\d+(.\d+)?([eE]\d+)?$`)
+
+func IsFloat(str string) bool {
+	return IsFloatV1(str)
 }
 
-func IsNumber(str string) bool {
+func IsFloatV2(str string) bool {
 	_, err := strconv.ParseFloat(str, 64)
-	return err != nil
+	return err == nil
 }
 
-var identifierRegex = regexp.MustCompile(`\w[0-9\w]+`)
+func IsFloatV1(str string) bool {
+	return floatRegex.Match([]byte(str))
+}
+
+var identifierRegex = regexp.MustCompile(`^[a-zA-Z]\w+$`)
 
 func IsIdentifier(str string) bool {
 	return identifierRegex.Match([]byte(str))
+}
+
+var emailRegex = regexp.MustCompile(`^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$`)
+
+func IsEmail(str string) bool {
+	return emailRegex.Match([]byte(str))
+}
+
+var phoneRegex = regexp.MustCompile(`^1[345789][0-9]{9}$`)
+
+func IsPhone(str string) bool {
+	return phoneRegex.Match([]byte(str))
 }
