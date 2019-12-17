@@ -132,3 +132,45 @@ func TestInterfaceStorage(t *testing.T) {
 		})
 	})
 }
+
+func TestHConfParse(t *testing.T) {
+	Convey("test conf parse", t, func() {
+		Convey("pass case1", func() {
+			infos, err := parseKey("key1.key2[3][4].key3", ".")
+			So(err, ShouldBeNil)
+			So(len(infos), ShouldEqual, 5)
+			So(infos[0].key, ShouldEqual, "key1")
+			So(infos[0].mod, ShouldEqual, MapMod)
+			So(infos[1].key, ShouldEqual, "key2")
+			So(infos[1].mod, ShouldEqual, MapMod)
+			So(infos[2].idx, ShouldEqual, 3)
+			So(infos[2].mod, ShouldEqual, ArrMod)
+			So(infos[3].idx, ShouldEqual, 4)
+			So(infos[3].mod, ShouldEqual, ArrMod)
+			So(infos[4].key, ShouldEqual, "key3")
+			So(infos[4].mod, ShouldEqual, MapMod)
+		})
+
+		Convey("pass case2", func() {
+			infos, err := parseKey("[1][2].key3[4].key5", ".")
+			So(err, ShouldBeNil)
+			So(len(infos), ShouldEqual, 5)
+			So(infos[0].idx, ShouldEqual, 1)
+			So(infos[0].mod, ShouldEqual, ArrMod)
+			So(infos[1].idx, ShouldEqual, 2)
+			So(infos[1].mod, ShouldEqual, ArrMod)
+			So(infos[2].key, ShouldEqual, "key3")
+			So(infos[2].mod, ShouldEqual, MapMod)
+			So(infos[3].idx, ShouldEqual, 4)
+			So(infos[3].mod, ShouldEqual, ArrMod)
+			So(infos[4].key, ShouldEqual, "key5")
+			So(infos[4].mod, ShouldEqual, MapMod)
+		})
+
+		Convey("fail case1", func() {
+			infos, err := parseKey("[1][key2].key3[4].key5", ".")
+			So(err, ShouldNotBeNil)
+			So(infos, ShouldBeNil)
+		})
+	})
+}

@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/cast"
 	"net"
 	"reflect"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -291,4 +293,36 @@ func (s InterfaceStorage) Sub(key string) (Storage, error) {
 	return &InterfaceStorage{
 		data: v,
 	}, nil
+}
+
+func parseKey(keys string, separator string) ([]*KeyInfo, error) {
+	var infos []*KeyInfo
+	for _, key := range strings.Split(keys, separator) {
+		fields := strings.Split(key, "[")
+		if len(fields[0]) != 0 {
+			infos = append(infos, &KeyInfo{
+				key: fields[0],
+				mod: MapMod,
+			})
+		}
+		for i := 1; i < len(fields); i++ {
+			if !strings.HasSuffix(fields[i], "]") {
+				return nil, fmt.Errorf("invalid format. key: [%v]", key)
+			}
+			field := fields[i][0 : len(fields[i])-1]
+			if len(field) == 0 {
+				return nil, fmt.Errorf("index should not be empty. key: [%v]", key)
+			}
+			idx, err := strconv.Atoi(field)
+			if err != nil {
+				return nil, fmt.Errorf("index should be a number. key: [%v]", key)
+			}
+			infos = append(infos, &KeyInfo{
+				idx: idx,
+				mod: ArrMod,
+			})
+		}
+	}
+
+	return infos, nil
 }
