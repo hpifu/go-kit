@@ -10,22 +10,23 @@ import (
 	"sync"
 )
 
-func NewHConfWithFile(filename string) (*HConf, error) {
-	provider, err := NewLocalProvider(filename)
+func New(decoderType string, providerType string, params ...interface{}) (*HConf, error) {
+	provider, err := NewProvider(providerType, params...)
 	if err != nil {
 		return nil, err
 	}
-
 	buf, err := provider.Get()
 	if err != nil {
 		return nil, err
 	}
-	decoder := &Json5Decoder{}
+	decoder, err := NewDecoder(decoderType)
+	if err != nil {
+		return nil, err
+	}
 	storage, err := decoder.Decode(buf)
 	if err != nil {
 		return nil, err
 	}
-
 	return &HConf{
 		provider: provider,
 		storage:  storage,

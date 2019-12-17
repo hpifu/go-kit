@@ -65,7 +65,7 @@ func DeleteFile() {
 func TestHConfGet(t *testing.T) {
 	Convey("test conf", t, func() {
 		CreateFile()
-		conf, err := NewHConfWithFile("test.json")
+		conf, err := New("json", "local", "test.json")
 		So(err, ShouldBeNil)
 		So(conf, ShouldNotBeNil)
 
@@ -83,7 +83,7 @@ func TestHConfGet(t *testing.T) {
 func TestHConfSet(t *testing.T) {
 	Convey("test conf set", t, func() {
 		CreateFile()
-		conf, err := NewHConfWithFile("test.json")
+		conf, err := New("json", "local", "test.json")
 		So(err, ShouldBeNil)
 		So(conf, ShouldNotBeNil)
 		So(conf.Set("key1.key2", "val3"), ShouldBeNil)
@@ -97,7 +97,7 @@ func TestHConfSet(t *testing.T) {
 func TestHConfBindEnv(t *testing.T) {
 	Convey("test conf bind env", t, func() {
 		CreateFile()
-		conf, err := NewHConfWithFile("test.json")
+		conf, err := New("json", "local", "test.json")
 		So(err, ShouldBeNil)
 		So(conf, ShouldNotBeNil)
 
@@ -140,7 +140,7 @@ func TestHConfUnmarshal(t *testing.T) {
 
 	Convey("test conf unmarshal", t, func() {
 		CreateFile()
-		conf, err := NewHConfWithFile("test.json")
+		conf, err := New("json", "local", "test.json")
 		So(err, ShouldBeNil)
 		So(conf, ShouldNotBeNil)
 
