@@ -2,7 +2,9 @@ package hconf
 
 import (
 	"context"
+	"fmt"
 	"github.com/hashicorp/consul/api"
+	"time"
 )
 
 type ConsulProvider struct {
@@ -27,6 +29,9 @@ func NewConsulProvider(address string, key string) (*ConsulProvider, error) {
 	kv, meta, err := client.KV().Get(key, nil)
 	if err != nil {
 		return nil, err
+	}
+	if kv == nil {
+		return nil, fmt.Errorf("config [%v] not found", key)
 	}
 
 	return &ConsulProvider{
@@ -54,21 +59,36 @@ func (p *ConsulProvider) Get() ([]byte, error) {
 
 func (p *ConsulProvider) EventLoop(ctx context.Context) {
 	go func() {
+		go func() {
+			sleepTimeOnError := 200 * time.Millisecond
+			for {
+				kv, meta, err := p.client.KV().Get(p.key, &api.QueryOptions{WaitIndex: p.lastIndex, WaitHash: p.lastHash})
+				if kv == nil {
+					err = fmt.Errorf("config [%v] not found", p.key)
+				}
+				if err != nil {
+					p.errors <- err
+					time.Sleep(sleepTimeOnError)
+					sleepTimeOnError *= 2
+					if sleepTimeOnError > 60*time.Second {
+						sleepTimeOnError = 60 * time.Second
+					}
+					continue
+				}
+
+				p.events <- struct{}{}
+				sleepTimeOnError = 200 * time.Millisecond
+				p.lastIndex = meta.LastIndex
+				p.lastHash = meta.LastContentHash
+				p.buf = kv.Value
+			}
+		}()
+	out:
 		for {
-			kv, meta, err := p.client.KV().Get(p.key, &api.QueryOptions{WaitIndex: p.lastIndex, WaitHash: p.lastHash})
-			if err != nil {
-				p.errors <- err
-				continue
+			select {
+			case <-ctx.Done():
+				break out
 			}
-
-			p.lastIndex = meta.LastIndex
-			if p.lastHash == meta.LastContentHash {
-				continue
-			}
-
-			p.lastHash = meta.LastContentHash
-			p.buf = kv.Value
-			p.events <- struct{}{}
 		}
 	}()
 }

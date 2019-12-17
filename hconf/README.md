@@ -1,5 +1,16 @@
 # hconf
 
+## provider
+
+## consul
+
+consul 添加和查看配置
+
+``` sh
+curl -X PUT 127.0.0.1:8500/v1/kv/test_namespace/test_service --data-binary @test.json
+curl -X GET 127.0.0.1:8500/v1/kv/test_namespace/test_service\?raw=true
+```
+
 ## 链接
 
 - toml 语法: <https://github.com/toml-lang/toml>
