@@ -2,6 +2,7 @@ package hrule
 
 import (
 	"fmt"
+	"github.com/hpifu/go-kit/hstr"
 	"regexp"
 	"strconv"
 	"strings"
@@ -74,85 +75,51 @@ var StringRuleGenerator = map[string]RuleGenerator{
 	},
 	"isdigit": func(params string) (Rule, error) {
 		return func(v interface{}) bool {
-			for _, ch := range v.(string) {
-				if ch < '0' || ch > '9' {
-					return false
-				}
-			}
-			return true
+			return hstr.All(v.(string), hstr.IsDigit)
 		}, nil
 	},
 	"isxdigit": func(params string) (Rule, error) {
 		return func(v interface{}) bool {
-			str := strings.ToLower(v.(string))
-			if !strings.HasPrefix(str, "0x") {
+			str := v.(string)
+			if len(str) <= 2 || str[0] != '0' || hstr.ToLower(str[1]) != 'x' {
 				return false
 			}
-			for i := 2; i < len(str); i++ {
-				ch := str[i]
-				if !((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f')) {
-					return false
-				}
-			}
-			return true
+			return hstr.All(str[2:], hstr.IsXdigit)
 		}, nil
 	},
 	"isalnum": func(params string) (Rule, error) {
 		return func(v interface{}) bool {
-			for _, ch := range v.(string) {
-				if !((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
-					return false
-				}
-			}
-			return true
+			return hstr.All(v.(string), hstr.IsAlnum)
 		}, nil
 	},
 	"isalpha": func(params string) (Rule, error) {
 		return func(v interface{}) bool {
-			for _, ch := range v.(string) {
-				if !((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
-					return false
-				}
-			}
-			return true
+			return hstr.All(v.(string), hstr.IsAlpha)
 		}, nil
 	},
 	"islower": func(params string) (Rule, error) {
 		return func(v interface{}) bool {
-			for _, ch := range v.(string) {
-				if !(ch >= 'a' && ch <= 'z') {
-					return false
-				}
-			}
-			return true
+			return hstr.All(v.(string), hstr.IsLower)
 		}, nil
 	},
 	"isupper": func(params string) (Rule, error) {
 		return func(v interface{}) bool {
-			for _, ch := range v.(string) {
-				if !(ch >= 'A' && ch <= 'Z') {
-					return false
-				}
-			}
-			return true
+			return hstr.All(v.(string), hstr.IsUpper)
 		}, nil
 	},
 	"isEmail": func(params string) (Rule, error) {
-		re := regexp.MustCompile(`^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$`)
 		return func(v interface{}) bool {
-			return re.MatchString(v.(string))
+			return hstr.IsEmail(v.(string))
 		}, nil
 	},
 	"isPhone": func(params string) (Rule, error) {
-		re := regexp.MustCompile(`^1[345789][0-9]{9}$`)
 		return func(v interface{}) bool {
-			return re.MatchString(v.(string))
+			return hstr.IsPhone(v.(string))
 		}, nil
 	},
 	"isCode": func(params string) (Rule, error) {
-		re := regexp.MustCompile(`^[0-9]{6}$`)
 		return func(v interface{}) bool {
-			return re.MatchString(v.(string))
+			return len(v.(string)) == 6 && hstr.All(v.(string), hstr.IsDigit)
 		}, nil
 	},
 }
