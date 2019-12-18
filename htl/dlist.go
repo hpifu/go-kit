@@ -5,74 +5,74 @@ import (
 	"fmt"
 )
 
-type DListIterator struct {
-	node *DListNode
+type DLinkedListIterator struct {
+	node *DLinkedListNode
 }
 
-func (it *DListIterator) Next() interface{} {
+func (it *DLinkedListIterator) Next() interface{} {
 	v := it.node.val
 	it.node = it.node.next
 	return v
 }
 
-func (it *DListIterator) HasNext() bool {
+func (it *DLinkedListIterator) HasNext() bool {
 	return it.node != nil
 }
 
-type DListRIterator struct {
-	node *DListNode
+type DLinkedListRIterator struct {
+	node *DLinkedListNode
 }
 
-func (it *DListRIterator) Next() interface{} {
+func (it *DLinkedListRIterator) Next() interface{} {
 	v := it.node.val
 	it.node = it.node.prev
 	return v
 }
 
-func (it *DListRIterator) HasNext() bool {
+func (it *DLinkedListRIterator) HasNext() bool {
 	return it.node != nil
 }
 
-type DListNode struct {
+type DLinkedListNode struct {
 	val  interface{}
-	next *DListNode
-	prev *DListNode
+	next *DLinkedListNode
+	prev *DLinkedListNode
 }
 
-func newDListNode(val interface{}, prev *DListNode, next *DListNode) *DListNode {
-	return &DListNode{
+func newDLinkedListNode(val interface{}, prev *DLinkedListNode, next *DLinkedListNode) *DLinkedListNode {
+	return &DLinkedListNode{
 		val:  val,
 		prev: prev,
 		next: next,
 	}
 }
 
-func NewDList() *DList {
-	return &DList{}
+func NewDLinkedList() *DLinkedList {
+	return &DLinkedList{}
 }
 
-type DList struct {
-	head *DListNode
-	tail *DListNode
+type DLinkedList struct {
+	head *DLinkedListNode
+	tail *DLinkedListNode
 	size int
 }
 
-func (l DList) Iterator() *DListIterator {
-	return &DListIterator{node: l.head}
+func (l DLinkedList) Iterator() *DLinkedListIterator {
+	return &DLinkedListIterator{node: l.head}
 }
 
-func (l DList) RIterator() *DListIterator {
-	return &DListIterator{node: l.tail}
+func (l DLinkedList) RIterator() *DLinkedListIterator {
+	return &DLinkedListIterator{node: l.tail}
 }
 
-func (l DList) ForEach(op func(interface{})) {
+func (l DLinkedList) ForEach(op func(interface{})) {
 	it := l.Iterator()
 	for it.HasNext() {
 		op(it.Next())
 	}
 }
 
-func (l DList) String() string {
+func (l DLinkedList) String() string {
 	var buf bytes.Buffer
 
 	node := l.head
@@ -86,55 +86,55 @@ func (l DList) String() string {
 	return buf.String()
 }
 
-func (l *DList) Len() int {
+func (l *DLinkedList) Len() int {
 	return l.size
 }
 
-func (l *DList) Empty() bool {
+func (l *DLinkedList) Empty() bool {
 	return l.size == 0
 }
 
-func (l *DList) Front() interface{} {
+func (l *DLinkedList) Front() interface{} {
 	if l.Empty() {
 		return nil
 	}
 	return l.head.val
 }
 
-func (l *DList) Back() interface{} {
+func (l *DLinkedList) Back() interface{} {
 	if l.Empty() {
 		return nil
 	}
 	return l.tail.val
 }
 
-func (l *DList) PushFront(v interface{}) {
+func (l *DLinkedList) PushFront(v interface{}) {
 	if l.Empty() {
-		node := newDListNode(v, nil, nil)
+		node := newDLinkedListNode(v, nil, nil)
 		l.head = node
 		l.tail = node
 	} else {
-		node := newDListNode(v, nil, l.head)
+		node := newDLinkedListNode(v, nil, l.head)
 		l.head.prev = node
 		l.head = node
 	}
 	l.size++
 }
 
-func (l *DList) PushBack(v interface{}) {
+func (l *DLinkedList) PushBack(v interface{}) {
 	if l.Empty() {
-		node := newDListNode(v, nil, nil)
+		node := newDLinkedListNode(v, nil, nil)
 		l.head = node
 		l.tail = node
 	} else {
-		node := newDListNode(v, l.tail, nil)
+		node := newDLinkedListNode(v, l.tail, nil)
 		l.tail.next = node
 		l.tail = node
 	}
 	l.size++
 }
 
-func (l *DList) PopFront() interface{} {
+func (l *DLinkedList) PopFront() interface{} {
 	if l.Empty() {
 		return nil
 	}
@@ -152,7 +152,7 @@ func (l *DList) PopFront() interface{} {
 	return v
 }
 
-func (l *DList) PopBack() interface{} {
+func (l *DLinkedList) PopBack() interface{} {
 	if l.Empty() {
 		return nil
 	}

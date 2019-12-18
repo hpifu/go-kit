@@ -8,7 +8,7 @@ import (
 
 func TestListPush(t *testing.T) {
 	Convey("test push", t, func() {
-		l := NewList()
+		l := NewLinkedList()
 
 		for i := 0; i < 3; i++ {
 			l.PushFront(i)
@@ -27,7 +27,7 @@ func TestListPush(t *testing.T) {
 
 func TestListPop(t *testing.T) {
 	Convey("test pop", t, func() {
-		l := NewList()
+		l := NewLinkedList()
 
 		for i := 0; i < 6; i++ {
 			l.PushBack(i)
@@ -45,7 +45,7 @@ func TestListPop(t *testing.T) {
 
 func TestListIterator(t *testing.T) {
 	Convey("test iterator", t, func() {
-		l := NewList()
+		l := NewLinkedList()
 
 		for i := 0; i < 6; i++ {
 			l.PushBack(i)

@@ -5,54 +5,54 @@ import (
 	"fmt"
 )
 
-type ListIterator struct {
-	node *ListNode
+type LinkedListIterator struct {
+	node *LinkedListNode
 }
 
-func (it *ListIterator) Next() interface{} {
+func (it *LinkedListIterator) Next() interface{} {
 	v := it.node.val
 	it.node = it.node.next
 	return v
 }
 
-func (it *ListIterator) HasNext() bool {
+func (it *LinkedListIterator) HasNext() bool {
 	return it.node != nil
 }
 
-type ListNode struct {
+type LinkedListNode struct {
 	val  interface{}
-	next *ListNode
+	next *LinkedListNode
 }
 
-func newListNode(val interface{}, next *ListNode) *ListNode {
-	return &ListNode{
+func newLinkedListNode(val interface{}, next *LinkedListNode) *LinkedListNode {
+	return &LinkedListNode{
 		val:  val,
 		next: next,
 	}
 }
 
-func NewList() *List {
-	return &List{}
+func NewLinkedList() *LinkedList {
+	return &LinkedList{}
 }
 
-type List struct {
-	head *ListNode
-	tail *ListNode
+type LinkedList struct {
+	head *LinkedListNode
+	tail *LinkedListNode
 	size int
 }
 
-func (l List) Iterator() *ListIterator {
-	return &ListIterator{node: l.head}
+func (l LinkedList) Iterator() *LinkedListIterator {
+	return &LinkedListIterator{node: l.head}
 }
 
-func (l List) ForEach(op func(interface{})) {
+func (l LinkedList) ForEach(op func(interface{})) {
 	it := l.Iterator()
 	for it.HasNext() {
 		op(it.Next())
 	}
 }
 
-func (l List) String() string {
+func (l LinkedList) String() string {
 	var buf bytes.Buffer
 
 	node := l.head
@@ -66,48 +66,48 @@ func (l List) String() string {
 	return buf.String()
 }
 
-func (l *List) Len() int {
+func (l *LinkedList) Len() int {
 	return l.size
 }
 
-func (l *List) Empty() bool {
+func (l *LinkedList) Empty() bool {
 	return l.size == 0
 }
 
-func (l *List) Front() interface{} {
+func (l *LinkedList) Front() interface{} {
 	if l.Empty() {
 		return nil
 	}
 	return l.head.val
 }
 
-func (l *List) Back() interface{} {
+func (l *LinkedList) Back() interface{} {
 	if l.Empty() {
 		return nil
 	}
 	return l.tail.val
 }
 
-func (l *List) PushFront(v interface{}) {
+func (l *LinkedList) PushFront(v interface{}) {
 	if l.Empty() {
-		node := newListNode(v, nil)
+		node := newLinkedListNode(v, nil)
 		l.head = node
 		l.tail = node
 	} else {
-		node := newListNode(v, l.head)
+		node := newLinkedListNode(v, l.head)
 		l.head = node
 	}
 
 	l.size++
 }
 
-func (l *List) PushBack(v interface{}) {
+func (l *LinkedList) PushBack(v interface{}) {
 	if l.Empty() {
-		node := newListNode(v, nil)
+		node := newLinkedListNode(v, nil)
 		l.head = node
 		l.tail = node
 	} else {
-		l.tail.next = newListNode(v, nil)
+		l.tail.next = newLinkedListNode(v, nil)
 		l.tail = l.tail.next
 	}
 
@@ -115,7 +115,7 @@ func (l *List) PushBack(v interface{}) {
 
 }
 
-func (l *List) PopFront() interface{} {
+func (l *LinkedList) PopFront() interface{} {
 	if l.Empty() {
 		return nil
 	}
@@ -132,6 +132,6 @@ func (l *List) PopFront() interface{} {
 	return v
 }
 
-func (l *List) PopBack() interface{} {
-	panic("PopBack is not support for performance reason, use DList instead")
+func (l *LinkedList) PopBack() interface{} {
+	panic("PopBack is not support for performance reason, use DLinkedList instead")
 }
