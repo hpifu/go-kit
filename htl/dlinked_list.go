@@ -73,6 +73,10 @@ func (l DLinkedList) ForEach(op func(interface{})) {
 }
 
 func (l DLinkedList) String() string {
+	if l.Empty() {
+		return ""
+	}
+
 	var buf bytes.Buffer
 
 	node := l.head
