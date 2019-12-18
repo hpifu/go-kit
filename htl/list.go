@@ -57,11 +57,11 @@ func (l List) String() string {
 
 	node := l.head
 	for node != l.tail {
-		buf.WriteString(fmt.Sprintf("%v", node.val))
-		buf.WriteString("->")
+		buf.WriteString(fmt.Sprint(node.val))
+		buf.WriteString(" -> ")
 		node = node.next
 	}
-	buf.WriteString(fmt.Sprintf("%v", node.val))
+	buf.WriteString(fmt.Sprint(node.val))
 
 	return buf.String()
 }
