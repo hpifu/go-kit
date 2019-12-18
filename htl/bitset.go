@@ -49,6 +49,16 @@ func (bs BitSet) Empty() bool {
 	return true
 }
 
+func (bs BitSet) String() string {
+	var buf bytes.Buffer
+	for i := 0; i < len(bs.bits)-1; i++ {
+		buf.WriteString(fmt.Sprintf("%064b", bs.bits[i]))
+	}
+	format := fmt.Sprintf("%%0%db", (bs.capacity-1)%64+1)
+	buf.WriteString(fmt.Sprintf(format, bs.bits[len(bs.bits)-1]))
+	return buf.String()
+}
+
 func (bs BitSet) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	buf.WriteByte('"')
