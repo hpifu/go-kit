@@ -1,35 +1,35 @@
 package htl
 
-func NewQueue() *Queue {
-	return &Queue{
-		l: NewLinkedList(),
-	}
-}
-
-type Queue struct {
-	l *LinkedList
-}
-
-func (q *Queue) Top() interface{} {
-	return q.l.Front()
-}
-
-func (q *Queue) Push(v interface{}) {
-	q.l.PushBack(v)
-}
-
-func (q *Queue) Pop() interface{} {
-	return q.l.PopFront()
-}
-
-func (q *Queue) Empty() bool {
-	return q.l.Empty()
-}
-
-func (q *Queue) Len() int {
-	return q.l.Len()
-}
-
-func (q Queue) String() string {
-	return q.l.String()
-}
+//func NewQueue() *MQueue {
+//	return &MQueue{
+//		l: NewLinkedList(),
+//	}
+//}
+//
+//type MQueue struct {
+//	l *LinkedList
+//}
+//
+//func (q *MQueue) Top() interface{} {
+//	return q.l.GetFirst()
+//}
+//
+//func (q *MQueue) Push(v interface{}) {
+//	q.l.PushBack(v)
+//}
+//
+//func (q *MQueue) Pop() interface{} {
+//	return q.l.PopFront()
+//}
+//
+//func (q *MQueue) Empty() bool {
+//	return q.l.Empty()
+//}
+//
+//func (q *MQueue) Len() int {
+//	return q.l.Len()
+//}
+//
+//func (q MQueue) String() string {
+//	return q.l.String()
+//}

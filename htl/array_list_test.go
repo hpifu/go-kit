@@ -11,9 +11,9 @@ func TestArrayListPush(t *testing.T) {
 		l := NewArrayList()
 
 		for i := 0; i < 6; i++ {
-			l.PushBack(i)
-			So(l.Len(), ShouldEqual, i+1)
-			So(l.Back(), ShouldEqual, i)
+			l.AddLast(i)
+			So(l.Size(), ShouldEqual, i+1)
+			So(l.GetLast(), ShouldEqual, i)
 		}
 
 		fmt.Println(l.String())
@@ -25,14 +25,14 @@ func TestArrayListPop(t *testing.T) {
 		l := NewArrayList()
 
 		for i := 0; i < 6; i++ {
-			l.PushBack(i)
+			l.AddLast(i)
 		}
 		fmt.Println(l.String())
 
 		for i := 0; i < 6; i++ {
-			So(l.Len(), ShouldEqual, 6-i)
-			So(l.Back(), ShouldEqual, 6-i-1)
-			v := l.PopBack()
+			So(l.Size(), ShouldEqual, 6-i)
+			So(l.GetLast(), ShouldEqual, 6-i-1)
+			v := l.RemoveLast()
 			So(v, ShouldEqual, 6-i-1)
 		}
 	})
@@ -43,7 +43,7 @@ func TestArrayListIterator(t *testing.T) {
 		l := NewArrayList()
 
 		for i := 0; i < 6; i++ {
-			l.PushBack(i)
+			l.AddLast(i)
 		}
 
 		it := l.Iterator()
