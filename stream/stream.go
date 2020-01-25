@@ -163,210 +163,77 @@ func (s *Stream) Next() interface{} {
 }
 
 func (s *Stream) ForEach(consumer Consumer) {
-	for v := s.iter.Next(); v != nil; v = s.iter.Next() {
-		ok := true
-		for _, op := range s.ops {
-			v, ok = op(v)
-			if !ok {
-				break
-			}
-		}
-		if v == nil {
-			break
-		}
-		if !ok {
-			continue
-		}
-
+	for v := s.Next(); v != nil; v = s.Next() {
 		consumer(v)
 	}
 }
 
 func (s *Stream) ToSlice() []interface{} {
 	var vs []interface{}
-	for v := s.iter.Next(); v != nil; v = s.iter.Next() {
-		ok := true
-		for _, op := range s.ops {
-			v, ok = op(v)
-			if !ok {
-				break
-			}
-		}
-		if v == nil {
-			break
-		}
-		if !ok {
-			continue
-		}
-
+	for v := s.Next(); v != nil; v = s.Next() {
 		vs = append(vs, v)
 	}
-
 	return vs
 }
 
 func (s *Stream) Max(comparator Comparator) interface{} {
 	var max interface{}
-	for v := s.iter.Next(); v != nil; v = s.iter.Next() {
-		ok := true
-		for _, op := range s.ops {
-			v, ok = op(v)
-			if !ok {
-				break
-			}
-		}
-		if v == nil {
-			break
-		}
-		if !ok {
-			continue
-		}
-
+	for v := s.Next(); v != nil; v = s.Next() {
 		if max == nil || comparator(max, v) < 0 {
 			max = v
 		}
 	}
-
 	return max
 }
 
 func (s *Stream) Min(comparator Comparator) interface{} {
 	var min interface{}
-	for v := s.iter.Next(); v != nil; v = s.iter.Next() {
-		ok := true
-		for _, op := range s.ops {
-			v, ok = op(v)
-			if !ok {
-				break
-			}
-		}
-		if v == nil {
-			break
-		}
-		if !ok {
-			continue
-		}
-
+	for v := s.Next(); v != nil; v = s.Next() {
 		if min == nil || comparator(min, v) > 0 {
 			min = v
 		}
 	}
-
 	return min
 }
 
 func (s *Stream) AnyMatch(predicate Predicate) bool {
-	for v := s.iter.Next(); v != nil; v = s.iter.Next() {
-		ok := true
-		for _, op := range s.ops {
-			v, ok = op(v)
-			if !ok {
-				break
-			}
-		}
-		if v == nil {
-			break
-		}
-		if !ok {
-			continue
-		}
-
+	for v := s.Next(); v != nil; v = s.Next() {
 		if predicate(v) {
 			return true
 		}
 	}
-
 	return false
 }
 
 func (s *Stream) AllMatch(predicate Predicate) bool {
-	for v := s.iter.Next(); v != nil; v = s.iter.Next() {
-		ok := true
-		for _, op := range s.ops {
-			v, ok = op(v)
-			if !ok {
-				break
-			}
-		}
-		if v == nil {
-			break
-		}
-		if !ok {
-			continue
-		}
-
+	for v := s.Next(); v != nil; v = s.Next() {
 		if !predicate(v) {
 			return false
 		}
 	}
-
 	return true
 }
 
 func (s *Stream) NoneMatch(predicate Predicate) bool {
-	for v := s.iter.Next(); v != nil; v = s.iter.Next() {
-		ok := true
-		for _, op := range s.ops {
-			v, ok = op(v)
-			if !ok {
-				break
-			}
-		}
-		if v == nil {
-			break
-		}
-		if !ok {
-			continue
-		}
-
+	for v := s.Next(); v != nil; v = s.Next() {
 		if predicate(v) {
 			return false
 		}
 	}
-
 	return true
 }
 
 func (s *Stream) Count() int {
 	num := 0
-	for v := s.iter.Next(); v != nil; v = s.iter.Next() {
-		ok := true
-		for _, op := range s.ops {
-			v, ok = op(v)
-			if !ok {
-				break
-			}
-		}
-		if v == nil {
-			break
-		}
-		if !ok {
-			continue
-		}
-
+	for v := s.Next(); v != nil; v = s.Next() {
 		num++
 	}
-
 	return num
 }
 
 func (s *Stream) Reduce(binaryOperator BinaryOperator, initialValue interface{}) interface{} {
 	x := initialValue
-	for v := s.iter.Next(); v != nil; v = s.iter.Next() {
-		ok := true
-		for _, op := range s.ops {
-			v, ok = op(v)
-			if !ok {
-				break
-			}
-		}
-		if v == nil {
-			break
-		}
-		if !ok {
-			continue
-		}
-
+	for v := s.Next(); v != nil; v = s.Next() {
 		x = binaryOperator(x, v)
 	}
 
