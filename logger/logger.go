@@ -4,15 +4,18 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/lestrrat-go/file-rotatelogs"
-	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"os"
 	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/lestrrat-go/file-rotatelogs"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+
+	"github.com/hpifu/go-kit/hconf"
 )
 
 var hostname string
@@ -156,6 +159,37 @@ func NewLoggerGroupWithViper(v *viper.Viper) (*logrus.Logger, *logrus.Logger, *l
 		return nil, nil, nil, err
 	}
 	accessLog, err := NewJsonLoggerWithViper(v.Sub("accessLog"))
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	return infoLog, warnLog, accessLog, nil
+}
+
+func NewLoggerGroupWithHConf(conf *hconf.HConf) (*logrus.Logger, *logrus.Logger, *logrus.Logger, error) {
+	infoConf, err := conf.Sub("infoLog")
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	infoLog, err := NewTextLogger(infoConf.GetDefaultString("filename"), infoConf.GetDefaultDuration("maxAge"))
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	warnConf, err := conf.Sub("warnLog")
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	warnLog, err := NewTextLogger(warnConf.GetDefaultString("filename"), warnConf.GetDefaultDuration("maxAge"))
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	accessConf, err := conf.Sub("accessLog")
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	accessLog, err := NewTextLogger(accessConf.GetDefaultString("filename"), accessConf.GetDefaultDuration("maxAge"))
 	if err != nil {
 		return nil, nil, nil, err
 	}
