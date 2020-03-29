@@ -1,6 +1,6 @@
 module github.com/hpifu/go-kit
 
-go 1.12
+go 1.13
 
 replace (
 	cloud.google.com/go => github.com/googleapis/google-cloud-go v0.0.0-20190603211518-c8433c9aaceb
