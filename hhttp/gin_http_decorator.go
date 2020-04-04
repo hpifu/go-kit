@@ -55,6 +55,7 @@ func (d *GinHttpDecorator) Decorate(inner func(string, *gin.Context) (interface{
 			"client":    c.ClientIP(),
 			"userAgent": c.GetHeader("User-Agent"),
 			"host":      c.Request.Host,
+			"method":    c.Request.Method,
 			"url":       c.Request.URL.String(),
 			"req":       req,
 			"res":       res,
