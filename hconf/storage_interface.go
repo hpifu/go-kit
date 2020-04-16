@@ -123,33 +123,61 @@ func interfaceToStruct(d interface{}, v interface{}) error {
 	rt := reflect.TypeOf(v).Elem()
 	switch rt.Kind() {
 	case reflect.Struct:
-		dv, ok := d.(map[string]interface{})
-		if !ok {
+		if dv, ok := d.(map[string]interface{}); ok {
+			for i := 0; i < rv.NumField(); i++ {
+				field := rv.Field(i)
+				key := rt.Field(i).Tag.Get("hconf")
+				if key == "-" {
+					continue
+				}
+				if key == "" {
+					key = hstr.CamelName(rt.Field(i).Name)
+				}
+				value := dv[key]
+				if rt.Field(i).Type.Kind() == reflect.Ptr {
+					if field.IsNil() {
+						nv := reflect.New(field.Type().Elem())
+						field.Set(nv)
+					}
+					if err := interfaceToStruct(value, field.Interface()); err != nil {
+						return err
+					}
+				} else {
+					if err := interfaceToStruct(value, field.Addr().Interface()); err != nil {
+						return err
+					}
+				}
+			}
+		} else if dv, ok := d.(map[interface{}]interface{}); ok {
+			for i := 0; i < rv.NumField(); i++ {
+				field := rv.Field(i)
+				key := rt.Field(i).Tag.Get("hconf")
+				if key == "-" {
+					continue
+				}
+				if key == "" {
+					key = hstr.CamelName(rt.Field(i).Name)
+				}
+				value, ok := dv[key].(string)
+				if !ok {
+					return fmt.Errorf("convert data to string failed. which is %v", reflect.TypeOf(d))
+				}
+				if rt.Field(i).Type.Kind() == reflect.Ptr {
+					if field.IsNil() {
+						nv := reflect.New(field.Type().Elem())
+						field.Set(nv)
+					}
+					if err := interfaceToStruct(value, field.Interface()); err != nil {
+						return err
+					}
+				} else {
+					if err := interfaceToStruct(value, field.Addr().Interface()); err != nil {
+						return err
+					}
+				}
+			}
+		} else {
 			return fmt.Errorf("convert data to map[string]interface{} failed. which is %v", reflect.TypeOf(d))
-		}
-		for i := 0; i < rv.NumField(); i++ {
-			field := rv.Field(i)
-			key := rt.Field(i).Tag.Get("hconf")
-			if key == "-" {
-				continue
-			}
-			if key == "" {
-				key = hstr.CamelName(rt.Field(i).Name)
-			}
-			value := dv[key]
-			if rt.Field(i).Type.Kind() == reflect.Ptr {
-				if field.IsNil() {
-					nv := reflect.New(field.Type().Elem())
-					field.Set(nv)
-				}
-				if err := interfaceToStruct(value, field.Interface()); err != nil {
-					return err
-				}
-			} else {
-				if err := interfaceToStruct(value, field.Addr().Interface()); err != nil {
-					return err
-				}
-			}
 		}
 	case reflect.Slice:
 		dv, ok := d.([]interface{})
