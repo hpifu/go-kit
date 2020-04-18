@@ -1,4 +1,4 @@
-package href
+package http
 
 import (
 	"fmt"
@@ -11,6 +11,74 @@ import (
 	"github.com/hpifu/go-kit/hstr"
 )
 
+func MapStringInterfaceToStruct(rt reflect.Type, rv reflect.Value, dv map[string]interface{}) error {
+	for i := 0; i < rv.NumField(); i++ {
+		field := rv.Field(i)
+		key := rt.Field(i).Tag.Get("hconf")
+		if key == "-" {
+			continue
+		}
+		if key == "" {
+			key = hstr.CamelName(rt.Field(i).Name)
+		}
+		value, ok := dv[key]
+		if !ok {
+			continue
+		}
+		if rt.Field(i).Type.Kind() == reflect.Ptr {
+			if field.IsNil() {
+				nv := reflect.New(field.Type().Elem())
+				field.Set(nv)
+			}
+			if err := InterfaceToStruct(value, field.Interface()); err != nil {
+				return fmt.Errorf("key: [%v], err: [%v]", key, err)
+			}
+		} else if rt.Field(i).Type.Kind() == reflect.Interface {
+			field.Set(reflect.ValueOf(value))
+		} else {
+			if err := InterfaceToStruct(value, field.Addr().Interface()); err != nil {
+				return fmt.Errorf("key: [%v], err: [%v]", key, err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func MapInterfaceInterfaceToStruct(rt reflect.Type, rv reflect.Value, dv map[interface{}]interface{}) error {
+	for i := 0; i < rv.NumField(); i++ {
+		field := rv.Field(i)
+		key := rt.Field(i).Tag.Get("hconf")
+		if key == "-" {
+			continue
+		}
+		if key == "" {
+			key = hstr.CamelName(rt.Field(i).Name)
+		}
+		value, ok := dv[key]
+		if !ok {
+			continue
+		}
+		if rt.Field(i).Type.Kind() == reflect.Ptr {
+			if field.IsNil() {
+				nv := reflect.New(field.Type().Elem())
+				field.Set(nv)
+			}
+			if err := InterfaceToStruct(value, field.Interface()); err != nil {
+				return fmt.Errorf("key: [%v], err: [%v]", key, err)
+			}
+		} else if rt.Field(i).Type.Kind() == reflect.Interface {
+			field.Set(reflect.ValueOf(value))
+		} else {
+			if err := InterfaceToStruct(value, field.Addr().Interface()); err != nil {
+				return fmt.Errorf("key: [%v], err: [%v]", key, err)
+			}
+		}
+	}
+
+	return nil
+}
+
 func InterfaceToStruct(d interface{}, v interface{}) error {
 	if d == nil {
 		return nil
@@ -22,66 +90,71 @@ func InterfaceToStruct(d interface{}, v interface{}) error {
 	rv := reflect.ValueOf(v).Elem()
 	rt := reflect.TypeOf(v).Elem()
 	switch rt.Kind() {
+	case reflect.Map:
+		switch rv.Interface().(type) {
+		case map[string]string:
+			if dv, ok := d.(map[string]string); ok {
+				rv.Set(reflect.ValueOf(dv))
+			} else if dv, ok := d.(map[string]interface{}); ok {
+				m := map[string]string{}
+				for key, val := range dv {
+					v, err := cast.ToStringE(val)
+					if err != nil {
+						return fmt.Errorf("value type is not string, key: [%v], val: [%v]", key, val)
+					}
+					m[key] = v
+				}
+				rv.Set(reflect.ValueOf(m))
+			} else if dv, ok := d.(map[interface{}]interface{}); ok {
+				m := map[string]string{}
+				for key, val := range dv {
+					k, err := cast.ToStringE(key)
+					if err != nil {
+						return fmt.Errorf("value type is not string, key: [%v], val: [%v]", key, val)
+					}
+					v, err := cast.ToStringE(val)
+					if err != nil {
+						return fmt.Errorf("value type is not string, key: [%v], val: [%v]", key, val)
+					}
+					m[k] = v
+				}
+				rv.Set(reflect.ValueOf(m))
+			} else {
+				return fmt.Errorf("unsupport data type [%v]", reflect.ValueOf(d))
+			}
+		case map[string]interface{}:
+			if dv, ok := d.(map[string]string); ok {
+				m := map[string]interface{}{}
+				for key, val := range dv {
+					m[key] = val
+				}
+				rv.Set(reflect.ValueOf(m))
+			} else if dv, ok := d.(map[string]interface{}); ok {
+				rv.Set(reflect.ValueOf(dv))
+			} else if dv, ok := d.(map[interface{}]interface{}); ok {
+				m := map[string]interface{}{}
+				for key, val := range dv {
+					k, err := cast.ToStringE(key)
+					if err != nil {
+						return fmt.Errorf("value type is not string, key: [%v], val: [%v]", key, val)
+					}
+					m[k] = val
+				}
+				rv.Set(reflect.ValueOf(m))
+			} else {
+				return fmt.Errorf("unsupport data type [%v]", reflect.ValueOf(d))
+			}
+		default:
+			return fmt.Errorf("unsupport type [%v]", rt)
+		}
 	case reflect.Struct:
 		if dv, ok := d.(map[string]interface{}); ok {
-			for i := 0; i < rv.NumField(); i++ {
-				field := rv.Field(i)
-				key := rt.Field(i).Tag.Get("hconf")
-				if key == "-" {
-					continue
-				}
-				if key == "" {
-					key = hstr.CamelName(rt.Field(i).Name)
-				}
-				value := dv[key]
-				if !ok {
-					return nil
-				}
-				if rt.Field(i).Type.Kind() == reflect.Ptr {
-					if field.IsNil() {
-						nv := reflect.New(field.Type().Elem())
-						field.Set(nv)
-					}
-					if err := InterfaceToStruct(value, field.Interface()); err != nil {
-						return fmt.Errorf("key: [%v], err: [%v]", key, err)
-					}
-				} else if rt.Field(i).Type.Kind() == reflect.Interface {
-					field.Set(reflect.ValueOf(value))
-				} else {
-					if err := InterfaceToStruct(value, field.Addr().Interface()); err != nil {
-						return fmt.Errorf("key: [%v], err: [%v]", key, err)
-					}
-				}
+			if err := MapStringInterfaceToStruct(rt, rv, dv); err != nil {
+				return err
 			}
 		} else if dv, ok := d.(map[interface{}]interface{}); ok {
-			for i := 0; i < rv.NumField(); i++ {
-				field := rv.Field(i)
-				key := rt.Field(i).Tag.Get("hconf")
-				if key == "-" {
-					continue
-				}
-				if key == "" {
-					key = hstr.CamelName(rt.Field(i).Name)
-				}
-				value, ok := dv[key]
-				if !ok {
-					return nil
-				}
-				if rt.Field(i).Type.Kind() == reflect.Ptr {
-					if field.IsNil() {
-						nv := reflect.New(field.Type().Elem())
-						field.Set(nv)
-					}
-					if err := InterfaceToStruct(value, field.Interface()); err != nil {
-						return fmt.Errorf("key: [%v], err: [%v]", key, err)
-					}
-				} else if rt.Field(i).Type.Kind() == reflect.Interface {
-					field.Set(reflect.ValueOf(value))
-				} else {
-					if err := InterfaceToStruct(value, field.Addr().Interface()); err != nil {
-						return fmt.Errorf("key: [%v], err: [%v]", key, err)
-					}
-				}
+			if err := MapInterfaceInterfaceToStruct(rt, rv, dv); err != nil {
+				return err
 			}
 		} else {
 			return fmt.Errorf("unsupport data type: [%v]", reflect.TypeOf(d))
