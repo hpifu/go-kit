@@ -34,17 +34,22 @@ func InterfaceToStruct(d interface{}, v interface{}) error {
 					key = hstr.CamelName(rt.Field(i).Name)
 				}
 				value := dv[key]
+				if !ok {
+					return nil
+				}
 				if rt.Field(i).Type.Kind() == reflect.Ptr {
 					if field.IsNil() {
 						nv := reflect.New(field.Type().Elem())
 						field.Set(nv)
 					}
 					if err := InterfaceToStruct(value, field.Interface()); err != nil {
-						return err
+						return fmt.Errorf("key: [%v], err: [%v]", key, err)
 					}
+				} else if rt.Field(i).Type.Kind() == reflect.Interface {
+					field.Set(reflect.ValueOf(value))
 				} else {
 					if err := InterfaceToStruct(value, field.Addr().Interface()); err != nil {
-						return err
+						return fmt.Errorf("key: [%v], err: [%v]", key, err)
 					}
 				}
 			}
@@ -58,9 +63,9 @@ func InterfaceToStruct(d interface{}, v interface{}) error {
 				if key == "" {
 					key = hstr.CamelName(rt.Field(i).Name)
 				}
-				value, ok := dv[key].(string)
+				value, ok := dv[key]
 				if !ok {
-					return fmt.Errorf("convert data to string failed. which is %v", reflect.TypeOf(d))
+					return nil
 				}
 				if rt.Field(i).Type.Kind() == reflect.Ptr {
 					if field.IsNil() {
@@ -68,21 +73,23 @@ func InterfaceToStruct(d interface{}, v interface{}) error {
 						field.Set(nv)
 					}
 					if err := InterfaceToStruct(value, field.Interface()); err != nil {
-						return err
+						return fmt.Errorf("key: [%v], err: [%v]", key, err)
 					}
+				} else if rt.Field(i).Type.Kind() == reflect.Interface {
+					field.Set(reflect.ValueOf(value))
 				} else {
 					if err := InterfaceToStruct(value, field.Addr().Interface()); err != nil {
-						return err
+						return fmt.Errorf("key: [%v], err: [%v]", key, err)
 					}
 				}
 			}
 		} else {
-			return fmt.Errorf("convert data to map[string]interface{} failed. which is %v", reflect.TypeOf(d))
+			return fmt.Errorf("unsupport data type: [%v]", reflect.TypeOf(d))
 		}
 	case reflect.Slice:
 		dv, ok := d.([]interface{})
 		if !ok {
-			return fmt.Errorf("convert data to []interface{} failed. which is %v", reflect.TypeOf(d))
+			return fmt.Errorf("convert data to []interface{} failed. which is [%v], data: [%v]", reflect.TypeOf(d), d)
 		}
 		rv.Set(reflect.MakeSlice(rt, 0, rv.Cap()))
 		for _, di := range dv {
@@ -205,7 +212,7 @@ func InterfaceToStruct(d interface{}, v interface{}) error {
 				return fmt.Errorf("convert type [%v] to ip failed", reflect.TypeOf(v))
 			}
 		default:
-			return fmt.Errorf("unsupport type %v", rt)
+			return fmt.Errorf("unsupport type [%v]", rt)
 		}
 	}
 
