@@ -39,11 +39,11 @@ func InterfaceToStruct(d interface{}, v interface{}) error {
 						nv := reflect.New(field.Type().Elem())
 						field.Set(nv)
 					}
-					if err := interfaceToStruct(value, field.Interface()); err != nil {
+					if err := InterfaceToStruct(value, field.Interface()); err != nil {
 						return err
 					}
 				} else {
-					if err := interfaceToStruct(value, field.Addr().Interface()); err != nil {
+					if err := InterfaceToStruct(value, field.Addr().Interface()); err != nil {
 						return err
 					}
 				}
@@ -67,11 +67,11 @@ func InterfaceToStruct(d interface{}, v interface{}) error {
 						nv := reflect.New(field.Type().Elem())
 						field.Set(nv)
 					}
-					if err := interfaceToStruct(value, field.Interface()); err != nil {
+					if err := InterfaceToStruct(value, field.Interface()); err != nil {
 						return err
 					}
 				} else {
-					if err := interfaceToStruct(value, field.Addr().Interface()); err != nil {
+					if err := InterfaceToStruct(value, field.Addr().Interface()); err != nil {
 						return err
 					}
 				}
@@ -87,7 +87,7 @@ func InterfaceToStruct(d interface{}, v interface{}) error {
 		rv.Set(reflect.MakeSlice(rt, 0, rv.Cap()))
 		for _, di := range dv {
 			nv := reflect.New(rt.Elem())
-			err := interfaceToStruct(di, nv.Interface())
+			err := InterfaceToStruct(di, nv.Interface())
 			if err != nil {
 				return err
 			}
