@@ -165,14 +165,21 @@ func InterfaceToStruct(d interface{}, v interface{}) error {
 			return fmt.Errorf("convert data to []interface{} failed. which is [%v], data: [%v]", reflect.TypeOf(d), d)
 		}
 		rv.Set(reflect.MakeSlice(rt, 0, rv.Cap()))
-		for _, di := range dv {
+		for i, di := range dv {
 			nv := reflect.New(rt.Elem())
 			err := InterfaceToStruct(di, nv.Interface())
 			if err != nil {
-				return err
+				return fmt.Errorf("idx: [%v], err: [%v]", i, err)
 			}
 			rv.Set(reflect.Append(rv, nv.Elem()))
 		}
+	case reflect.Ptr:
+		nv := reflect.New(rt.Elem())
+		err := InterfaceToStruct(d, nv.Interface())
+		if err != nil {
+			return err
+		}
+		rv.Set(nv)
 	default:
 		switch rv.Interface().(type) {
 		case string:
@@ -274,7 +281,7 @@ func InterfaceToStruct(d interface{}, v interface{}) error {
 		case net.IP:
 			switch v.(type) {
 			case string:
-				v, err := hstr.ToIP(v.(string))
+				v, err := hstr.ToIP(d.(string))
 				if err != nil {
 					return err
 				}
@@ -285,7 +292,11 @@ func InterfaceToStruct(d interface{}, v interface{}) error {
 				return fmt.Errorf("convert type [%v] to ip failed", reflect.TypeOf(v))
 			}
 		default:
-			return fmt.Errorf("unsupport type [%v]", rt)
+			if rt.Kind() == reflect.Int {
+				rv.SetInt(cast.ToInt64(v))
+			} else {
+				return fmt.Errorf("unsupport type [%v]", rt)
+			}
 		}
 	}
 
