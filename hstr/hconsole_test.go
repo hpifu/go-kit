@@ -14,7 +14,7 @@ func TestConsole(t *testing.T) {
 			ForegroundRed,
 			BackgroundBlack,
 		)
-		fmt.Println(s.Render("hello world"))
+		fmt.Println(s.Render("hello world\n hello world"))
 		fmt.Println("abc")
 	})
 }

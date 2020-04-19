@@ -17,7 +17,20 @@ func NewFontStyle(effects ...Effect) *FontStyle {
 	return style
 }
 
-func (s *FontStyle) Render(message string) string {
+func (s *FontStyle) Render(str string) string {
+	buf := &bytes.Buffer{}
+	lines := strings.Split(str, "\n")
+	for i, line := range strings.Split(str, "\n") {
+		buf.WriteString(s.RenderSingleLine(line))
+		if i < len(lines)-1 {
+			buf.WriteString("\n")
+		}
+	}
+
+	return buf.String()
+}
+
+func (s *FontStyle) RenderSingleLine(str string) string {
 	buf := &bytes.Buffer{}
 	buf.WriteString("\033")
 	buf.WriteString("[")
@@ -27,9 +40,8 @@ func (s *FontStyle) Render(message string) string {
 	}
 	buf.WriteString(strings.Join(effects, ";"))
 	buf.WriteString("m")
-	buf.WriteString(message)
+	buf.WriteString(str)
 	buf.WriteString("\033[0m")
-
 	return buf.String()
 }
 
