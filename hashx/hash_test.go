@@ -59,3 +59,53 @@ func TestHash128(t *testing.T) {
 		}
 	})
 }
+
+func TestMd5Hash(t *testing.T) {
+	s := "17744581949"
+	sMd5 := Md5Hash(s)
+	if sMd5 == "f72da137dae79425eb9c060234185a55" {
+		t.Log(sMd5)
+	} else {
+		t.Errorf("the %s md5 %s may be not right.", s, sMd5)
+	}
+}
+
+func TestBKDRHash(t *testing.T) {
+	s := "f72da137dae79425eb9c060234185a55"
+	ih := BKDRHash(s)
+	if ih == 721271279 {
+		t.Log(ih)
+	} else {
+		t.Errorf("the %s bkdr %v may be not right.", s, ih)
+	}
+}
+
+func TestDJBHash(t *testing.T) {
+	s := "f72da137dae79425eb9c060234185a55"
+	ih := DJBHash(s)
+	if ih == 1400130340 {
+		t.Log(ih)
+	} else {
+		t.Errorf("the %s bkdr %v may be not right.", s, ih)
+	}
+}
+
+func TestELFHash(t *testing.T) {
+	s := "f72da137dae79425eb9c060234185a55"
+	ih := ELFHash(s)
+	if ih == 1733014661 {
+		t.Log(ih)
+	} else {
+		t.Errorf("the %s bkdr %v may be not right.", s, ih)
+	}
+}
+
+func TestFNVHash(t *testing.T) {
+	s := "f72da137dae79425eb9c060234185a55"
+	ih := FNVHash(s)
+	if ih == 933970133 {
+		t.Log(ih)
+	} else {
+		t.Errorf("the %s bkdr %v may be not right.", s, ih)
+	}
+}
